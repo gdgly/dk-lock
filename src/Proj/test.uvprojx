@@ -655,6 +655,11 @@
               <FileType>1</FileType>
               <FilePath>..\tplib\aes.c</FilePath>
             </File>
+            <File>
+              <FileName>App_md5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\tplib\App_md5.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

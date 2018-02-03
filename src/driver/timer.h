@@ -16,6 +16,7 @@ enum timer
 	tim3_cnt,
 	tim4_cnt,
 	tim5_cnt,
+	timer_lock,
 	timer_uart1,
 	timer_uart2,
 	timer_uart3,

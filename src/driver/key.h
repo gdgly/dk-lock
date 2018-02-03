@@ -9,9 +9,9 @@
 //#define WK_UP  PAin(0)	 
  
 
-#define HAND  GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-#define LOCK_ON  GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-#define LOCK_OFF   GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+#define HAND  		GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+#define LOCK_ON  	GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+#define LOCK_OFF   	GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
  
 
 #define HAND_1	1		//KEY0  

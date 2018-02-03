@@ -25832,15 +25832,22 @@ N
 N#define BUTTON1_READ()		GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//按键
 N
 N
-N#define LOCK_ON_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
-N#define LOCK_OFF_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
+N#define LOCK_ON_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
+N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define LOCK_ON  			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define LOCK_OFF   			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
+N
+N
+N#define MOTOA_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_0)	
+N#define MOTOA_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_0)
+N
+N#define MOTOB_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_1)	
+N#define MOTOB_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_1)
 N
 N
 N#define BEEP_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
@@ -25857,6 +25864,10 @@ N
 Nvoid iwatchdog_clear(void);
 Nvoid gprs_config(void);
 Nvoid bsp_init(void);
+N
+N
+Nvoid lock_on(void);
+Nvoid lock_off(void);
 N
 N#endif
 N
@@ -26110,6 +26121,7 @@ N    tim2_cnt,
 N	tim3_cnt,
 N	tim4_cnt,
 N	tim5_cnt,
+N	timer_lock,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
@@ -26229,7 +26241,6 @@ N	char *str = 0;
 N
 N	str = strstr((const char*)usart2_buff, (const char*)p_str);
 N	
-N
 N	return (u8*)str;
 N}
 N
@@ -26253,10 +26264,10 @@ Nu8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 N{
 N
 N	u8 res = 1;
-N	u8 buff[512] = {0};
+N	u8 *buff;
 N	
 N	timer_is_timeout_1ms(timer_at, 0);	//开始定时器timer_at
-N	while (res == 1)
+N	while (res)
 N	{
 N		
 N		memset(usart2_buff, 0, 512);
@@ -26283,7 +26294,7 @@ N		}
 N			
 N		if (timer_is_timeout_1ms(timer_at, timeout) == 0)	//定时器timer_at结束
 N		{
-N			res = 1;
+N			res = 0;
 N			usart2_rx_status = 0;	//数据处理完 开始接收数据
 N			return NULL;
 X			return 0;
@@ -26292,78 +26303,6 @@ N
 N	}
 N	
 N}
-N
-N
-Nvoid read_lock_id(void)
-N{
-N
-N	u8 *dest;
-N
-N	
-N	dest = gprs_send_at("AT+CLIENTID?\r\n", "OK", 0, 0);
-N	USART_OUT(USART2, "lock_id=%s\r\n", dest);
-X	USART_OUT(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), "lock_id=%s\r\n", dest);
-N	
-N	if(NULL != strstr((char *)dest, "+CLIENTID: "))
-X	if(0 != strstr((char *)dest, "+CLIENTID: "))
-N	{
-N		memcpy(PARK_LOCK_Buffer, dest, 16);
-N	}
-N	
-N}
-N
-N
-N
-N
-Nvoid subscribe_topic(void)
-N{
-N
-N	u8 buff[512] = {0};
-N	u8 *dest;
-N	
-N	
-N	read_lock_id();
-N	
-N	while(1)
-N	{
-N		switch(topic_id)
-N		{
-N			case 0:
-N				//sprintf((char*)buff, "%s%s%s", "AT+SUBSCRIBE=USART_OUT(USART2, "lock_id=%s\r\n", buff);/", lock_id, ",2\r\n");	
-N//				sprintf((char*)buff, "%s%s%s", "AT+SUBSCRIBE=%s\r\n", buff);/", lock_id, ",2\r\n");	
-N				USART_OUT(USART2, "lock_id=%s\r\n", buff);
-X				USART_OUT(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), "lock_id=%s\r\n", buff);
-N				dest = gprs_send_at(buff, "OK", 500, 2000);
-N				topic_id = 1;
-N			break;
-N			
-N			
-N			case 1:
-N				sprintf((char*)buff, "%s%s%s", "AT+SUBSCRIBE=bell/", PARK_LOCK_Buffer, ",2\r\n");
-N				USART_OUT(USART2, "lock_id=%s\r\n", buff);
-X				USART_OUT(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), "lock_id=%s\r\n", buff);
-N				dest = gprs_send_at(buff, "OK", 500, 2000);
-N				topic_id = 2;
-N			break;
-N			
-N			case 2: 
-N				sprintf((char*)buff, "%s%s%s", "AT+SUBSCRIBE=bell/", PARK_LOCK_Buffer, ",2\r\n");
-N				USART_OUT(USART2, "lock_id=%s\r\n", buff);
-X				USART_OUT(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), "lock_id=%s\r\n", buff);
-N				dest = gprs_send_at(buff, "OK", 500, 2000);
-N				topic_id = 2;
-N			break;
-N		
-N		}
-N	}
-N	
-N}
-N
-N
-N
-N
-N
-N
 N
 N
 N
@@ -26405,18 +26344,16 @@ N			}
 N		break;
 N			
 N		case 2:
-N			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,5000);
+N			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,10000);
 N			if (ret != NULL)
 X			if (ret != 0)
 N			{
-N//				ret = strstr((char*)ret, "+STATUS: MQTT READY");
 N				if(strstr((char*)ret, "+STATUS: MQTT READY") != NULL)
 X				if(strstr((char*)ret, "+STATUS: MQTT READY") != 0)
 N				{
 N					gprs_status++;
 N					gprs_err_cnt = 0;
 N				}
-N//				ret = strstr((char*)ret, "+STATUS: MQTT CONNECT OK");
 N				else if(strstr((char*)ret, "+STATUS: MQTT CONNECT OK") != NULL)
 X				else if(strstr((char*)ret, "+STATUS: MQTT CONNECT OK") != 0)
 N				{
@@ -26560,8 +26497,7 @@ N		case 9:
 N			usart2_rx_status = 2;
 N			USART_OUT(USART1, "usart2_rx_status = %d\r\n", usart2_rx_status);
 X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "usart2_rx_status = %d\r\n", usart2_rx_status);
-N		
-N		
+N				
 N			ret = gprs_send_at("AT+CLIENTID?\r\n", "OK", 50, 1000);
 N			if (ret != NULL)
 X			if (ret != 0)

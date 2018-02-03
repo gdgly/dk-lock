@@ -116,7 +116,6 @@ u8 *gprs_check_cmd(u8 *p_str)
 
 	str = strstr((const char*)usart2_buff, (const char*)p_str);
 	
-
 	return (u8*)str;
 }
 
@@ -140,10 +139,10 @@ u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 {
 
 	u8 res = 1;
-	u8 buff[512] = {0};
+	u8 *buff;
 	
 	timer_is_timeout_1ms(timer_at, 0);	//开始定时器timer_at
-	while (res == 1)
+	while (res)
 	{
 		
 		memset(usart2_buff, 0, 512);
@@ -168,7 +167,7 @@ u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 			
 		if (timer_is_timeout_1ms(timer_at, timeout) == 0)	//定时器timer_at结束
 		{
-			res = 1;
+			res = 0;
 			usart2_rx_status = 0;	//数据处理完 开始接收数据
 			return NULL;
 		}
@@ -176,73 +175,6 @@ u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 	}
 	
 }
-
-
-void read_lock_id(void)
-{
-
-	u8 *dest;
-
-	
-	dest = gprs_send_at("AT+CLIENTID?\r\n", "OK", 0, 0);
-	USART_OUT(USART2, "lock_id=%s\r\n", dest);
-	
-	if(NULL != strstr((char *)dest, "+CLIENTID: "))
-	{
-		memcpy(PARK_LOCK_Buffer, dest, 16);
-	}
-	
-}
-
-
-
-
-void subscribe_topic(void)
-{
-
-	u8 buff[512] = {0};
-	u8 *dest;
-	
-	
-	read_lock_id();
-	
-	while(1)
-	{
-		switch(topic_id)
-		{
-			case 0:
-				//sprintf((char*)buff, "%s%s%s", "AT+SUBSCRIBE=USART_OUT(USART2, "lock_id=%s\r\n", buff);/", lock_id, ",2\r\n");	
-//				sprintf((char*)buff, "%s%s%s", "AT+SUBSCRIBE=%s\r\n", buff);/", lock_id, ",2\r\n");	
-				USART_OUT(USART2, "lock_id=%s\r\n", buff);
-				dest = gprs_send_at(buff, "OK", 500, 2000);
-				topic_id = 1;
-			break;
-			
-			
-			case 1:
-				sprintf((char*)buff, "%s%s%s", "AT+SUBSCRIBE=bell/", PARK_LOCK_Buffer, ",2\r\n");
-				USART_OUT(USART2, "lock_id=%s\r\n", buff);
-				dest = gprs_send_at(buff, "OK", 500, 2000);
-				topic_id = 2;
-			break;
-			
-			case 2: 
-				sprintf((char*)buff, "%s%s%s", "AT+SUBSCRIBE=bell/", PARK_LOCK_Buffer, ",2\r\n");
-				USART_OUT(USART2, "lock_id=%s\r\n", buff);
-				dest = gprs_send_at(buff, "OK", 500, 2000);
-				topic_id = 2;
-			break;
-		
-		}
-	}
-	
-}
-
-
-
-
-
-
 
 
 
@@ -283,16 +215,14 @@ void gprs_config(void)
 		break;
 			
 		case 2:
-			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,5000);
+			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,10000);
 			if (ret != NULL)
 			{
-//				ret = strstr((char*)ret, "+STATUS: MQTT READY");
 				if(strstr((char*)ret, "+STATUS: MQTT READY") != NULL)
 				{
 					gprs_status++;
 					gprs_err_cnt = 0;
 				}
-//				ret = strstr((char*)ret, "+STATUS: MQTT CONNECT OK");
 				else if(strstr((char*)ret, "+STATUS: MQTT CONNECT OK") != NULL)
 				{
 					gprs_status = 4;
@@ -424,8 +354,7 @@ void gprs_config(void)
 		case 9:
 			usart2_rx_status = 2;
 			USART_OUT(USART1, "usart2_rx_status = %d\r\n", usart2_rx_status);
-		
-		
+				
 			ret = gprs_send_at("AT+CLIENTID?\r\n", "OK", 50, 1000);
 			if (ret != NULL)
 			{

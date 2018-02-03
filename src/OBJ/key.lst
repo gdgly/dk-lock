@@ -23588,9 +23588,9 @@ N//#define KEY1 PAin(15)
 N//#define WK_UP  PAin(0)	 
 N 
 N
-N#define HAND  GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define LOCK_ON  GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define LOCK_OFF   GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N#define HAND  		GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N#define LOCK_ON  	GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N#define LOCK_OFF   	GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N 
 N
 N#define HAND_1	1		//KEY0  

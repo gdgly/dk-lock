@@ -16,3 +16,4 @@
 ..\obj\adc_1.o: ..\FLib\inc\misc.h
 ..\obj\adc_1.o: ..\FLib\inc\stm32f10x_adc.h
 ..\obj\adc_1.o: ..\SYS\delay.h
+..\obj\adc_1.o: ..\driver\timer.h

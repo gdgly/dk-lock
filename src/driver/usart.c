@@ -28,7 +28,7 @@
 
 
 
-
+extern u8 protocol_buff[512];
 
 
 static usart_buff_t sb = SerialBuffDefault();
@@ -352,6 +352,7 @@ void usart2_recv_data(void)
 	{
 		
 		USART_OUT(USART1, usart2_buff);
+		memcpy(protocol_buff, usart2_buff, 512);
 		
 		memset(usart2_buff, 0, 512);	
 		usart2_cnt = 0;	

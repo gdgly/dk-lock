@@ -33,3 +33,4 @@
 ..\obj\main.o: ..\driver\usart.h
 ..\obj\main.o: ..\tplib\aes.h
 ..\obj\main.o: ..\driver\led.h
+..\obj\main.o: ..\tplib\app_md5.h

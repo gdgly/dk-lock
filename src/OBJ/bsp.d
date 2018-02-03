@@ -20,3 +20,5 @@
 ..\obj\bsp.o: ..\SYS\sys.h
 ..\obj\bsp.o: ..\driver\usart.h
 ..\obj\bsp.o: ..\driver\usart3.h
+..\obj\bsp.o: ..\driver\adc.h
+..\obj\bsp.o: ..\FLib\inc\stm32f10x_adc.h

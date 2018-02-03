@@ -26716,15 +26716,22 @@ N
 N#define BUTTON1_READ()		GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//按键
 N
 N
-N#define LOCK_ON_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
-N#define LOCK_OFF_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
+N#define LOCK_ON_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
+N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define LOCK_ON  			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define LOCK_OFF   			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
+N
+N
+N#define MOTOA_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_0)	
+N#define MOTOA_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_0)
+N
+N#define MOTOB_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_1)	
+N#define MOTOB_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_1)
 N
 N
 N#define BEEP_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
@@ -26741,6 +26748,10 @@ N
 Nvoid iwatchdog_clear(void);
 Nvoid gprs_config(void);
 Nvoid bsp_init(void);
+N
+N
+Nvoid lock_on(void);
+Nvoid lock_off(void);
 N
 N#endif
 N
@@ -26767,6 +26778,7 @@ N    tim2_cnt,
 N	tim3_cnt,
 N	tim4_cnt,
 N	tim5_cnt,
+N	timer_lock,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
@@ -27001,6 +27013,46 @@ Nvoid Park_Lock_Close(void);
 Nvoid Park_Lock_stop(void);
 N#endif
 L 18 "..\USER\main.c" 2
+N#include "app_md5.h"
+L 1 "..\tplib\app_md5.h" 1
+N#ifndef _APP_MD5_H
+N#define _APP_MD5_H
+N
+Ntypedef unsigned long UINT4;   
+Ntypedef unsigned char *POINTER;   
+N
+Ntypedef enum
+N{
+N	MD5_FALSE = 0,
+N	MD5_TRUE,
+N}MD5_CHECK;
+N#define R_memset(x, y, z) memset(x, y, z)   
+N#define R_memcpy(x, y, z) memcpy(x, y, z)   
+N#define R_memcmp(x, y, z) memcmp(x, y, z)   
+N
+N#define MD5_CODE_LEN	8
+N
+N/* MD5 context. */   
+Ntypedef struct {   
+N	/* state (ABCD) */    
+N	/*四个32bits数，用于存放最终计算得到的消息摘要。当消息长度〉512bits时，也用于存放每个512bits的中间结果*/    
+N	UINT4 state[4];    
+N	   
+N	/* number of bits, modulo 2^64 (lsb first) */    
+N	/*存储原始信息的bits数长度,不包括填充的bits，最长为 2^64 bits，因为2^64是一个64位数的最大值*/   
+N	UINT4 count[2];   
+N	   
+N	/* input buffer */    
+N	/*存放输入的信息的缓冲区，512bits*/   
+N	unsigned char buffer[64];    
+N} MD5_CTX;   
+Nvoid MD5Init(MD5_CTX *);   
+Nvoid MD5Update(MD5_CTX *, unsigned char *, unsigned int);   
+Nvoid MD5Final(unsigned char [16], MD5_CTX *);   
+NMD5_CHECK MakeFile_MD5_Checksum(u8 *pPacket, u32 pPacket_len);
+N#endif//_APP_MD5_H
+L 19 "..\USER\main.c" 2
+N
 N
 N
 N//gps
@@ -27013,10 +27065,10 @@ Nu32 Gps_Lati;
 Nu8 USART1_TX_BUF[512]; 					//串口1,发送缓存区
 N
 N
-Nchar cipherText[512];
-Nchar receiveText[24];
-Nchar expressText[512];  
-Nchar aesKey[16];
+Nu8 cipherText[512];
+Nu8 receiveText[24];
+Nu8 expressText[512];  
+Nu8 aesKey[16];
 N
 N
 Nu8 PublishLockBackbuf[35];
@@ -27073,9 +27125,18 @@ Nu8 lockbuf[16];
 Nu8 lockbuff[16];
 N
 N
+N
+N
+Nu8 protocol_buff[512] = {0};
+N
+N
 Nextern u8 PARK_LOCK_Buffer[16];
 Nextern uint8_t gprs_status;
 N
+Nextern u8 usart2_buff[512];
+Nextern u16 usart2_cnt; 
+N
+Nu8 tmp[20];
 N
 Nvoid Gps_Msg_Show(void)
 N{
@@ -27100,7 +27161,13 @@ Nint main(void)
 N{ 
 N	u16 j,i,rxlen;
 N	u16 k=0;
-N	u8 upload=0; 	
+N	u8 upload=0; 
+N	u8 *ret;
+N//	u8 *ret1, ret2;
+N	
+N	
+N	
+N	
 N	bsp_init();
 N
 N
@@ -27111,55 +27178,10 @@ N
 N	USART_OUT(USART1, "wangzhongya\r\n");
 X	USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "wangzhongya\r\n");
 N	
-N
-N//	while(1)
-N//	{
-N//		USART_OUT(USART1, "123465\r\n");
-N//		if(USART3_RX_STA&0X8000)		
-N//		{
-N//			rxlen=USART3_RX_STA&0X7FFF;	
-N//			for(i=0;i<rxlen;i++)USART1_TX_BUF[i]=USART3_RX_BUF[i];	   
-N//			
-N//			USART3_RX_STA=0;		   	
-N//			USART1_TX_BUF[i]=0;			
-N//			GPS_Analysis(&gpsx,(u8*)USART1_TX_BUF);
-N//			Gps_Msg_Show();		
-N//			if(upload)USART_OUT(USART1,"\r\n%s\r\n",USART1_TX_BUF);
-N//			
-N//			if(gpsx.latitude>0&&gpsx.longitude>0)
-N//			{
-N//					memset(expressText, 0 ,1024);
-N//					sprintf((char *)expressText,"%c%s,%s%c",'{',(char *)longitudedtbuf,(char *)latitudedtbuf,'}',48);
-N//					sprintf((char *)PublishDataGpsbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",64,2\r\n");	
-N////				    SendCmd((char *)PublishDataGpsbuf,">",20);
-N//					gprs_send_at(PublishDataGpsbuf, ">", 200, 10000);
-N////					myfree(PublishDataGpsbuf);				
-N//					//SendCmd((char *)localbuf,"OK",10);//
-N//					memset(cipherText, 0 ,1024);
-N//					AES_Encrypt((char *)expressText, cipherText, aesKey);
-N//					SendCmd((char *)cipherText,"OK",20);//
-N//					USART_OUT(USART1, "local:%s\r\n",expressText);	
-N//				  Gps_longi=gpsx.longitude;
-N//				  Gps_Lati=gpsx.latitude;
-N//				break;
-N
-N//				 
-N//			}
-N//		}
-N//		else
-N//		{
-N//			k++;
-N//			timer_delay_1ms(1000);
-N//		//	BEEP=1;
-N//			if(k>10)
-N//			{
-N//				break;
-N//			}
-N//		}
-N//		usart1_recv_data();
-N
-N//		usart2_recv_data();	
-N//  }
+N	MOTOA_HIGH();
+X	GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0001));
+N	MOTOB_HIGH();
+X	GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
 N
 N	while(1)
 N	{	 
@@ -27176,429 +27198,332 @@ N		usart1_recv_data();
 N		usart2_recv_data();
 N		
 N		
+N		
+N		MOTOA_LOW();
+X		GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0001));
+N		timer_delay_1ms(200);
+N		MOTOB_HIGH();
+X		GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
+N		
+N		
+N		MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);
+N	
 N		// 电池信息
-N//		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
-N//		Bat_V=Bat_V*3300/4096;
-N//		Bat_V=Bat_V*88/20;
-N//		Bat_Pre=(Bat_V-5000)*100/2400;
-N//		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
+N		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
+X		Bat_V =Get_Adc_Average(((uint8_t)0x00),10);
+N		Bat_V=Bat_V*3300/4096;
+N		Bat_V=Bat_V*88/20;
+N		Bat_Pre=(Bat_V-5000)*100/2400;
+N		
+N		if(timer_is_timeout_1ms(tim1_cnt, 30000) == 0)
+N		{
+N			
+N 		
+N			sprintf((char *)PublishDataBatbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
+N			USART_OUT(USART1, "ssss=%s\r\n", PublishDataBatbuf);
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "ssss=%s\r\n", PublishDataBatbuf);
+N			ret = gprs_send_at(PublishDataBatbuf, ">", 300, 0);
+N			if(ret != NULL)
+X			if(ret != 0)
+N			{
+N				memset(expressText, 0 ,512);
+N				memset(cipherText, 0 ,512);
+N				sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"20");
+N				USART_OUT(USART1, "expressText=%s\r\n", expressText);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "expressText=%s\r\n", expressText);
+N//				AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+N				USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "aesKey=%s\r\n", aesKey);
+N				USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "cipherText=%s\r\n", cipherText);
+N				memset(tmp, 0, 20);
+N				cipherText[0] = 0x31;
+N				tmp[0] = 0x31;
+N				ret = gprs_send_at(tmp, "OK", 300, 0);
+N				if(ret != NULL)
+X				if(ret != 0)
+N				{
+N					
+N				}
+N				memset(PublishDataBatbuf, 0, 512);
+N			}
+N//			
+N			if(Bat_Pre<10&&Bat_Pre_Flag==1)
+N			{
+N				Bat_Pre_Flag=0;
+N				sprintf((char *)PublishDataBatbuf,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",36,2\r\n");
+N				USART_OUT(USART1, "wangzhongya=%s\r\n", PublishDataBatbuf);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "wangzhongya=%s\r\n", PublishDataBatbuf);
+N				ret = gprs_send_at(PublishDataBatbuf, ">", 300, 0);
+N				if(ret != NULL)
+X				if(ret != 0)
+N				{
+N					memset(expressText, 0 ,512);
+N					memset(cipherText, 0 ,512);
+N					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"20");
+N//					AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+N					ret = gprs_send_at(cipherText, "OK", 300, 0);
+N					if(ret == NULL)
+X					if(ret == 0)
+N					{
+N						
+N					}
+N				}
+N			}
+N		}
+N//		///
+N		p1 = strstr((u8*)protocol_buff, "topic: lock/");
+N		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
+N		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
+N		{
+N			USART_OUT(USART1, "lock\r\n");
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "lock\r\n");
+N			
+N 			if((ALARM_LOCK_ON() == 0) || (ALARM_LOCK_OFF() == 0))
+X 			if((GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x0010)) == 0) || (GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x0020)) == 0))
+N			{
+N				memset(receiveText ,0 , 512);
+N				memset(expressText ,0 , 512);
+N				
+N				strcpy((char*)receiveText ,(char *)(p1+32));
+N//				AES_Decrypt((char*)expressText, (char*)receiveText, (char*)aesKey);
+N				Shaking=1;
+N				if(*receiveText==0x31)
+N				{
+N					if(ALARM_LOCK_ON() == 0)
+X					if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x0010)) == 0)
+N					{
+N						Lock_Open=1;
+N						Lock_Open_On=1;
+N						
+N					}
+N					else
+N					{
+N						Lock_Open=0;
+N					}
+N				}
+N				else if(*receiveText==0x32)
+N				{
+N					if(ALARM_LOCK_OFF() == 0)
+X					if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x0020)) == 0)
+N					{
+N						Lock_Close=1;
+N						Lock_Close_On=1;
+N					}
+N					else
+N					{
+N						Lock_Close=0;
+N					}
+N				
+N				}
+N				else if(*receiveText == 0x30)
+N				{
+N					Park_Lock_stop();
+N				}
+N				
+N				memset(protocol_buff, 0, 512);	
+N				
+N			}
+N		}
+N//		//
+N//		if((ALARM_LOCK_ON() == 1) || (ALARM_LOCK_OFF() == 1))
 N//		{
-N//			Bat_Pre_Flag=1;
-N//			sprintf((char *)PublishDataBatbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-N//			SendCmd((char *)PublishDataBatbuf,">",20);
-N//			timer_delay_1ms(10);
-N//			memset(expressText, 0 ,1024);
-N//			sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"20");
-N//			memset(cipherText, 0 ,1024);
-N//			AES_Encrypt((char *)expressText, cipherText, aesKey);
-N//			SendCmd((char *)cipherText,"OK",20);//
-N//			//SendCmd((char *)bat_buff,"OK",20);//
+N//			
 N//		}
 N//		
-N//		if(Bat_Pre<10&&Bat_Pre_Flag==1)
-N//		{
-N//			Bat_Pre_Flag=0;
-N//			
-N//			sprintf((char *)PublishDataBatbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-N//			SendCmd((char *)PublishDataBatbuf,">",20);
-N//			timer_delay_1ms(10);
-N//			memset(expressText, 0 ,1024);
-N//			sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
-N//			memset(cipherText, 0 ,1024);
-N//			AES_Encrypt((char *)expressText, cipherText, aesKey);
-N//			SendCmd((char *)cipherText,"OK",20);//
-N//			
-N//		}
+N		p1 = strstr((char*)protocol_buff, "topic: bell/");
+N		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
+N		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
+N		{
+N			USART_OUT(USART1, "bell\r\n");
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "bell\r\n");
+N		
+N			
+N			bell_flag=1;
+N			
+N			BEEP_HIGH();
+X			GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0008));
+N			timer_delay_1ms(500);
+N			BEEP_LOW();
+X			GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0008));
+N		}
+N		
+N		
+N		if(bell_flag == 1)
+N		{
+N			bell_flag = 0;
+N		}
+N		
+N		
+N		if(Lock_Open==1) 
+N		{
+N			Lock_Open=0;
+N			
+N			Park_Lock_Open();
+N		}
+N		
+N		if(Lock_Close == 1)
+N		{
+N			Lock_Close=0;
+N		
+N			Park_Lock_Close();
+N			
+N		}
+N		
+N		
+N		
+N		
+N		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0 && Lock_Open == 1)
+X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==1 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==0 && Lock_Open == 1)
+N		{
+N			
+N			Park_Lock_Open();	//开锁
+N			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
+X			if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==0 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==1)
+N			{
+N				Lock_Open = 0;
+N				Park_Lock_stop();	//停止运行
+N				
+N				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+N				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
+N				ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+N				if(ret != NULL)
+X				if(ret != 0)
+N				{
+N					memset(expressText, 0 ,512);
+N					memset(cipherText, 0 ,512);
+N					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"1");
+N					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "expressText=%s\r\n", expressText);
+N//						AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+N					ret = gprs_send_at(expressText, "OK", 300, 0);
+N					if(ret == NULL)
+X					if(ret == 0)
+N					{
+N						
+N					}
+N				}
+N				
+N			}
+N			
+N		}
+N		
+N		if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1 && Lock_Close == 1)
+X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==0 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==1 && Lock_Close == 1)
+N		{
+N			
+N			Park_Lock_Close();
+N			
+N			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)
+X			if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==1 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==0)
+N			{
+N				Lock_Close = 0;
+N				Park_Lock_stop();	//停止运行
+N				
+N				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+N				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
+N				ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+N				if(ret != NULL)
+X				if(ret != 0)
+N				{
+N					memset(expressText, 0 ,512);
+N					memset(cipherText, 0 ,512);
+N					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"0");
+N					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "expressText=%s\r\n", expressText);
+N//						AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+N					ret = gprs_send_at(expressText, "OK", 300, 0);
+N					if(ret == NULL)
+X					if(ret == 0)
+N					{
+N						
+N					}
+N				}
+N			}
+N		}
+N		
+N		if(LOCK_ON_READ()==0)
+X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==0)
+N		{
+N//			BEEP_HIGH();
+N//			timer_delay_1ms(100);
+N//			BEEP_LOW();
+N			
+N//			USART_OUT(USART1, "ddddd\r\n");
+N		}
+N		
 N		
 N//		
-N//		p1=strstr((u8 *)usart2_rcv_buf,"topic: lock/");
-N//		p2=strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
-N
-N////		USART_OUT(USART1,"usart_p1:%s\r\n",p1);
-N//		
-N////		USART_OUT(USART1, "usart_p2:%s\r\n",p2);
-N//		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
-N//		{		
-N//			if(LOCK_OFF==0||LOCK_ON==0)
-N//			{			
-N//		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
-N//		{	
-N//			USART_OUT(USART1, "p1:%s\r\n",p1+33);
-N//			strcpy(receiveText ,(char *)(p1+33));
-N//			USART_OUT(USART1, "ci:%s\r\n",receiveText);
-N//			memset(expressText ,0 ,1024);
-N//			AES_Decrypt(expressText ,receiveText, aesKey);
-N//			Shaking=1;	
-N//		    USART_OUT(USART1, "ex:%s\r\n",expressText);
-N//				USART_OUT(USART1, "aeskey:%s\r\n",aesKey);
-N//				
-N//					if(*expressText==0x31)
-N//					{
-N////						USART_OUT("p2:%s\r\n",p2);	
-N//						if(LOCK_ON==0)
-N//						{
-N//						USART_OUT(USART1, "p2:%s\r\n",p2);	
-N//						Lock_Open=1; 
-N//						Lock_Open_Tim5s=calendar.sec;
-N//						Lock_Open_On=1;
-N//						}
-N//						else
-N//						{
-N//							Lock_Open=0;
-N//						}
-N//					}
-N//					else if(*expressText==0x32)
-N//					{
-N//						if(LOCK_OFF==0)
-N//						{
-N//						Lock_Close=1;
-N//						Lock_Close_Tim5s=calendar.sec;
-N//						Lock_Close_On=1;
-N//						}
-N//						else
-N//						{
-N//						Lock_Close=0;
-N//						}
-N//					}	 
-N//					else if(*expressText==0x30)
-N//					{
-N//						Park_Lock_stop();
-N//					}	
-N//			USART2_Clear();
-N//			p1="\0";		
-N////			myfree(p2);
-N////			myfree(p4);
-N////			myfree(p3);
-N////			myfree(p1);	
-N//			}
-N//			}
-N//		}
-N//		
-N//		if(LOCK_OFF==1||LOCK_ON==1)
+N//		if(ALARM_LOCK_ON()==0)
 N//		{
-N//			if(strncmp((char *)p1,"topic: lock",11)==0)
-N//			{	
-N//					USART2_Clear();
-N//					p1="\0";		
-N////					myfree(p2);
-N////					myfree(p1);	
-N//			}
-N//		}
-N//		
-N//		p3=strstr((char *)usart2_rcv_buf,"topic: bell/");
-N////		USART_OUT(USART1, "usart_p3:%s\r\n",p3);
-N//		p4=strstr((char *)p3,(char *)PARK_LOCK_Buffer);
-N//				
-N////		USART_OUT(USART1, "usart_p4:%s\r\n",p4);
-N//	//if(strncmp((char *)p4,(char *)PARK_LOCK_Buffer,8)==0)					
-N//	//p1=strstr((char *)usart2_rcv_buf,"topic");
-N//		if(strncmp((char *)p3,"topic: bell/",12)==0&&bell_flag==0)
-N//		//if(strncmp((char *)p4,(char *)PARK_LOCK_Buffer,16)==0&&bell_flag==0)
-N//		{		
-N//			bell_flag=1;
-N//			USART_OUT(USART1, "p1:%s\r\n",p4);			
-N////			YELLOW_LED=1;
-N////			BEEP=1;
-N//			BEEP_HIGH();
-N
-N//			//p1="\0";
-N//			USART2_Clear();
-N////
+N//			 Shaking=0;
 N//			
-N//			timer_delay_1ms(2000);
-N////			YELLOW_LED=0;
-N////			BEEP=0;
-N//			BEEP_LOW();
-N//		}
-N//	  if(bell_flag==1)
-N//		{
-N//			bell_flag=0;
-N//		}
-N//		  //USART2_Clear();
-N//			//myfree(usart2_rcv_buf);
-N//			//myfree(p1);
-N//			//myfree(p2);
-N//			//myfree(p3);
-N//			//myfree(p4);
-N//			//usart2_rcv_len=0;
-N//			timer_delay_1ms(10);
-N
-N
-N//		if(Lock_Open==1) 
-N//		{
-N//			Lock_Open=0;
 N//			
-N//			Park_Lock_Open();
-N//		}
-N
-N//    if(Lock_Close==1)  
-N//		{
-N//			Lock_Close=0;
-N//		
-N//			Park_Lock_Close();
 N//		}
 N//		
-N
-N//		//key=KEY_Scan(0);
-N//		if((LOCK_ON==0)&&(LOCK_OFF_flag==0)&&(flag==4)&&Hand_Flag==0)
-N//		{		
-N//      Shaking=0;			
-N//			self_calendar.self_w_date=calendar.w_date;
-N//			self_calendar.self_hour=calendar.hour;
-N//			self_calendar.self_min=calendar.min;
-N//		  self_calendar.self_flag=0;
-N//			//IWDG_Feed();	
+N		
+N//		if((ALARM_LOCK_ON()==0)&&(LOCK_OFF_flag==0)&&(flag==4)&&Hand_Flag==0)
+N//		{
+N//			Shaking=0;
+N//			Park_Lock_stop();
 N//			
-N//		  Park_Lock_stop();
 N//			if(Shaking_Alarm_Flag==0)
 N//			{
 N//				if(Lock_Open_Off==1)
 N//				{
-N//					sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");	
-N//					SendCmd((char *)PublishLockBackbuf,">",20);//
-N
-N////					myfree(PublishLockBackbuf);
-N////					timer_delay_1ms(30);
-N//					//SendCmd("AT+PUBLISH=lockback/00010002,16,2\r\n",">",20);
-N//					memset(expressText , 0 ,1024);
-N//					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"1");
-N//					memset(cipherText, 0 ,1024);
-N//          AES_Encrypt((char *)expressText, cipherText, aesKey);
-N//					SendCmd((char *)cipherText,"OK",20);//
-N//					//SendCmd((char *)lockbuf,"OK",20);//
+N//					sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+N//					USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
+N//					ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+N//					if(ret != NULL)
+N//					{
+N//						memset(expressText, 0 ,512);
+N//						memset(cipherText, 0 ,512);
+N//						sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"1");
+N//						USART_OUT(USART1, "expressText=%s\r\n", expressText);
+N////						AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+N//						ret = gprs_send_at(expressText, "OK", 300, 0);
+N//						if(ret == NULL)
+N//						{
+N//							
+N//						}
+N//					}
 N//				}
 N//				if(Lock_Open_Off==0)
 N//				{
-N//					sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");		
-N//					SendCmd((char *)PublishLockBackbuf,">",20);//
-N////						myfree(PublishLockBackbuf);
-N////					timer_delay_1ms(30);
-N//				//	SendCmd("AT+PUBLISH=lockback/00010002,16,2\r\n",">",20);
-N//					memset(expressText , 0 ,1024);
-N//					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"0");//10
-N//					USART_OUT(USART1, "cmd:%s\r\n",expressText);
-N//					memset(cipherText , 0 ,1024);
-N//					AES_Encrypt((char *)expressText, cipherText, aesKey);
-N//					SendCmd((char *)cipherText,"OK",20);//
-N//					//SendCmd((char *)lockbuff,"OK",20);//
-N////					BEEP=1;
-N//					BEEP_HIGH();
-N//					timer_delay_1ms(20);
-N//					BEEP_LOW();
-N//				}
-N//		  }
+N//					sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+N//					USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
+N//					ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+N//					if(ret != NULL)
+N//					{
+N//						memset(expressText, 0 ,512);
+N//						memset(cipherText, 0 ,512);
+N//						sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"0");
+N//						USART_OUT(USART1, "expressText=%s\r\n", expressText);
+N////						AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+N//						ret = gprs_send_at(expressText, "OK", 300, 0);
+N//						if(ret == NULL)
+N//						{
+N//							
+N//						}
+N//					}
+N//				}				
+N//			}
 N//			Lock_Open_Off=0;
 N//			Lock_Open_On=0;
 N//			Lock_Close_On=0;
-N//			USART_OUT(USART1, "lockback_on\r\n");
-N//			
-N////			myfree((char *)lockbuf);
-N////			myfree((char *)lockbuff);
 N//			LOCK_OFF_flag=1;
 N//		}
-N//		else if(LOCK_ON==1)
+N//		else if(ALARM_LOCK_ON()==1)
 N//		{
 N//			LOCK_OFF_flag=0;
 N//		}
-N//		if(Lock_Close_On==1)
+N//		
+N//		if(Lock_Close_On == 1)
 N//		{
-N//			u8 temp=calendar.sec;
-N//			if(temp>=Lock_Close_Tim5s)
-N//			{
-N//				if((temp-Lock_Close_Tim5s)>5)//关锁超时
-N//				{
-N//					Lock_Close_On=0;
-N//					Park_Lock_Open();
-N//					Lock_Close_Off=1;
-N//				}
-N//			}
-N//			else
-N//			{
-N//				if((temp+60-Lock_Close_Tim5s)>5)//关锁超时
-N//				{
-N//					Lock_Close_On=0;
-N//					Park_Lock_Open();
-N//					Lock_Close_Off=1;
-N//				}		
-N//			}		
-N//		}
-N////			IWDG_Feed();	
-N//		//开锁返回开锁1的返回命令
-N//	 if((LOCK_OFF==0)&&(LOCK_ON_flag==0)&&(flag==4))//正常开锁对应1
-N//		{
-N//			 Shaking=0;	//晃动排除	
-N//			//自检时间标定
-N//			self_calendar.self_w_date=calendar.w_date;
-N//			self_calendar.self_hour=calendar.hour;
-N//			self_calendar.self_min=calendar.min;
-N//			self_calendar.self_flag=0;
-N
 N//			
-N//			Park_Lock_stop();
-N//			if(Shaking_Alarm_Flag==0)//晃动报警和自检
-N//			{
-N//				if(Lock_Close_Off==1)
-N//				{
-N//					sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");							
-N//	        SendCmd((char *)PublishLockBackbuf,">",20);//
-N////					myfree(PublishLockBackbuf);
-N//					//timer_delay_1ms(30);
-N//					memset(expressText , 0 ,1024);
-N//					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"1");	
-N//					
-N//					//SendCmd("AT+PUBLISH=lockback/00010002,16,2\r\n",">",20);
-N//					memset(cipherText , 0 ,1024);
-N//          AES_Encrypt((char *)expressText, cipherText, aesKey);
-N//					SendCmd((char *)cipherText,"OK",20);//
-N//					//SendCmd((char *)lockbuf,"OK",20);//
-N//				}
-N//				if(Lock_Close_Off==0)
-N//				{
-N//					sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-N//			    SendCmd((char *)PublishLockBackbuf,">",20);//
-N////					myfree(PublishLockBackbuf);
-N//					
-N//				//	SendCmd("AT+PUBLISH=lockback/00010002,16,2\r\n",">",20);
-N//					memset(expressText , 0 ,1024);
-N//					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"0");
-N//					
-N//					memset(cipherText , 0 ,1024);
-N//          AES_Encrypt((char *)expressText, cipherText, aesKey);
-N//					SendCmd((char *)cipherText,"OK",20);//
-N//					//SendCmd((char *)lockbuff,"OK",20);//
-N//					USART_OUT(USART1, "ca_off:%d\r\n",calendar.sec);
-N////					BEEP=1;
-N//					BEEP_HIGH();
-N//					timer_delay_1ms(10);
-N////					BEEP=0;
-N//					BEEP_LOW();
-N//				}
-N//			}
-N//			Lock_Open_Off=0;
-N//			Lock_Open_On=0;
-N//			Lock_Close_Off=0;
-N//			Lock_Close_On=0;
-N//			//停止低电压
-N////			myfree((char *)lockbuf);
-N////			myfree((char *)lockbuff);
-N//			LOCK_ON_flag=1;
 N//		}
-N//		else if(LOCK_OFF==1)
-N//		{
-N//			LOCK_ON_flag=0;
-N//		}
-N//		
-N//		//超时检测
-N//		if(Lock_Open_On==1)
-N//		{
-N//			u8 temp=calendar.sec;
-N//			if(temp>=Lock_Open_Tim5s)
-N//			{
-N//				if((temp-Lock_Open_Tim5s)>3)//开锁超时
-N//				{
-N//					Lock_Open_On=0;
-N//					Park_Lock_Close();
-N//					Lock_Open_Off=1;
-N//				}
-N//			}
-N//			else
-N//			{
-N//				if((temp+60-Lock_Open_Tim5s)>3)//开锁超时
-N//				{
-N//					Lock_Open_On=0;
-N//					Park_Lock_Close();
-N//					Lock_Open_Off=1;
-N//				}		
-N//			}		
-N//		}
-N//		/*//	自检功能
-N//		if(calendar.w_date>self_calendar.self_w_date)
-N//		{
-N//		if((calendar.w_date-self_calendar.self_w_date==2)&&(self_calendar.self_flag==0)&&(calendar.sec==0)&&(calendar.min==0))//
-N//		{
-N//			Self_Check();
-N//			self_calendar.self_flag=1;
-N//			flag=0;
-N//		}	
-N//		}
-N//		timer_delay_1ms(10);*/
-N//		
-N//		
-N//		////////////发布信息地锁经纬度
-N//		//if(calendar.sec==0&&second_flag==0)//24小时检测一次
-N//		if(calendar.sec==0&&second_flag==0&&calendar.hour==0&&calendar.min==0)//24小时检测一次
-N//		{
-N////			GPS_POW_EN=1;
-N//			GPS_POW_HIGH();
-N//			second_flag=1;
-N//			if(USART3_RX_STA&0X8000)		
-N//			{
-N//				rxlen=USART3_RX_STA&0X7FFF;	
-N//				for(i=0;i<rxlen;i++)USART1_TX_BUF[i]=USART3_RX_BUF[i];	   
-N//				USART3_RX_STA=0;		   
-N//				USART1_TX_BUF[i]=0;			
-N//				GPS_Analysis(&gpsx,(u8*)USART1_TX_BUF);
-N//				Gps_Msg_Show();				
-N//				if(upload)USART_OUT(USART1,"\r\n%s\r\n",USART1_TX_BUF);
-N//			}
-N//			if(gpsx.latitude>0&&gpsx.longitude>0)
-N//				{
-N//					/*
-N//					myfree(Gps_Lati_At24C_Read);
-N//					myfree(Gps_Longi_At24C_Read);
-N//					USART_OUT("str:%s\r\n",(char *)Gps_Longi_At24C_Read);
-N//					AT24CXX_Read(0,(u8 *)Gps_Longi_At24C_Read,8);
-N//					AT24CXX_Read(1,(u8 *)Gps_Lati_At24C_Read,7);
-N//					USART_OUT("str:%s\r\n",(char *)Gps_Longi_At24C_Read);
-N//					Gps_longi=atol(Gps_Longi_At24C_Read);
-N//					Gps_Lati=atol(Gps_Lati_At24C_Read);
-N//					USART_OUT("12345:%ld\r\n",Gps_longi);
-N//					USART_OUT("6789:%ld\r\n",(long)gpsx.longitude);*/
-N////					if((labs(Gps_longi-gpsx.longitude)>5000)||(labs(Gps_Lati-gpsx.latitude)>5000))
-N////					{
-N//						memset(expressText, 0 ,1024);
-N//						sprintf((char *)expressText,"%c%s,%s%c",'{',(char *)longitudedtbuf,(char *)latitudedtbuf,'}',48);
-N//						sprintf((char *)PublishDataGpsbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",64,2\r\n");
-N//						
-N//					//SendCmd("AT+PUBLISH=lockdata/00010002,78,2\r\n",">",10);		
-N//						SendCmd((char *)PublishDataGpsbuf,">",20);
-N////						myfree(PublishDataGpsbuf);				
-N//						//SendCmd((char *)localbuf,"OK",10);//
-N//						memset(cipherText, 0 ,1024);
-N//						AES_Encrypt((char *)expressText, cipherText, aesKey);
-N//						SendCmd((char *)cipherText,"OK",20);//
-N//						USART_OUT(USART1, "local:%s\r\n",expressText);	
-N////					}
-N////					GPS_POW_EN=0;
-N//					GPS_POW_LOW();
-N//		   }		
-N//			//Self_Check();
-N
-N//				//USART_OUT("str:%s\r\n",expressText);
-N//		}
-N//		else if(calendar.sec!=0)
-N//		{
-N//			second_flag=0;	
-N//		}
-N
-N////		USART_OUT(USART1, "sec:%d\r\n",calendar.sec);
-N//		Hand_Lock();
-N
-N//		if((LOCK_OFF==1&&LOCK_ON==1)&&(Shaking==0))
-N//		{
-N//			//USART_OUT("123456");
-N//			Shaking_Alarm_Flag=1;
-N////			BEEP=1;
-N//			BEEP_HIGH();
-N//		}
-N//		else
-N//		{
-N//			Shaking_Alarm_Flag=0;
-N////			BEEP=0;
-N//			BEEP_LOW();
-N//		}
-N//		
-N		
 N		
 N	}	 
 N}

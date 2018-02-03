@@ -18,6 +18,7 @@
 #include "timer.h"
 #include "usart.h"
 #include "usart3.h"
+#include "adc.h"
 
 /*
 *Function: rcc_config      
@@ -191,7 +192,7 @@ void gpio_init(void)
 	
 	
 	
-	//LOCK ON  
+	//LOCK ON   OFF
 	
 	gpio_init_structure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -212,8 +213,17 @@ void gpio_init(void)
 }
 
 
+void lock_on(void)
+{
+	MOTOA_LOW();
+	MOTOB_HIGH();
+}
 
-
+void lock_off(void)
+{
+	MOTOB_HIGH();
+	MOTOA_LOW();
+}
 
 
 
@@ -282,7 +292,7 @@ void bsp_init(void)
 	bsp_rcc_init();
 	bsp_nvic_init();
 	gpio_init();
-////	iwatchdog_config();
+//	iwatchdog_config();
 	usart1_init(115200, 8, 0, 1);
 	usart2_init(115200);
 //	usart3_init(9600);
@@ -290,7 +300,7 @@ void bsp_init(void)
 	timer2_init(200, 40);
 //	RTC_Init();
 //	AT24CXX_Init();   
-//	Adc_Init();
+	Adc_Init();
 }
 
 

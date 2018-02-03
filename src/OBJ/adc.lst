@@ -24176,7 +24176,57 @@ N
 N
 L 3 "..\driver\adc.c" 2
 N#include "stm32f10x_adc.h"
-N	   
+N#include "timer.h"
+L 1 "..\driver\timer.h" 1
+N#ifndef __TIMER_H
+N#define __TIMER_H
+N#include "sys.h"
+N  
+Nextern  u8 Lock_Open_Tim5s;
+Nextern u8 Lock_Close_Tim5s;
+N
+N
+N
+N
+N
+Nenum timer
+N{
+N    tim1_cnt,
+N    tim2_cnt,
+N	tim3_cnt,
+N	tim4_cnt,
+N	tim5_cnt,
+N	timer_lock,
+N	timer_uart1,
+N	timer_uart2,
+N	timer_uart3,
+N	timer_gprs,
+N	timer_at,
+N	timer_max
+N};
+N
+N
+N
+N
+N//如果index对应的时间超时，清零并返回1，未超时返回0
+N#define IS_TIMEOUT_1MS(index, count)    ((g_tim_cnt[(uint8_t)(index)] >= (count)) ?  	\
+N                                        ((g_tim_cnt[(uint8_t)(index)] = 0) == 0) : 0)
+X#define IS_TIMEOUT_1MS(index, count)    ((g_tim_cnt[(uint8_t)(index)] >= (count)) ?  	                                        ((g_tim_cnt[(uint8_t)(index)] = 0) == 0) : 0)
+N
+N
+N
+Nextern volatile uint32_t g_timer_cnt[(uint8_t)timer_max];
+N
+Nvoid timer2_init(u16 arr, u16 psc);
+Nu8 timer_is_timeout_1ms(uint8_t type, uint32_t count);
+Nvoid timer_delay_1ms(uint32_t ms);
+N
+N
+N 
+N#endif
+L 5 "..\driver\adc.c" 2
+N
+N
 N//初始化ADC
 N//这里我们仅以规则通道为例
 N//我们默认将开启通道0~3																	   
@@ -24185,8 +24235,8 @@ N{
 N	ADC_InitTypeDef ADC_InitStructure; 
 N	GPIO_InitTypeDef GPIO_InitStructure;
 N
-N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_ADC1	, ENABLE );	  //使能ADC1通道时钟
-X	RCC_APB2PeriphClockCmd(((uint32_t)0x00000004) |((uint32_t)0x00000200)	, ENABLE );	  
+N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_ADC1, ENABLE );	  //使能ADC1通道时钟
+X	RCC_APB2PeriphClockCmd(((uint32_t)0x00000004) |((uint32_t)0x00000200), ENABLE );	  
 N 
 N
 N	RCC_ADCCLKConfig(RCC_PCLK2_Div6);   //设置ADC分频因子6 72M/6=12,ADC最大时间不能超过14M
@@ -24258,7 +24308,7 @@ N	u8 t;
 N	for(t=0;t<times;t++)
 N	{
 N		temp_val+=Get_Adc(ch);
-N		delay_ms(5);
+N		timer_delay_1ms(2);
 N	}
 N	return temp_val/times;
 N} 	 

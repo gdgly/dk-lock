@@ -28763,15 +28763,22 @@ N
 N#define BUTTON1_READ()		GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//按键
 N
 N
-N#define LOCK_ON_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
-N#define LOCK_OFF_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
+N#define LOCK_ON_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
+N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define LOCK_ON  			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define LOCK_OFF   			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
+N
+N
+N#define MOTOA_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_0)	
+N#define MOTOA_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_0)
+N
+N#define MOTOB_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_1)	
+N#define MOTOB_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_1)
 N
 N
 N#define BEEP_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
@@ -28788,6 +28795,10 @@ N
 Nvoid iwatchdog_clear(void);
 Nvoid gprs_config(void);
 Nvoid bsp_init(void);
+N
+N
+Nvoid lock_on(void);
+Nvoid lock_off(void);
 N
 N#endif
 N
@@ -29451,16 +29462,16 @@ N	aesDataLen = strlen(pExpressText);
 N	//pExpressText:待加密的明文数据，pkey：加密密钥  str：加密后的数据
 N	str = encrypt(pExpressText, pAeskey);  //aesTempBuff[AES_TEMP_BUFF_LEN]
 N	
-N	printf ("encrypt result:  ");
-N	printf (str);
-N  printf ("\r\n");
+N//	printf ("encrypt result:  ");
+N//	printf (str);
+N//  printf ("\r\n");
 N
 N	//str:待编码的数据  pCipherText：编码后的数据  aesDataLen：待编码的长度
 N	Base64Encode(str, pCipherText,aesDataLen);
 N	free(str);
-N  printf("Base64 encoded result:  ");
-N	printf(pCipherText);
-N  printf("\r\n");
+N//  printf("Base64 encoded result:  ");
+N//	printf(pCipherText);
+N//  printf("\r\n");
 N
 N}
 N

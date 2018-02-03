@@ -1,7 +1,9 @@
  #include "adc.h"
  #include "delay.h"
 #include "stm32f10x_adc.h"
-	   
+#include "timer.h"
+
+
 //初始化ADC
 //这里我们仅以规则通道为例
 //我们默认将开启通道0~3																	   
@@ -10,7 +12,7 @@ void  Adc_Init(void)
 	ADC_InitTypeDef ADC_InitStructure; 
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_ADC1	, ENABLE );	  //使能ADC1通道时钟
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_ADC1, ENABLE );	  //使能ADC1通道时钟
  
 
 	RCC_ADCCLKConfig(RCC_PCLK2_Div6);   //设置ADC分频因子6 72M/6=12,ADC最大时间不能超过14M
@@ -65,7 +67,7 @@ u16 Get_Adc_Average(u8 ch,u8 times)
 	for(t=0;t<times;t++)
 	{
 		temp_val+=Get_Adc(ch);
-		delay_ms(5);
+		timer_delay_1ms(2);
 	}
 	return temp_val/times;
 } 	 

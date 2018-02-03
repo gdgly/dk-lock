@@ -607,16 +607,16 @@ void AES_Encrypt(char* pExpressText , char* pCipherText  , char* pAeskey)
 	//pExpressText:待加密的明文数据，pkey：加密密钥  str：加密后的数据
 	str = encrypt(pExpressText, pAeskey);  //aesTempBuff[AES_TEMP_BUFF_LEN]
 	
-	printf ("encrypt result:  ");
-	printf (str);
-  printf ("\r\n");
+//	printf ("encrypt result:  ");
+//	printf (str);
+//  printf ("\r\n");
 
 	//str:待编码的数据  pCipherText：编码后的数据  aesDataLen：待编码的长度
 	Base64Encode(str, pCipherText,aesDataLen);
 	free(str);
-  printf("Base64 encoded result:  ");
-	printf(pCipherText);
-  printf("\r\n");
+//  printf("Base64 encoded result:  ");
+//	printf(pCipherText);
+//  printf("\r\n");
 
 }
 

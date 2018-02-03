@@ -41,15 +41,22 @@
 #define BUTTON1_READ()		GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//按键
 
 
-#define LOCK_ON_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
-#define LOCK_OFF_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
+#define LOCK_ON_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
+#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 
 
 
-#define HAND  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-#define LOCK_ON  			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-#define LOCK_OFF   			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 
+
+
+#define MOTOA_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_0)	
+#define MOTOA_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_0)
+
+#define MOTOB_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_1)	
+#define MOTOB_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_1)
 
 
 #define BEEP_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
@@ -66,6 +73,10 @@
 void iwatchdog_clear(void);
 void gprs_config(void);
 void bsp_init(void);
+
+
+void lock_on(void);
+void lock_off(void);
 
 #endif
 

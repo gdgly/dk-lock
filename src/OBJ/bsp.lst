@@ -24137,15 +24137,22 @@ N
 N#define BUTTON1_READ()		GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//按键
 N
 N
-N#define LOCK_ON_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
-N#define LOCK_OFF_READ()		GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
+N#define LOCK_ON_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
+N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define LOCK_ON  			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define LOCK_OFF   			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
+N
+N
+N#define MOTOA_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_0)	
+N#define MOTOA_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_0)
+N
+N#define MOTOB_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_1)	
+N#define MOTOB_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_1)
 N
 N
 N#define BEEP_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
@@ -24162,6 +24169,10 @@ N
 Nvoid iwatchdog_clear(void);
 Nvoid gprs_config(void);
 Nvoid bsp_init(void);
+N
+N
+Nvoid lock_on(void);
+Nvoid lock_off(void);
 N
 N#endif
 N
@@ -24303,6 +24314,7 @@ N    tim2_cnt,
 N	tim3_cnt,
 N	tim4_cnt,
 N	tim5_cnt,
+N	timer_lock,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
@@ -24445,6 +24457,527 @@ N
 N
 N
 L 21 "..\BSP\bsp.c" 2
+N#include "adc.h"
+L 1 "..\driver\adc.h" 1
+N#ifndef __ADC_H
+N#define __ADC_H	
+N#include "sys.h"
+N#include "stm32f10x_adc.h"
+L 1 "..\FLib\inc\stm32f10x_adc.h" 1
+N/**
+N  ******************************************************************************
+N  * @file    stm32f10x_adc.h
+N  * @author  MCD Application Team
+N  * @version V3.5.0
+N  * @date    11-March-2011
+N  * @brief   This file contains all the functions prototypes for the ADC firmware 
+N  *          library.
+N  ******************************************************************************
+N  * @attention
+N  *
+N  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+N  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+N  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+N  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+N  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+N  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+N  *
+N  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+N  ******************************************************************************
+N  */
+N
+N/* Define to prevent recursive inclusion -------------------------------------*/
+N#ifndef __STM32F10x_ADC_H
+N#define __STM32F10x_ADC_H
+N
+N#ifdef __cplusplus
+S extern "C" {
+N#endif
+N
+N/* Includes ------------------------------------------------------------------*/
+N#include "stm32f10x.h"
+N
+N/** @addtogroup STM32F10x_StdPeriph_Driver
+N  * @{
+N  */
+N
+N/** @addtogroup ADC
+N  * @{
+N  */
+N
+N/** @defgroup ADC_Exported_Types
+N  * @{
+N  */
+N
+N/** 
+N  * @brief  ADC Init structure definition  
+N  */
+N
+Ntypedef struct
+N{
+N  uint32_t ADC_Mode;                      /*!< Configures the ADC to operate in independent or
+N                                               dual mode. 
+N                                               This parameter can be a value of @ref ADC_mode */
+N
+N  FunctionalState ADC_ScanConvMode;       /*!< Specifies whether the conversion is performed in
+N                                               Scan (multichannels) or Single (one channel) mode.
+N                                               This parameter can be set to ENABLE or DISABLE */
+N
+N  FunctionalState ADC_ContinuousConvMode; /*!< Specifies whether the conversion is performed in
+N                                               Continuous or Single mode.
+N                                               This parameter can be set to ENABLE or DISABLE. */
+N
+N  uint32_t ADC_ExternalTrigConv;          /*!< Defines the external trigger used to start the analog
+N                                               to digital conversion of regular channels. This parameter
+N                                               can be a value of @ref ADC_external_trigger_sources_for_regular_channels_conversion */
+N
+N  uint32_t ADC_DataAlign;                 /*!< Specifies whether the ADC data alignment is left or right.
+N                                               This parameter can be a value of @ref ADC_data_align */
+N
+N  uint8_t ADC_NbrOfChannel;               /*!< Specifies the number of ADC channels that will be converted
+N                                               using the sequencer for regular channel group.
+N                                               This parameter must range from 1 to 16. */
+N}ADC_InitTypeDef;
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_Exported_Constants
+N  * @{
+N  */
+N
+N#define IS_ADC_ALL_PERIPH(PERIPH) (((PERIPH) == ADC1) || \
+N                                   ((PERIPH) == ADC2) || \
+N                                   ((PERIPH) == ADC3))
+X#define IS_ADC_ALL_PERIPH(PERIPH) (((PERIPH) == ADC1) ||                                    ((PERIPH) == ADC2) ||                                    ((PERIPH) == ADC3))
+N
+N#define IS_ADC_DMA_PERIPH(PERIPH) (((PERIPH) == ADC1) || \
+N                                   ((PERIPH) == ADC3))
+X#define IS_ADC_DMA_PERIPH(PERIPH) (((PERIPH) == ADC1) ||                                    ((PERIPH) == ADC3))
+N
+N/** @defgroup ADC_mode 
+N  * @{
+N  */
+N
+N#define ADC_Mode_Independent                       ((uint32_t)0x00000000)
+N#define ADC_Mode_RegInjecSimult                    ((uint32_t)0x00010000)
+N#define ADC_Mode_RegSimult_AlterTrig               ((uint32_t)0x00020000)
+N#define ADC_Mode_InjecSimult_FastInterl            ((uint32_t)0x00030000)
+N#define ADC_Mode_InjecSimult_SlowInterl            ((uint32_t)0x00040000)
+N#define ADC_Mode_InjecSimult                       ((uint32_t)0x00050000)
+N#define ADC_Mode_RegSimult                         ((uint32_t)0x00060000)
+N#define ADC_Mode_FastInterl                        ((uint32_t)0x00070000)
+N#define ADC_Mode_SlowInterl                        ((uint32_t)0x00080000)
+N#define ADC_Mode_AlterTrig                         ((uint32_t)0x00090000)
+N
+N#define IS_ADC_MODE(MODE) (((MODE) == ADC_Mode_Independent) || \
+N                           ((MODE) == ADC_Mode_RegInjecSimult) || \
+N                           ((MODE) == ADC_Mode_RegSimult_AlterTrig) || \
+N                           ((MODE) == ADC_Mode_InjecSimult_FastInterl) || \
+N                           ((MODE) == ADC_Mode_InjecSimult_SlowInterl) || \
+N                           ((MODE) == ADC_Mode_InjecSimult) || \
+N                           ((MODE) == ADC_Mode_RegSimult) || \
+N                           ((MODE) == ADC_Mode_FastInterl) || \
+N                           ((MODE) == ADC_Mode_SlowInterl) || \
+N                           ((MODE) == ADC_Mode_AlterTrig))
+X#define IS_ADC_MODE(MODE) (((MODE) == ADC_Mode_Independent) ||                            ((MODE) == ADC_Mode_RegInjecSimult) ||                            ((MODE) == ADC_Mode_RegSimult_AlterTrig) ||                            ((MODE) == ADC_Mode_InjecSimult_FastInterl) ||                            ((MODE) == ADC_Mode_InjecSimult_SlowInterl) ||                            ((MODE) == ADC_Mode_InjecSimult) ||                            ((MODE) == ADC_Mode_RegSimult) ||                            ((MODE) == ADC_Mode_FastInterl) ||                            ((MODE) == ADC_Mode_SlowInterl) ||                            ((MODE) == ADC_Mode_AlterTrig))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_external_trigger_sources_for_regular_channels_conversion 
+N  * @{
+N  */
+N
+N#define ADC_ExternalTrigConv_T1_CC1                ((uint32_t)0x00000000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigConv_T1_CC2                ((uint32_t)0x00020000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigConv_T2_CC2                ((uint32_t)0x00060000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigConv_T3_TRGO               ((uint32_t)0x00080000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigConv_T4_CC4                ((uint32_t)0x000A0000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigConv_Ext_IT11_TIM8_TRGO    ((uint32_t)0x000C0000) /*!< For ADC1 and ADC2 */
+N
+N#define ADC_ExternalTrigConv_T1_CC3                ((uint32_t)0x00040000) /*!< For ADC1, ADC2 and ADC3 */
+N#define ADC_ExternalTrigConv_None                  ((uint32_t)0x000E0000) /*!< For ADC1, ADC2 and ADC3 */
+N
+N#define ADC_ExternalTrigConv_T3_CC1                ((uint32_t)0x00000000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigConv_T2_CC3                ((uint32_t)0x00020000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigConv_T8_CC1                ((uint32_t)0x00060000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigConv_T8_TRGO               ((uint32_t)0x00080000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigConv_T5_CC1                ((uint32_t)0x000A0000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigConv_T5_CC3                ((uint32_t)0x000C0000) /*!< For ADC3 only */
+N
+N#define IS_ADC_EXT_TRIG(REGTRIG) (((REGTRIG) == ADC_ExternalTrigConv_T1_CC1) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T1_CC2) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T1_CC3) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T2_CC2) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T3_TRGO) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T4_CC4) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_Ext_IT11_TIM8_TRGO) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_None) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T3_CC1) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T2_CC3) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T8_CC1) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T8_TRGO) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T5_CC1) || \
+N                                  ((REGTRIG) == ADC_ExternalTrigConv_T5_CC3))
+X#define IS_ADC_EXT_TRIG(REGTRIG) (((REGTRIG) == ADC_ExternalTrigConv_T1_CC1) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T1_CC2) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T1_CC3) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T2_CC2) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T3_TRGO) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T4_CC4) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_Ext_IT11_TIM8_TRGO) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_None) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T3_CC1) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T2_CC3) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T8_CC1) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T8_TRGO) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T5_CC1) ||                                   ((REGTRIG) == ADC_ExternalTrigConv_T5_CC3))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_data_align 
+N  * @{
+N  */
+N
+N#define ADC_DataAlign_Right                        ((uint32_t)0x00000000)
+N#define ADC_DataAlign_Left                         ((uint32_t)0x00000800)
+N#define IS_ADC_DATA_ALIGN(ALIGN) (((ALIGN) == ADC_DataAlign_Right) || \
+N                                  ((ALIGN) == ADC_DataAlign_Left))
+X#define IS_ADC_DATA_ALIGN(ALIGN) (((ALIGN) == ADC_DataAlign_Right) ||                                   ((ALIGN) == ADC_DataAlign_Left))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_channels 
+N  * @{
+N  */
+N
+N#define ADC_Channel_0                               ((uint8_t)0x00)
+N#define ADC_Channel_1                               ((uint8_t)0x01)
+N#define ADC_Channel_2                               ((uint8_t)0x02)
+N#define ADC_Channel_3                               ((uint8_t)0x03)
+N#define ADC_Channel_4                               ((uint8_t)0x04)
+N#define ADC_Channel_5                               ((uint8_t)0x05)
+N#define ADC_Channel_6                               ((uint8_t)0x06)
+N#define ADC_Channel_7                               ((uint8_t)0x07)
+N#define ADC_Channel_8                               ((uint8_t)0x08)
+N#define ADC_Channel_9                               ((uint8_t)0x09)
+N#define ADC_Channel_10                              ((uint8_t)0x0A)
+N#define ADC_Channel_11                              ((uint8_t)0x0B)
+N#define ADC_Channel_12                              ((uint8_t)0x0C)
+N#define ADC_Channel_13                              ((uint8_t)0x0D)
+N#define ADC_Channel_14                              ((uint8_t)0x0E)
+N#define ADC_Channel_15                              ((uint8_t)0x0F)
+N#define ADC_Channel_16                              ((uint8_t)0x10)
+N#define ADC_Channel_17                              ((uint8_t)0x11)
+N
+N#define ADC_Channel_TempSensor                      ((uint8_t)ADC_Channel_16)
+N#define ADC_Channel_Vrefint                         ((uint8_t)ADC_Channel_17)
+N
+N#define IS_ADC_CHANNEL(CHANNEL) (((CHANNEL) == ADC_Channel_0) || ((CHANNEL) == ADC_Channel_1) || \
+N                                 ((CHANNEL) == ADC_Channel_2) || ((CHANNEL) == ADC_Channel_3) || \
+N                                 ((CHANNEL) == ADC_Channel_4) || ((CHANNEL) == ADC_Channel_5) || \
+N                                 ((CHANNEL) == ADC_Channel_6) || ((CHANNEL) == ADC_Channel_7) || \
+N                                 ((CHANNEL) == ADC_Channel_8) || ((CHANNEL) == ADC_Channel_9) || \
+N                                 ((CHANNEL) == ADC_Channel_10) || ((CHANNEL) == ADC_Channel_11) || \
+N                                 ((CHANNEL) == ADC_Channel_12) || ((CHANNEL) == ADC_Channel_13) || \
+N                                 ((CHANNEL) == ADC_Channel_14) || ((CHANNEL) == ADC_Channel_15) || \
+N                                 ((CHANNEL) == ADC_Channel_16) || ((CHANNEL) == ADC_Channel_17))
+X#define IS_ADC_CHANNEL(CHANNEL) (((CHANNEL) == ADC_Channel_0) || ((CHANNEL) == ADC_Channel_1) ||                                  ((CHANNEL) == ADC_Channel_2) || ((CHANNEL) == ADC_Channel_3) ||                                  ((CHANNEL) == ADC_Channel_4) || ((CHANNEL) == ADC_Channel_5) ||                                  ((CHANNEL) == ADC_Channel_6) || ((CHANNEL) == ADC_Channel_7) ||                                  ((CHANNEL) == ADC_Channel_8) || ((CHANNEL) == ADC_Channel_9) ||                                  ((CHANNEL) == ADC_Channel_10) || ((CHANNEL) == ADC_Channel_11) ||                                  ((CHANNEL) == ADC_Channel_12) || ((CHANNEL) == ADC_Channel_13) ||                                  ((CHANNEL) == ADC_Channel_14) || ((CHANNEL) == ADC_Channel_15) ||                                  ((CHANNEL) == ADC_Channel_16) || ((CHANNEL) == ADC_Channel_17))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_sampling_time 
+N  * @{
+N  */
+N
+N#define ADC_SampleTime_1Cycles5                    ((uint8_t)0x00)
+N#define ADC_SampleTime_7Cycles5                    ((uint8_t)0x01)
+N#define ADC_SampleTime_13Cycles5                   ((uint8_t)0x02)
+N#define ADC_SampleTime_28Cycles5                   ((uint8_t)0x03)
+N#define ADC_SampleTime_41Cycles5                   ((uint8_t)0x04)
+N#define ADC_SampleTime_55Cycles5                   ((uint8_t)0x05)
+N#define ADC_SampleTime_71Cycles5                   ((uint8_t)0x06)
+N#define ADC_SampleTime_239Cycles5                  ((uint8_t)0x07)
+N#define IS_ADC_SAMPLE_TIME(TIME) (((TIME) == ADC_SampleTime_1Cycles5) || \
+N                                  ((TIME) == ADC_SampleTime_7Cycles5) || \
+N                                  ((TIME) == ADC_SampleTime_13Cycles5) || \
+N                                  ((TIME) == ADC_SampleTime_28Cycles5) || \
+N                                  ((TIME) == ADC_SampleTime_41Cycles5) || \
+N                                  ((TIME) == ADC_SampleTime_55Cycles5) || \
+N                                  ((TIME) == ADC_SampleTime_71Cycles5) || \
+N                                  ((TIME) == ADC_SampleTime_239Cycles5))
+X#define IS_ADC_SAMPLE_TIME(TIME) (((TIME) == ADC_SampleTime_1Cycles5) ||                                   ((TIME) == ADC_SampleTime_7Cycles5) ||                                   ((TIME) == ADC_SampleTime_13Cycles5) ||                                   ((TIME) == ADC_SampleTime_28Cycles5) ||                                   ((TIME) == ADC_SampleTime_41Cycles5) ||                                   ((TIME) == ADC_SampleTime_55Cycles5) ||                                   ((TIME) == ADC_SampleTime_71Cycles5) ||                                   ((TIME) == ADC_SampleTime_239Cycles5))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_external_trigger_sources_for_injected_channels_conversion 
+N  * @{
+N  */
+N
+N#define ADC_ExternalTrigInjecConv_T2_TRGO           ((uint32_t)0x00002000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigInjecConv_T2_CC1            ((uint32_t)0x00003000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigInjecConv_T3_CC4            ((uint32_t)0x00004000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigInjecConv_T4_TRGO           ((uint32_t)0x00005000) /*!< For ADC1 and ADC2 */
+N#define ADC_ExternalTrigInjecConv_Ext_IT15_TIM8_CC4 ((uint32_t)0x00006000) /*!< For ADC1 and ADC2 */
+N
+N#define ADC_ExternalTrigInjecConv_T1_TRGO           ((uint32_t)0x00000000) /*!< For ADC1, ADC2 and ADC3 */
+N#define ADC_ExternalTrigInjecConv_T1_CC4            ((uint32_t)0x00001000) /*!< For ADC1, ADC2 and ADC3 */
+N#define ADC_ExternalTrigInjecConv_None              ((uint32_t)0x00007000) /*!< For ADC1, ADC2 and ADC3 */
+N
+N#define ADC_ExternalTrigInjecConv_T4_CC3            ((uint32_t)0x00002000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigInjecConv_T8_CC2            ((uint32_t)0x00003000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigInjecConv_T8_CC4            ((uint32_t)0x00004000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigInjecConv_T5_TRGO           ((uint32_t)0x00005000) /*!< For ADC3 only */
+N#define ADC_ExternalTrigInjecConv_T5_CC4            ((uint32_t)0x00006000) /*!< For ADC3 only */
+N
+N#define IS_ADC_EXT_INJEC_TRIG(INJTRIG) (((INJTRIG) == ADC_ExternalTrigInjecConv_T1_TRGO) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T1_CC4) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T2_TRGO) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T2_CC1) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T3_CC4) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T4_TRGO) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_Ext_IT15_TIM8_CC4) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_None) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T4_CC3) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T8_CC2) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T8_CC4) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T5_TRGO) || \
+N                                        ((INJTRIG) == ADC_ExternalTrigInjecConv_T5_CC4))
+X#define IS_ADC_EXT_INJEC_TRIG(INJTRIG) (((INJTRIG) == ADC_ExternalTrigInjecConv_T1_TRGO) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T1_CC4) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T2_TRGO) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T2_CC1) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T3_CC4) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T4_TRGO) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_Ext_IT15_TIM8_CC4) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_None) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T4_CC3) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T8_CC2) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T8_CC4) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T5_TRGO) ||                                         ((INJTRIG) == ADC_ExternalTrigInjecConv_T5_CC4))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_injected_channel_selection 
+N  * @{
+N  */
+N
+N#define ADC_InjectedChannel_1                       ((uint8_t)0x14)
+N#define ADC_InjectedChannel_2                       ((uint8_t)0x18)
+N#define ADC_InjectedChannel_3                       ((uint8_t)0x1C)
+N#define ADC_InjectedChannel_4                       ((uint8_t)0x20)
+N#define IS_ADC_INJECTED_CHANNEL(CHANNEL) (((CHANNEL) == ADC_InjectedChannel_1) || \
+N                                          ((CHANNEL) == ADC_InjectedChannel_2) || \
+N                                          ((CHANNEL) == ADC_InjectedChannel_3) || \
+N                                          ((CHANNEL) == ADC_InjectedChannel_4))
+X#define IS_ADC_INJECTED_CHANNEL(CHANNEL) (((CHANNEL) == ADC_InjectedChannel_1) ||                                           ((CHANNEL) == ADC_InjectedChannel_2) ||                                           ((CHANNEL) == ADC_InjectedChannel_3) ||                                           ((CHANNEL) == ADC_InjectedChannel_4))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_analog_watchdog_selection 
+N  * @{
+N  */
+N
+N#define ADC_AnalogWatchdog_SingleRegEnable         ((uint32_t)0x00800200)
+N#define ADC_AnalogWatchdog_SingleInjecEnable       ((uint32_t)0x00400200)
+N#define ADC_AnalogWatchdog_SingleRegOrInjecEnable  ((uint32_t)0x00C00200)
+N#define ADC_AnalogWatchdog_AllRegEnable            ((uint32_t)0x00800000)
+N#define ADC_AnalogWatchdog_AllInjecEnable          ((uint32_t)0x00400000)
+N#define ADC_AnalogWatchdog_AllRegAllInjecEnable    ((uint32_t)0x00C00000)
+N#define ADC_AnalogWatchdog_None                    ((uint32_t)0x00000000)
+N
+N#define IS_ADC_ANALOG_WATCHDOG(WATCHDOG) (((WATCHDOG) == ADC_AnalogWatchdog_SingleRegEnable) || \
+N                                          ((WATCHDOG) == ADC_AnalogWatchdog_SingleInjecEnable) || \
+N                                          ((WATCHDOG) == ADC_AnalogWatchdog_SingleRegOrInjecEnable) || \
+N                                          ((WATCHDOG) == ADC_AnalogWatchdog_AllRegEnable) || \
+N                                          ((WATCHDOG) == ADC_AnalogWatchdog_AllInjecEnable) || \
+N                                          ((WATCHDOG) == ADC_AnalogWatchdog_AllRegAllInjecEnable) || \
+N                                          ((WATCHDOG) == ADC_AnalogWatchdog_None))
+X#define IS_ADC_ANALOG_WATCHDOG(WATCHDOG) (((WATCHDOG) == ADC_AnalogWatchdog_SingleRegEnable) ||                                           ((WATCHDOG) == ADC_AnalogWatchdog_SingleInjecEnable) ||                                           ((WATCHDOG) == ADC_AnalogWatchdog_SingleRegOrInjecEnable) ||                                           ((WATCHDOG) == ADC_AnalogWatchdog_AllRegEnable) ||                                           ((WATCHDOG) == ADC_AnalogWatchdog_AllInjecEnable) ||                                           ((WATCHDOG) == ADC_AnalogWatchdog_AllRegAllInjecEnable) ||                                           ((WATCHDOG) == ADC_AnalogWatchdog_None))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_interrupts_definition 
+N  * @{
+N  */
+N
+N#define ADC_IT_EOC                                 ((uint16_t)0x0220)
+N#define ADC_IT_AWD                                 ((uint16_t)0x0140)
+N#define ADC_IT_JEOC                                ((uint16_t)0x0480)
+N
+N#define IS_ADC_IT(IT) ((((IT) & (uint16_t)0xF81F) == 0x00) && ((IT) != 0x00))
+N
+N#define IS_ADC_GET_IT(IT) (((IT) == ADC_IT_EOC) || ((IT) == ADC_IT_AWD) || \
+N                           ((IT) == ADC_IT_JEOC))
+X#define IS_ADC_GET_IT(IT) (((IT) == ADC_IT_EOC) || ((IT) == ADC_IT_AWD) ||                            ((IT) == ADC_IT_JEOC))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_flags_definition 
+N  * @{
+N  */
+N
+N#define ADC_FLAG_AWD                               ((uint8_t)0x01)
+N#define ADC_FLAG_EOC                               ((uint8_t)0x02)
+N#define ADC_FLAG_JEOC                              ((uint8_t)0x04)
+N#define ADC_FLAG_JSTRT                             ((uint8_t)0x08)
+N#define ADC_FLAG_STRT                              ((uint8_t)0x10)
+N#define IS_ADC_CLEAR_FLAG(FLAG) ((((FLAG) & (uint8_t)0xE0) == 0x00) && ((FLAG) != 0x00))
+N#define IS_ADC_GET_FLAG(FLAG) (((FLAG) == ADC_FLAG_AWD) || ((FLAG) == ADC_FLAG_EOC) || \
+N                               ((FLAG) == ADC_FLAG_JEOC) || ((FLAG)== ADC_FLAG_JSTRT) || \
+N                               ((FLAG) == ADC_FLAG_STRT))
+X#define IS_ADC_GET_FLAG(FLAG) (((FLAG) == ADC_FLAG_AWD) || ((FLAG) == ADC_FLAG_EOC) ||                                ((FLAG) == ADC_FLAG_JEOC) || ((FLAG)== ADC_FLAG_JSTRT) ||                                ((FLAG) == ADC_FLAG_STRT))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_thresholds 
+N  * @{
+N  */
+N
+N#define IS_ADC_THRESHOLD(THRESHOLD) ((THRESHOLD) <= 0xFFF)
+N
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_injected_offset 
+N  * @{
+N  */
+N
+N#define IS_ADC_OFFSET(OFFSET) ((OFFSET) <= 0xFFF)
+N
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_injected_length 
+N  * @{
+N  */
+N
+N#define IS_ADC_INJECTED_LENGTH(LENGTH) (((LENGTH) >= 0x1) && ((LENGTH) <= 0x4))
+N
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_injected_rank 
+N  * @{
+N  */
+N
+N#define IS_ADC_INJECTED_RANK(RANK) (((RANK) >= 0x1) && ((RANK) <= 0x4))
+N
+N/**
+N  * @}
+N  */ 
+N
+N
+N/** @defgroup ADC_regular_length 
+N  * @{
+N  */
+N
+N#define IS_ADC_REGULAR_LENGTH(LENGTH) (((LENGTH) >= 0x1) && ((LENGTH) <= 0x10))
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_regular_rank 
+N  * @{
+N  */
+N
+N#define IS_ADC_REGULAR_RANK(RANK) (((RANK) >= 0x1) && ((RANK) <= 0x10))
+N
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_regular_discontinuous_mode_number 
+N  * @{
+N  */
+N
+N#define IS_ADC_REGULAR_DISC_NUMBER(NUMBER) (((NUMBER) >= 0x1) && ((NUMBER) <= 0x8))
+N
+N/**
+N  * @}
+N  */
+N
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_Exported_Macros
+N  * @{
+N  */
+N
+N/**
+N  * @}
+N  */
+N
+N/** @defgroup ADC_Exported_Functions
+N  * @{
+N  */
+N
+Nvoid ADC_DeInit(ADC_TypeDef* ADCx);
+Nvoid ADC_Init(ADC_TypeDef* ADCx, ADC_InitTypeDef* ADC_InitStruct);
+Nvoid ADC_StructInit(ADC_InitTypeDef* ADC_InitStruct);
+Nvoid ADC_Cmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+Nvoid ADC_DMACmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+Nvoid ADC_ITConfig(ADC_TypeDef* ADCx, uint16_t ADC_IT, FunctionalState NewState);
+Nvoid ADC_ResetCalibration(ADC_TypeDef* ADCx);
+NFlagStatus ADC_GetResetCalibrationStatus(ADC_TypeDef* ADCx);
+Nvoid ADC_StartCalibration(ADC_TypeDef* ADCx);
+NFlagStatus ADC_GetCalibrationStatus(ADC_TypeDef* ADCx);
+Nvoid ADC_SoftwareStartConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+NFlagStatus ADC_GetSoftwareStartConvStatus(ADC_TypeDef* ADCx);
+Nvoid ADC_DiscModeChannelCountConfig(ADC_TypeDef* ADCx, uint8_t Number);
+Nvoid ADC_DiscModeCmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+Nvoid ADC_RegularChannelConfig(ADC_TypeDef* ADCx, uint8_t ADC_Channel, uint8_t Rank, uint8_t ADC_SampleTime);
+Nvoid ADC_ExternalTrigConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+Nuint16_t ADC_GetConversionValue(ADC_TypeDef* ADCx);
+Nuint32_t ADC_GetDualModeConversionValue(void);
+Nvoid ADC_AutoInjectedConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+Nvoid ADC_InjectedDiscModeCmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+Nvoid ADC_ExternalTrigInjectedConvConfig(ADC_TypeDef* ADCx, uint32_t ADC_ExternalTrigInjecConv);
+Nvoid ADC_ExternalTrigInjectedConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+Nvoid ADC_SoftwareStartInjectedConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState);
+NFlagStatus ADC_GetSoftwareStartInjectedConvCmdStatus(ADC_TypeDef* ADCx);
+Nvoid ADC_InjectedChannelConfig(ADC_TypeDef* ADCx, uint8_t ADC_Channel, uint8_t Rank, uint8_t ADC_SampleTime);
+Nvoid ADC_InjectedSequencerLengthConfig(ADC_TypeDef* ADCx, uint8_t Length);
+Nvoid ADC_SetInjectedOffset(ADC_TypeDef* ADCx, uint8_t ADC_InjectedChannel, uint16_t Offset);
+Nuint16_t ADC_GetInjectedConversionValue(ADC_TypeDef* ADCx, uint8_t ADC_InjectedChannel);
+Nvoid ADC_AnalogWatchdogCmd(ADC_TypeDef* ADCx, uint32_t ADC_AnalogWatchdog);
+Nvoid ADC_AnalogWatchdogThresholdsConfig(ADC_TypeDef* ADCx, uint16_t HighThreshold, uint16_t LowThreshold);
+Nvoid ADC_AnalogWatchdogSingleChannelConfig(ADC_TypeDef* ADCx, uint8_t ADC_Channel);
+Nvoid ADC_TempSensorVrefintCmd(FunctionalState NewState);
+NFlagStatus ADC_GetFlagStatus(ADC_TypeDef* ADCx, uint8_t ADC_FLAG);
+Nvoid ADC_ClearFlag(ADC_TypeDef* ADCx, uint8_t ADC_FLAG);
+NITStatus ADC_GetITStatus(ADC_TypeDef* ADCx, uint16_t ADC_IT);
+Nvoid ADC_ClearITPendingBit(ADC_TypeDef* ADCx, uint16_t ADC_IT);
+N
+N#ifdef __cplusplus
+S}
+N#endif
+N
+N#endif /*__STM32F10x_ADC_H */
+N
+N/**
+N  * @}
+N  */
+N
+N/**
+N  * @}
+N  */
+N
+N/**
+N  * @}
+N  */
+N
+N/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+L 5 "..\driver\adc.h" 2
+N//本程序只供学习使用，未经作者许可，不得用于其它任何用途
+N//ALIENTEK战舰STM32开发板
+N//ADC 代码	   
+N//正点原子@ALIENTEK
+N//技术论坛:www.openedv.com
+N//修改日期:2012/9/7
+N//版本：V1.0
+N//版权所有，盗版必究。
+N//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
+N//All rights reserved									  
+N////////////////////////////////////////////////////////////////////////////////// 
+N
+Nvoid Adc_Init(void);
+Nu16  Get_Adc(u8 ch); 
+Nu16 Get_Adc_Average(u8 ch,u8 times); 
+N 
+N#endif 
+L 22 "..\BSP\bsp.c" 2
 N
 N/*
 N*Function: rcc_config      
@@ -24646,7 +25179,7 @@ X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), 
 N	
 N	
 N	
-N	//LOCK ON  
+N	//LOCK ON   OFF
 N	
 N	gpio_init_structure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
 X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0010) | ((uint16_t)0x0020);
@@ -24673,8 +25206,21 @@ X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), 
 N}
 N
 N
+Nvoid lock_on(void)
+N{
+N	MOTOA_LOW();
+X	GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0001));
+N	MOTOB_HIGH();
+X	GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
+N}
 N
-N
+Nvoid lock_off(void)
+N{
+N	MOTOB_HIGH();
+X	GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
+N	MOTOA_LOW();
+X	GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0001));
+N}
 N
 N
 N
@@ -24748,7 +25294,7 @@ N{
 N	bsp_rcc_init();
 N	bsp_nvic_init();
 N	gpio_init();
-N////	iwatchdog_config();
+N//	iwatchdog_config();
 N	usart1_init(115200, 8, 0, 1);
 N	usart2_init(115200);
 N//	usart3_init(9600);
@@ -24756,7 +25302,7 @@ N	USART3_Init(9600);
 N	timer2_init(200, 40);
 N//	RTC_Init();
 N//	AT24CXX_Init();   
-N//	Adc_Init();
+N	Adc_Init();
 N}
 N
 N
