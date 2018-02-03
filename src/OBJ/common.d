@@ -15,5 +15,4 @@
 ..\obj\common.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\common.o: ..\FLib\inc\misc.h
 ..\obj\common.o: ..\BSP\bsp.h
-..\obj\common.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\common.o: ..\FLib\inc\stm32f10x_iwdg.h

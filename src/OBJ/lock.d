@@ -14,5 +14,4 @@
 ..\obj\lock.o: ..\FLib\inc\stm32f10x_tim.h
 ..\obj\lock.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\lock.o: ..\FLib\inc\misc.h
-..\obj\lock.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\lock.o: ..\FLib\inc\stm32f10x_iwdg.h

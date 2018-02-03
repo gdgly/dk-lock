@@ -14,5 +14,4 @@
 ..\obj\button.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\button.o: ..\FLib\inc\misc.h
 ..\obj\button.o: ..\BSP\bsp.h
-..\obj\button.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\button.o: ..\FLib\inc\stm32f10x_iwdg.h

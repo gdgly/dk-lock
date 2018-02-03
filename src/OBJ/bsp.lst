@@ -23539,440 +23539,6 @@ N#include <stm32f10x_rcc.h>
 N#include <stm32f10x_gpio.h>
 N#include <stm32f10x_usart.h>
 N#include <stm32f10x_tim.h>
-N#include <stm32f10x_flash.h>
-L 1 "..\FLib\inc\stm32f10x_flash.h" 1
-N/**
-N  ******************************************************************************
-N  * @file    stm32f10x_flash.h
-N  * @author  MCD Application Team
-N  * @version V3.5.0
-N  * @date    11-March-2011
-N  * @brief   This file contains all the functions prototypes for the FLASH 
-N  *          firmware library.
-N  ******************************************************************************
-N  * @attention
-N  *
-N  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-N  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-N  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-N  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-N  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-N  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-N  *
-N  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
-N  ******************************************************************************
-N  */
-N
-N/* Define to prevent recursive inclusion -------------------------------------*/
-N#ifndef __STM32F10x_FLASH_H
-N#define __STM32F10x_FLASH_H
-N
-N#ifdef __cplusplus
-S extern "C" {
-N#endif
-N
-N/* Includes ------------------------------------------------------------------*/
-N#include "stm32f10x.h"
-N
-N/** @addtogroup STM32F10x_StdPeriph_Driver
-N  * @{
-N  */
-N
-N/** @addtogroup FLASH
-N  * @{
-N  */
-N
-N/** @defgroup FLASH_Exported_Types
-N  * @{
-N  */
-N
-N/** 
-N  * @brief  FLASH Status  
-N  */
-N
-Ntypedef enum
-N{ 
-N  FLASH_BUSY = 1,
-N  FLASH_ERROR_PG,
-N  FLASH_ERROR_WRP,
-N  FLASH_COMPLETE,
-N  FLASH_TIMEOUT
-N}FLASH_Status;
-N
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup FLASH_Exported_Constants
-N  * @{
-N  */
-N
-N/** @defgroup Flash_Latency 
-N  * @{
-N  */
-N
-N#define FLASH_Latency_0                ((uint32_t)0x00000000)  /*!< FLASH Zero Latency cycle */
-N#define FLASH_Latency_1                ((uint32_t)0x00000001)  /*!< FLASH One Latency cycle */
-N#define FLASH_Latency_2                ((uint32_t)0x00000002)  /*!< FLASH Two Latency cycles */
-N#define IS_FLASH_LATENCY(LATENCY) (((LATENCY) == FLASH_Latency_0) || \
-N                                   ((LATENCY) == FLASH_Latency_1) || \
-N                                   ((LATENCY) == FLASH_Latency_2))
-X#define IS_FLASH_LATENCY(LATENCY) (((LATENCY) == FLASH_Latency_0) ||                                    ((LATENCY) == FLASH_Latency_1) ||                                    ((LATENCY) == FLASH_Latency_2))
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup Half_Cycle_Enable_Disable 
-N  * @{
-N  */
-N
-N#define FLASH_HalfCycleAccess_Enable   ((uint32_t)0x00000008)  /*!< FLASH Half Cycle Enable */
-N#define FLASH_HalfCycleAccess_Disable  ((uint32_t)0x00000000)  /*!< FLASH Half Cycle Disable */
-N#define IS_FLASH_HALFCYCLEACCESS_STATE(STATE) (((STATE) == FLASH_HalfCycleAccess_Enable) || \
-N                                               ((STATE) == FLASH_HalfCycleAccess_Disable)) 
-X#define IS_FLASH_HALFCYCLEACCESS_STATE(STATE) (((STATE) == FLASH_HalfCycleAccess_Enable) ||                                                ((STATE) == FLASH_HalfCycleAccess_Disable)) 
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup Prefetch_Buffer_Enable_Disable 
-N  * @{
-N  */
-N
-N#define FLASH_PrefetchBuffer_Enable    ((uint32_t)0x00000010)  /*!< FLASH Prefetch Buffer Enable */
-N#define FLASH_PrefetchBuffer_Disable   ((uint32_t)0x00000000)  /*!< FLASH Prefetch Buffer Disable */
-N#define IS_FLASH_PREFETCHBUFFER_STATE(STATE) (((STATE) == FLASH_PrefetchBuffer_Enable) || \
-N                                              ((STATE) == FLASH_PrefetchBuffer_Disable)) 
-X#define IS_FLASH_PREFETCHBUFFER_STATE(STATE) (((STATE) == FLASH_PrefetchBuffer_Enable) ||                                               ((STATE) == FLASH_PrefetchBuffer_Disable)) 
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup Option_Bytes_Write_Protection 
-N  * @{
-N  */
-N
-N/* Values to be used with STM32 Low and Medium density devices */
-N#define FLASH_WRProt_Pages0to3         ((uint32_t)0x00000001) /*!< STM32 Low and Medium density devices: Write protection of page 0 to 3 */
-N#define FLASH_WRProt_Pages4to7         ((uint32_t)0x00000002) /*!< STM32 Low and Medium density devices: Write protection of page 4 to 7 */
-N#define FLASH_WRProt_Pages8to11        ((uint32_t)0x00000004) /*!< STM32 Low and Medium density devices: Write protection of page 8 to 11 */
-N#define FLASH_WRProt_Pages12to15       ((uint32_t)0x00000008) /*!< STM32 Low and Medium density devices: Write protection of page 12 to 15 */
-N#define FLASH_WRProt_Pages16to19       ((uint32_t)0x00000010) /*!< STM32 Low and Medium density devices: Write protection of page 16 to 19 */
-N#define FLASH_WRProt_Pages20to23       ((uint32_t)0x00000020) /*!< STM32 Low and Medium density devices: Write protection of page 20 to 23 */
-N#define FLASH_WRProt_Pages24to27       ((uint32_t)0x00000040) /*!< STM32 Low and Medium density devices: Write protection of page 24 to 27 */
-N#define FLASH_WRProt_Pages28to31       ((uint32_t)0x00000080) /*!< STM32 Low and Medium density devices: Write protection of page 28 to 31 */
-N
-N/* Values to be used with STM32 Medium-density devices */
-N#define FLASH_WRProt_Pages32to35       ((uint32_t)0x00000100) /*!< STM32 Medium-density devices: Write protection of page 32 to 35 */
-N#define FLASH_WRProt_Pages36to39       ((uint32_t)0x00000200) /*!< STM32 Medium-density devices: Write protection of page 36 to 39 */
-N#define FLASH_WRProt_Pages40to43       ((uint32_t)0x00000400) /*!< STM32 Medium-density devices: Write protection of page 40 to 43 */
-N#define FLASH_WRProt_Pages44to47       ((uint32_t)0x00000800) /*!< STM32 Medium-density devices: Write protection of page 44 to 47 */
-N#define FLASH_WRProt_Pages48to51       ((uint32_t)0x00001000) /*!< STM32 Medium-density devices: Write protection of page 48 to 51 */
-N#define FLASH_WRProt_Pages52to55       ((uint32_t)0x00002000) /*!< STM32 Medium-density devices: Write protection of page 52 to 55 */
-N#define FLASH_WRProt_Pages56to59       ((uint32_t)0x00004000) /*!< STM32 Medium-density devices: Write protection of page 56 to 59 */
-N#define FLASH_WRProt_Pages60to63       ((uint32_t)0x00008000) /*!< STM32 Medium-density devices: Write protection of page 60 to 63 */
-N#define FLASH_WRProt_Pages64to67       ((uint32_t)0x00010000) /*!< STM32 Medium-density devices: Write protection of page 64 to 67 */
-N#define FLASH_WRProt_Pages68to71       ((uint32_t)0x00020000) /*!< STM32 Medium-density devices: Write protection of page 68 to 71 */
-N#define FLASH_WRProt_Pages72to75       ((uint32_t)0x00040000) /*!< STM32 Medium-density devices: Write protection of page 72 to 75 */
-N#define FLASH_WRProt_Pages76to79       ((uint32_t)0x00080000) /*!< STM32 Medium-density devices: Write protection of page 76 to 79 */
-N#define FLASH_WRProt_Pages80to83       ((uint32_t)0x00100000) /*!< STM32 Medium-density devices: Write protection of page 80 to 83 */
-N#define FLASH_WRProt_Pages84to87       ((uint32_t)0x00200000) /*!< STM32 Medium-density devices: Write protection of page 84 to 87 */
-N#define FLASH_WRProt_Pages88to91       ((uint32_t)0x00400000) /*!< STM32 Medium-density devices: Write protection of page 88 to 91 */
-N#define FLASH_WRProt_Pages92to95       ((uint32_t)0x00800000) /*!< STM32 Medium-density devices: Write protection of page 92 to 95 */
-N#define FLASH_WRProt_Pages96to99       ((uint32_t)0x01000000) /*!< STM32 Medium-density devices: Write protection of page 96 to 99 */
-N#define FLASH_WRProt_Pages100to103     ((uint32_t)0x02000000) /*!< STM32 Medium-density devices: Write protection of page 100 to 103 */
-N#define FLASH_WRProt_Pages104to107     ((uint32_t)0x04000000) /*!< STM32 Medium-density devices: Write protection of page 104 to 107 */
-N#define FLASH_WRProt_Pages108to111     ((uint32_t)0x08000000) /*!< STM32 Medium-density devices: Write protection of page 108 to 111 */
-N#define FLASH_WRProt_Pages112to115     ((uint32_t)0x10000000) /*!< STM32 Medium-density devices: Write protection of page 112 to 115 */
-N#define FLASH_WRProt_Pages116to119     ((uint32_t)0x20000000) /*!< STM32 Medium-density devices: Write protection of page 115 to 119 */
-N#define FLASH_WRProt_Pages120to123     ((uint32_t)0x40000000) /*!< STM32 Medium-density devices: Write protection of page 120 to 123 */
-N#define FLASH_WRProt_Pages124to127     ((uint32_t)0x80000000) /*!< STM32 Medium-density devices: Write protection of page 124 to 127 */
-N
-N/* Values to be used with STM32 High-density and STM32F10X Connectivity line devices */
-N#define FLASH_WRProt_Pages0to1         ((uint32_t)0x00000001) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 0 to 1 */
-N#define FLASH_WRProt_Pages2to3         ((uint32_t)0x00000002) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 2 to 3 */
-N#define FLASH_WRProt_Pages4to5         ((uint32_t)0x00000004) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 4 to 5 */
-N#define FLASH_WRProt_Pages6to7         ((uint32_t)0x00000008) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 6 to 7 */
-N#define FLASH_WRProt_Pages8to9         ((uint32_t)0x00000010) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 8 to 9 */
-N#define FLASH_WRProt_Pages10to11       ((uint32_t)0x00000020) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 10 to 11 */
-N#define FLASH_WRProt_Pages12to13       ((uint32_t)0x00000040) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 12 to 13 */
-N#define FLASH_WRProt_Pages14to15       ((uint32_t)0x00000080) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 14 to 15 */
-N#define FLASH_WRProt_Pages16to17       ((uint32_t)0x00000100) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 16 to 17 */
-N#define FLASH_WRProt_Pages18to19       ((uint32_t)0x00000200) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 18 to 19 */
-N#define FLASH_WRProt_Pages20to21       ((uint32_t)0x00000400) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 20 to 21 */
-N#define FLASH_WRProt_Pages22to23       ((uint32_t)0x00000800) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 22 to 23 */
-N#define FLASH_WRProt_Pages24to25       ((uint32_t)0x00001000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 24 to 25 */
-N#define FLASH_WRProt_Pages26to27       ((uint32_t)0x00002000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 26 to 27 */
-N#define FLASH_WRProt_Pages28to29       ((uint32_t)0x00004000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 28 to 29 */
-N#define FLASH_WRProt_Pages30to31       ((uint32_t)0x00008000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 30 to 31 */
-N#define FLASH_WRProt_Pages32to33       ((uint32_t)0x00010000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 32 to 33 */
-N#define FLASH_WRProt_Pages34to35       ((uint32_t)0x00020000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 34 to 35 */
-N#define FLASH_WRProt_Pages36to37       ((uint32_t)0x00040000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 36 to 37 */
-N#define FLASH_WRProt_Pages38to39       ((uint32_t)0x00080000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 38 to 39 */
-N#define FLASH_WRProt_Pages40to41       ((uint32_t)0x00100000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 40 to 41 */
-N#define FLASH_WRProt_Pages42to43       ((uint32_t)0x00200000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 42 to 43 */
-N#define FLASH_WRProt_Pages44to45       ((uint32_t)0x00400000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 44 to 45 */
-N#define FLASH_WRProt_Pages46to47       ((uint32_t)0x00800000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 46 to 47 */
-N#define FLASH_WRProt_Pages48to49       ((uint32_t)0x01000000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 48 to 49 */
-N#define FLASH_WRProt_Pages50to51       ((uint32_t)0x02000000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 50 to 51 */
-N#define FLASH_WRProt_Pages52to53       ((uint32_t)0x04000000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 52 to 53 */
-N#define FLASH_WRProt_Pages54to55       ((uint32_t)0x08000000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 54 to 55 */
-N#define FLASH_WRProt_Pages56to57       ((uint32_t)0x10000000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 56 to 57 */
-N#define FLASH_WRProt_Pages58to59       ((uint32_t)0x20000000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 58 to 59 */
-N#define FLASH_WRProt_Pages60to61       ((uint32_t)0x40000000) /*!< STM32 High-density, XL-density and Connectivity line devices:
-N                                                                   Write protection of page 60 to 61 */
-N#define FLASH_WRProt_Pages62to127      ((uint32_t)0x80000000) /*!< STM32 Connectivity line devices: Write protection of page 62 to 127 */
-N#define FLASH_WRProt_Pages62to255      ((uint32_t)0x80000000) /*!< STM32 Medium-density devices: Write protection of page 62 to 255 */
-N#define FLASH_WRProt_Pages62to511      ((uint32_t)0x80000000) /*!< STM32 XL-density devices: Write protection of page 62 to 511 */
-N
-N#define FLASH_WRProt_AllPages          ((uint32_t)0xFFFFFFFF) /*!< Write protection of all Pages */
-N
-N#define IS_FLASH_WRPROT_PAGE(PAGE) (((PAGE) != 0x00000000))
-N
-N#define IS_FLASH_ADDRESS(ADDRESS) (((ADDRESS) >= 0x08000000) && ((ADDRESS) < 0x080FFFFF))
-N
-N#define IS_OB_DATA_ADDRESS(ADDRESS) (((ADDRESS) == 0x1FFFF804) || ((ADDRESS) == 0x1FFFF806))
-N
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup Option_Bytes_IWatchdog 
-N  * @{
-N  */
-N
-N#define OB_IWDG_SW                     ((uint16_t)0x0001)  /*!< Software IWDG selected */
-N#define OB_IWDG_HW                     ((uint16_t)0x0000)  /*!< Hardware IWDG selected */
-N#define IS_OB_IWDG_SOURCE(SOURCE) (((SOURCE) == OB_IWDG_SW) || ((SOURCE) == OB_IWDG_HW))
-N
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup Option_Bytes_nRST_STOP 
-N  * @{
-N  */
-N
-N#define OB_STOP_NoRST                  ((uint16_t)0x0002) /*!< No reset generated when entering in STOP */
-N#define OB_STOP_RST                    ((uint16_t)0x0000) /*!< Reset generated when entering in STOP */
-N#define IS_OB_STOP_SOURCE(SOURCE) (((SOURCE) == OB_STOP_NoRST) || ((SOURCE) == OB_STOP_RST))
-N
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup Option_Bytes_nRST_STDBY 
-N  * @{
-N  */
-N
-N#define OB_STDBY_NoRST                 ((uint16_t)0x0004) /*!< No reset generated when entering in STANDBY */
-N#define OB_STDBY_RST                   ((uint16_t)0x0000) /*!< Reset generated when entering in STANDBY */
-N#define IS_OB_STDBY_SOURCE(SOURCE) (((SOURCE) == OB_STDBY_NoRST) || ((SOURCE) == OB_STDBY_RST))
-N
-N#ifdef STM32F10X_XL
-S/**
-S  * @}
-S  */
-S/** @defgroup FLASH_Boot
-S  * @{
-S  */
-S#define FLASH_BOOT_Bank1  ((uint16_t)0x0000) /*!< At startup, if boot pins are set in boot from user Flash position
-S                                                  and this parameter is selected the device will boot from Bank1(Default) */
-S#define FLASH_BOOT_Bank2  ((uint16_t)0x0001) /*!< At startup, if boot pins are set in boot from user Flash position
-S                                                  and this parameter is selected the device will boot from Bank 2 or Bank 1,
-S                                                  depending on the activation of the bank */
-S#define IS_FLASH_BOOT(BOOT) (((BOOT) == FLASH_BOOT_Bank1) || ((BOOT) == FLASH_BOOT_Bank2))
-N#endif
-N/**
-N  * @}
-N  */
-N/** @defgroup FLASH_Interrupts 
-N  * @{
-N  */
-N#ifdef STM32F10X_XL
-S#define FLASH_IT_BANK2_ERROR                 ((uint32_t)0x80000400)  /*!< FPEC BANK2 error interrupt source */
-S#define FLASH_IT_BANK2_EOP                   ((uint32_t)0x80001000)  /*!< End of FLASH BANK2 Operation Interrupt source */
-S
-S#define FLASH_IT_BANK1_ERROR                 FLASH_IT_ERROR          /*!< FPEC BANK1 error interrupt source */
-S#define FLASH_IT_BANK1_EOP                   FLASH_IT_EOP            /*!< End of FLASH BANK1 Operation Interrupt source */
-S
-S#define FLASH_IT_ERROR                 ((uint32_t)0x00000400)  /*!< FPEC BANK1 error interrupt source */
-S#define FLASH_IT_EOP                   ((uint32_t)0x00001000)  /*!< End of FLASH BANK1 Operation Interrupt source */
-S#define IS_FLASH_IT(IT) ((((IT) & (uint32_t)0x7FFFEBFF) == 0x00000000) && (((IT) != 0x00000000)))
-N#else
-N#define FLASH_IT_ERROR                 ((uint32_t)0x00000400)  /*!< FPEC error interrupt source */
-N#define FLASH_IT_EOP                   ((uint32_t)0x00001000)  /*!< End of FLASH Operation Interrupt source */
-N#define FLASH_IT_BANK1_ERROR           FLASH_IT_ERROR          /*!< FPEC BANK1 error interrupt source */
-N#define FLASH_IT_BANK1_EOP             FLASH_IT_EOP            /*!< End of FLASH BANK1 Operation Interrupt source */
-N
-N#define IS_FLASH_IT(IT) ((((IT) & (uint32_t)0xFFFFEBFF) == 0x00000000) && (((IT) != 0x00000000)))
-N#endif
-N
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup FLASH_Flags 
-N  * @{
-N  */
-N#ifdef STM32F10X_XL
-S#define FLASH_FLAG_BANK2_BSY                 ((uint32_t)0x80000001)  /*!< FLASH BANK2 Busy flag */
-S#define FLASH_FLAG_BANK2_EOP                 ((uint32_t)0x80000020)  /*!< FLASH BANK2 End of Operation flag */
-S#define FLASH_FLAG_BANK2_PGERR               ((uint32_t)0x80000004)  /*!< FLASH BANK2 Program error flag */
-S#define FLASH_FLAG_BANK2_WRPRTERR            ((uint32_t)0x80000010)  /*!< FLASH BANK2 Write protected error flag */
-S
-S#define FLASH_FLAG_BANK1_BSY                 FLASH_FLAG_BSY       /*!< FLASH BANK1 Busy flag*/
-S#define FLASH_FLAG_BANK1_EOP                 FLASH_FLAG_EOP       /*!< FLASH BANK1 End of Operation flag */
-S#define FLASH_FLAG_BANK1_PGERR               FLASH_FLAG_PGERR     /*!< FLASH BANK1 Program error flag */
-S#define FLASH_FLAG_BANK1_WRPRTERR            FLASH_FLAG_WRPRTERR  /*!< FLASH BANK1 Write protected error flag */
-S
-S#define FLASH_FLAG_BSY                 ((uint32_t)0x00000001)  /*!< FLASH Busy flag */
-S#define FLASH_FLAG_EOP                 ((uint32_t)0x00000020)  /*!< FLASH End of Operation flag */
-S#define FLASH_FLAG_PGERR               ((uint32_t)0x00000004)  /*!< FLASH Program error flag */
-S#define FLASH_FLAG_WRPRTERR            ((uint32_t)0x00000010)  /*!< FLASH Write protected error flag */
-S#define FLASH_FLAG_OPTERR              ((uint32_t)0x00000001)  /*!< FLASH Option Byte error flag */
-S 
-S#define IS_FLASH_CLEAR_FLAG(FLAG) ((((FLAG) & (uint32_t)0x7FFFFFCA) == 0x00000000) && ((FLAG) != 0x00000000))
-S#define IS_FLASH_GET_FLAG(FLAG)  (((FLAG) == FLASH_FLAG_BSY) || ((FLAG) == FLASH_FLAG_EOP) || \
-S                                  ((FLAG) == FLASH_FLAG_PGERR) || ((FLAG) == FLASH_FLAG_WRPRTERR) || \
-S                                  ((FLAG) == FLASH_FLAG_OPTERR)|| \
-S                                  ((FLAG) == FLASH_FLAG_BANK1_BSY) || ((FLAG) == FLASH_FLAG_BANK1_EOP) || \
-S                                  ((FLAG) == FLASH_FLAG_BANK1_PGERR) || ((FLAG) == FLASH_FLAG_BANK1_WRPRTERR) || \
-S                                  ((FLAG) == FLASH_FLAG_BANK2_BSY) || ((FLAG) == FLASH_FLAG_BANK2_EOP) || \
-S                                  ((FLAG) == FLASH_FLAG_BANK2_PGERR) || ((FLAG) == FLASH_FLAG_BANK2_WRPRTERR))
-X#define IS_FLASH_GET_FLAG(FLAG)  (((FLAG) == FLASH_FLAG_BSY) || ((FLAG) == FLASH_FLAG_EOP) ||                                   ((FLAG) == FLASH_FLAG_PGERR) || ((FLAG) == FLASH_FLAG_WRPRTERR) ||                                   ((FLAG) == FLASH_FLAG_OPTERR)||                                   ((FLAG) == FLASH_FLAG_BANK1_BSY) || ((FLAG) == FLASH_FLAG_BANK1_EOP) ||                                   ((FLAG) == FLASH_FLAG_BANK1_PGERR) || ((FLAG) == FLASH_FLAG_BANK1_WRPRTERR) ||                                   ((FLAG) == FLASH_FLAG_BANK2_BSY) || ((FLAG) == FLASH_FLAG_BANK2_EOP) ||                                   ((FLAG) == FLASH_FLAG_BANK2_PGERR) || ((FLAG) == FLASH_FLAG_BANK2_WRPRTERR))
-N#else
-N#define FLASH_FLAG_BSY                 ((uint32_t)0x00000001)  /*!< FLASH Busy flag */
-N#define FLASH_FLAG_EOP                 ((uint32_t)0x00000020)  /*!< FLASH End of Operation flag */
-N#define FLASH_FLAG_PGERR               ((uint32_t)0x00000004)  /*!< FLASH Program error flag */
-N#define FLASH_FLAG_WRPRTERR            ((uint32_t)0x00000010)  /*!< FLASH Write protected error flag */
-N#define FLASH_FLAG_OPTERR              ((uint32_t)0x00000001)  /*!< FLASH Option Byte error flag */
-N
-N#define FLASH_FLAG_BANK1_BSY                 FLASH_FLAG_BSY       /*!< FLASH BANK1 Busy flag*/
-N#define FLASH_FLAG_BANK1_EOP                 FLASH_FLAG_EOP       /*!< FLASH BANK1 End of Operation flag */
-N#define FLASH_FLAG_BANK1_PGERR               FLASH_FLAG_PGERR     /*!< FLASH BANK1 Program error flag */
-N#define FLASH_FLAG_BANK1_WRPRTERR            FLASH_FLAG_WRPRTERR  /*!< FLASH BANK1 Write protected error flag */
-N 
-N#define IS_FLASH_CLEAR_FLAG(FLAG) ((((FLAG) & (uint32_t)0xFFFFFFCA) == 0x00000000) && ((FLAG) != 0x00000000))
-N#define IS_FLASH_GET_FLAG(FLAG)  (((FLAG) == FLASH_FLAG_BSY) || ((FLAG) == FLASH_FLAG_EOP) || \
-N                                  ((FLAG) == FLASH_FLAG_PGERR) || ((FLAG) == FLASH_FLAG_WRPRTERR) || \
-N								  ((FLAG) == FLASH_FLAG_BANK1_BSY) || ((FLAG) == FLASH_FLAG_BANK1_EOP) || \
-N                                  ((FLAG) == FLASH_FLAG_BANK1_PGERR) || ((FLAG) == FLASH_FLAG_BANK1_WRPRTERR) || \
-N                                  ((FLAG) == FLASH_FLAG_OPTERR))
-X#define IS_FLASH_GET_FLAG(FLAG)  (((FLAG) == FLASH_FLAG_BSY) || ((FLAG) == FLASH_FLAG_EOP) ||                                   ((FLAG) == FLASH_FLAG_PGERR) || ((FLAG) == FLASH_FLAG_WRPRTERR) || 								  ((FLAG) == FLASH_FLAG_BANK1_BSY) || ((FLAG) == FLASH_FLAG_BANK1_EOP) ||                                   ((FLAG) == FLASH_FLAG_BANK1_PGERR) || ((FLAG) == FLASH_FLAG_BANK1_WRPRTERR) ||                                   ((FLAG) == FLASH_FLAG_OPTERR))
-N#endif
-N
-N/**
-N  * @}
-N  */
-N
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup FLASH_Exported_Macros
-N  * @{
-N  */
-N
-N/**
-N  * @}
-N  */
-N
-N/** @defgroup FLASH_Exported_Functions
-N  * @{
-N  */
-N
-N/*------------ Functions used for all STM32F10x devices -----*/
-Nvoid FLASH_SetLatency(uint32_t FLASH_Latency);
-Nvoid FLASH_HalfCycleAccessCmd(uint32_t FLASH_HalfCycleAccess);
-Nvoid FLASH_PrefetchBufferCmd(uint32_t FLASH_PrefetchBuffer);
-Nvoid FLASH_Unlock(void);
-Nvoid FLASH_Lock(void);
-NFLASH_Status FLASH_ErasePage(uint32_t Page_Address);
-NFLASH_Status FLASH_EraseAllPages(void);
-NFLASH_Status FLASH_EraseOptionBytes(void);
-NFLASH_Status FLASH_ProgramWord(uint32_t Address, uint32_t Data);
-NFLASH_Status FLASH_ProgramHalfWord(uint32_t Address, uint16_t Data);
-NFLASH_Status FLASH_ProgramOptionByteData(uint32_t Address, uint8_t Data);
-NFLASH_Status FLASH_EnableWriteProtection(uint32_t FLASH_Pages);
-NFLASH_Status FLASH_ReadOutProtection(FunctionalState NewState);
-NFLASH_Status FLASH_UserOptionByteConfig(uint16_t OB_IWDG, uint16_t OB_STOP, uint16_t OB_STDBY);
-Nuint32_t FLASH_GetUserOptionByte(void);
-Nuint32_t FLASH_GetWriteProtectionOptionByte(void);
-NFlagStatus FLASH_GetReadOutProtectionStatus(void);
-NFlagStatus FLASH_GetPrefetchBufferStatus(void);
-Nvoid FLASH_ITConfig(uint32_t FLASH_IT, FunctionalState NewState);
-NFlagStatus FLASH_GetFlagStatus(uint32_t FLASH_FLAG);
-Nvoid FLASH_ClearFlag(uint32_t FLASH_FLAG);
-NFLASH_Status FLASH_GetStatus(void);
-NFLASH_Status FLASH_WaitForLastOperation(uint32_t Timeout);
-N
-N/*------------ New function used for all STM32F10x devices -----*/
-Nvoid FLASH_UnlockBank1(void);
-Nvoid FLASH_LockBank1(void);
-NFLASH_Status FLASH_EraseAllBank1Pages(void);
-NFLASH_Status FLASH_GetBank1Status(void);
-NFLASH_Status FLASH_WaitForLastBank1Operation(uint32_t Timeout);
-N
-N#ifdef STM32F10X_XL
-S/*---- New Functions used only with STM32F10x_XL density devices -----*/
-Svoid FLASH_UnlockBank2(void);
-Svoid FLASH_LockBank2(void);
-SFLASH_Status FLASH_EraseAllBank2Pages(void);
-SFLASH_Status FLASH_GetBank2Status(void);
-SFLASH_Status FLASH_WaitForLastBank2Operation(uint32_t Timeout);
-SFLASH_Status FLASH_BootConfig(uint16_t FLASH_BOOT);
-N#endif
-N
-N#ifdef __cplusplus
-S}
-N#endif
-N
-N#endif /* __STM32F10x_FLASH_H */
-N/**
-N  * @}
-N  */
-N
-N/**
-N  * @}
-N  */
-N
-N/**
-N  * @}
-N  */
-N
-N/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
-L 24 "..\BSP\bsp.h" 2
 N#include <stm32f10x_iwdg.h>
 L 1 "..\FLib\inc\stm32f10x_iwdg.h" 1
 N/**
@@ -24117,24 +23683,24 @@ N  * @}
 N  */
 N
 N/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
-L 25 "..\BSP\bsp.h" 2
+L 24 "..\BSP\bsp.h" 2
 N#include <misc.h>
 N
 N
 N
-N#define ENABLE				1
-N#define DISABLE				0
+N#define ENABLE						1
+N#define DISABLE						0
 N
 N
-N#define SCL_HIGH()			GPIO_SetBits(GPIOB, GPIO_Pin_0)
-N#define SCL_LOW()			GPIO_ResetBits(GPIOB, GPIO_Pin_0)
+N#define SCL_HIGH()				GPIO_SetBits(GPIOB, GPIO_Pin_0)
+N#define SCL_LOW()				GPIO_ResetBits(GPIOB, GPIO_Pin_0)
 N
-N#define SDA_HIGH()			GPIO_SetBits(GPIOB, GPIO_Pin_1)
-N#define SDA_LOW()			GPIO_ResetBits(GPIOB, GPIO_Pin_1)
+N#define SDA_HIGH()				GPIO_SetBits(GPIOB, GPIO_Pin_1)
+N#define SDA_LOW()				GPIO_ResetBits(GPIOB, GPIO_Pin_1)
 N
-N#define SDA_READ()			GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1)
+N#define SDA_READ()				GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1)
 N
-N#define BUTTON1_READ()		GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//°´¼ü
+N#define BUTTON1_READ()			GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//°´¼ü
 N
 N
 N#define LOCK_ON_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
@@ -24155,8 +23721,8 @@ N#define MOTOB_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_1)
 N#define MOTOB_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_1)
 N
 N
-N#define BEEP_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
-N#define BEEP_LOW() 				GPIO_ResetBits(GPIOC, GPIO_Pin_3)
+N#define BEEP_ON() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
+N#define BEEP_OFF() 				GPIO_ResetBits(GPIOC, GPIO_Pin_3)
 N
 N#define GPS_POW_HIGH()			GPIO_SetBits(GPIOC, GPIO_Pin_4)	
 N#define GPS_POW_LOW()			GPIO_ResetBits(GPIOC, GPIO_Pin_4)	
@@ -24312,8 +23878,9 @@ N{
 N    tim1_cnt,
 N    tim2_cnt,
 N	tim3_cnt,
-N	tim4_cnt,
-N	tim5_cnt,
+N	timer_close_lock,
+N	timer_open_lock,
+N	timer_heartbeat,
 N	timer_lock,
 N	timer_uart1,
 N	timer_uart2,
@@ -25173,7 +24740,7 @@ N	//button
 N	gpio_init_structure.GPIO_Pin = GPIO_Pin_6;
 X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0040);
 N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-N	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
+N	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
 N  	GPIO_Init(GPIOC, &gpio_init_structure);
 X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), &gpio_init_structure);
 N	
@@ -25184,7 +24751,7 @@ N
 N	gpio_init_structure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
 X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0010) | ((uint16_t)0x0020);
 N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-N	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
+N	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
 N  	GPIO_Init(GPIOA, &gpio_init_structure);
 X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), &gpio_init_structure);
 N	
@@ -25206,7 +24773,7 @@ X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), 
 N}
 N
 N
-Nvoid lock_on(void)
+Nvoid lock_open(void)
 N{
 N	MOTOA_LOW();
 X	GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0001));
@@ -25214,14 +24781,21 @@ N	MOTOB_HIGH();
 X	GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
 N}
 N
-Nvoid lock_off(void)
+Nvoid lock_close(void)
 N{
-N	MOTOB_HIGH();
-X	GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
-N	MOTOA_LOW();
-X	GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0001));
+N	MOTOA_HIGH();
+X	GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0001));
+N	MOTOB_LOW();
+X	GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
 N}
 N
+Nvoid lock_stop(void)
+N{
+N	MOTOA_LOW();
+X	GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0001));
+N	MOTOB_LOW();
+X	GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
+N}
 N
 N
 N/*

@@ -13,7 +13,6 @@
 ..\obj\bsp.o: ..\FLib\inc\stm32f10x_tim.h
 ..\obj\bsp.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\bsp.o: ..\FLib\inc\misc.h
-..\obj\bsp.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\bsp.o: ..\FLib\inc\stm32f10x_iwdg.h
 ..\obj\bsp.o: ..\SYS\common.h
 ..\obj\bsp.o: ..\driver\timer.h

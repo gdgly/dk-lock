@@ -22,5 +22,4 @@
 ..\obj\aes.o: ..\FLib\inc\stm32f10x_tim.h
 ..\obj\aes.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\aes.o: ..\FLib\inc\misc.h
-..\obj\aes.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\aes.o: ..\FLib\inc\stm32f10x_iwdg.h

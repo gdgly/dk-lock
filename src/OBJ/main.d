@@ -25,7 +25,6 @@
 ..\obj\main.o: ..\driver\adc.h
 ..\obj\main.o: ..\FLib\inc\stm32f10x_adc.h
 ..\obj\main.o: ..\BSP\bsp.h
-..\obj\main.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\main.o: ..\FLib\inc\stm32f10x_iwdg.h
 ..\obj\main.o: ..\driver\timer.h
 ..\obj\main.o: ..\driver\gprs.h

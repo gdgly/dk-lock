@@ -16,6 +16,5 @@
 ..\obj\protocol.o: ..\FLib\inc\stm32f10x_tim.h
 ..\obj\protocol.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\protocol.o: ..\FLib\inc\misc.h
-..\obj\protocol.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\protocol.o: ..\FLib\inc\stm32f10x_iwdg.h
 ..\obj\protocol.o: ..\driver\usart.h

@@ -16,5 +16,4 @@
 ..\obj\timer_1.o: ..\FLib\inc\misc.h
 ..\obj\timer_1.o: ..\driver\usart.h
 ..\obj\timer_1.o: ..\BSP\bsp.h
-..\obj\timer_1.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\timer_1.o: ..\FLib\inc\stm32f10x_iwdg.h

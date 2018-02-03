@@ -16,7 +16,6 @@
 ..\obj\gprs.o: ..\FLib\inc\stm32f10x_tim.h
 ..\obj\gprs.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\gprs.o: ..\FLib\inc\misc.h
-..\obj\gprs.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\gprs.o: ..\FLib\inc\stm32f10x_iwdg.h
 ..\obj\gprs.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 ..\obj\gprs.o: ..\driver\usart.h

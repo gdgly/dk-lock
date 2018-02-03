@@ -14,7 +14,6 @@
 ..\obj\batt.o: ..\FLib\inc\stm32f10x_tim.h
 ..\obj\batt.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\batt.o: ..\FLib\inc\misc.h
-..\obj\batt.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\batt.o: ..\FLib\inc\stm32f10x_iwdg.h
 ..\obj\batt.o: ..\driver\adc.h
 ..\obj\batt.o: ..\SYS\sys.h

@@ -103,7 +103,7 @@
 ;;;234    		
 ;;;235    		timer_is_timeout_1ms(timer_uart1, 0);
 000022  2100              MOVS     r1,#0
-000024  2006              MOVS     r0,#6
+000024  2007              MOVS     r0,#7
 000026  f7fffffe          BL       timer_is_timeout_1ms
 ;;;236    		
 ;;;237    //		if(usart1_rx_status == 0)
@@ -239,7 +239,7 @@
 ;;;302    		
 ;;;303    		timer_is_timeout_1ms(timer_uart2, 0);		//定时器清零
 00001c  2100              MOVS     r1,#0
-00001e  2007              MOVS     r0,#7
+00001e  2008              MOVS     r0,#8
 000020  f7fffffe          BL       timer_is_timeout_1ms
 ;;;304    		
 ;;;305    		if(usart2_rx_status == 0)
@@ -795,7 +795,7 @@
 ;;;266    
 ;;;267    	if(timer_is_timeout_1ms(timer_uart1, 40) == 0)	//40ms没接收到数据认为接收数据完成		
 000002  2128              MOVS     r1,#0x28
-000004  2006              MOVS     r0,#6
+000004  2007              MOVS     r0,#7
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b978              CBNZ     r0,|L9.44|
 ;;;268    	{
@@ -893,7 +893,7 @@
 ;;;350    		
 ;;;351    	if(timer_is_timeout_1ms(timer_uart2, 40) == 0)	//40ms没接收到数据认为接收数据完成		
 000002  2128              MOVS     r1,#0x28
-000004  2007              MOVS     r0,#7
+000004  2008              MOVS     r0,#8
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b988              CBNZ     r0,|L11.48|
 ;;;352    	{
@@ -997,7 +997,7 @@
 ;;;435    	
 ;;;436    	if(timer_is_timeout_1ms(timer_gprs, 40))	//40ms没接收到数据认为接收数据完成		
 000002  2128              MOVS     r1,#0x28
-000004  2009              MOVS     r0,#9
+000004  200a              MOVS     r0,#0xa
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b110              CBZ      r0,|L13.18|
 ;;;437    	{

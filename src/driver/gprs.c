@@ -218,12 +218,12 @@ void gprs_config(void)
 			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,10000);
 			if (ret != NULL)
 			{
-				if(strstr((char*)ret, "+STATUS: MQTT READY") != NULL)
+				if(strstr((char*)ret, "MQTT READY") != NULL)
 				{
 					gprs_status++;
 					gprs_err_cnt = 0;
 				}
-				else if(strstr((char*)ret, "+STATUS: MQTT CONNECT OK") != NULL)
+				else if(strstr((char*)ret, "MQTT CONNECT OK") != NULL)
 				{
 					gprs_status = 4;
 					gprs_err_cnt = 0;

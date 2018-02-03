@@ -16,7 +16,6 @@
 ..\obj\rtc_1.o: ..\SYS\delay.h
 ..\obj\rtc_1.o: ..\driver\usart.h
 ..\obj\rtc_1.o: ..\BSP\bsp.h
-..\obj\rtc_1.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\rtc_1.o: ..\FLib\inc\stm32f10x_iwdg.h
 ..\obj\rtc_1.o: ..\driver\rtc.h
 ..\obj\rtc_1.o: ..\FLib\inc\stm32f10x_rtc.h

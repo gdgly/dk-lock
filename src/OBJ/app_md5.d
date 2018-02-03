@@ -18,5 +18,4 @@
 ..\obj\app_md5.o: ..\tplib\App_md5.h
 ..\obj\app_md5.o: ..\driver\usart.h
 ..\obj\app_md5.o: ..\BSP\bsp.h
-..\obj\app_md5.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\app_md5.o: ..\FLib\inc\stm32f10x_iwdg.h

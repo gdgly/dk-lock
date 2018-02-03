@@ -187,7 +187,7 @@ void gpio_init(void)
 	//button
 	gpio_init_structure.GPIO_Pin = GPIO_Pin_6;
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
+	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
   	GPIO_Init(GPIOC, &gpio_init_structure);
 	
 	
@@ -196,7 +196,7 @@ void gpio_init(void)
 	
 	gpio_init_structure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
+	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
   	GPIO_Init(GPIOA, &gpio_init_structure);
 	
 	//MOTO D+ MOTO D-
@@ -213,18 +213,23 @@ void gpio_init(void)
 }
 
 
-void lock_on(void)
+void lock_open(void)
 {
 	MOTOA_LOW();
 	MOTOB_HIGH();
 }
 
-void lock_off(void)
+void lock_close(void)
 {
-	MOTOB_HIGH();
-	MOTOA_LOW();
+	MOTOA_HIGH();
+	MOTOB_LOW();
 }
 
+void lock_stop(void)
+{
+	MOTOA_LOW();
+	MOTOB_LOW();
+}
 
 
 /*

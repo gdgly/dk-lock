@@ -20,25 +20,24 @@
 #include <stm32f10x_gpio.h>
 #include <stm32f10x_usart.h>
 #include <stm32f10x_tim.h>
-#include <stm32f10x_flash.h>
 #include <stm32f10x_iwdg.h>
 #include <misc.h>
 
 
 
-#define ENABLE				1
-#define DISABLE				0
+#define ENABLE						1
+#define DISABLE						0
 
 
-#define SCL_HIGH()			GPIO_SetBits(GPIOB, GPIO_Pin_0)
-#define SCL_LOW()			GPIO_ResetBits(GPIOB, GPIO_Pin_0)
+#define SCL_HIGH()				GPIO_SetBits(GPIOB, GPIO_Pin_0)
+#define SCL_LOW()				GPIO_ResetBits(GPIOB, GPIO_Pin_0)
 
-#define SDA_HIGH()			GPIO_SetBits(GPIOB, GPIO_Pin_1)
-#define SDA_LOW()			GPIO_ResetBits(GPIOB, GPIO_Pin_1)
+#define SDA_HIGH()				GPIO_SetBits(GPIOB, GPIO_Pin_1)
+#define SDA_LOW()				GPIO_ResetBits(GPIOB, GPIO_Pin_1)
 
-#define SDA_READ()			GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1)
+#define SDA_READ()				GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1)
 
-#define BUTTON1_READ()		GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//°´¼ü
+#define BUTTON1_READ()			GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_6)		//°´¼ü
 
 
 #define LOCK_ON_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)
@@ -59,8 +58,8 @@
 #define MOTOB_LOW() 			GPIO_ResetBits(GPIOC, GPIO_Pin_1)
 
 
-#define BEEP_HIGH() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
-#define BEEP_LOW() 				GPIO_ResetBits(GPIOC, GPIO_Pin_3)
+#define BEEP_ON() 			GPIO_SetBits(GPIOC, GPIO_Pin_3)	
+#define BEEP_OFF() 				GPIO_ResetBits(GPIOC, GPIO_Pin_3)
 
 #define GPS_POW_HIGH()			GPIO_SetBits(GPIOC, GPIO_Pin_4)	
 #define GPS_POW_LOW()			GPIO_ResetBits(GPIOC, GPIO_Pin_4)	

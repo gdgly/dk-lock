@@ -18,7 +18,6 @@
 ..\obj\usart_1.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\usart_1.o: ..\driver\usart.h
 ..\obj\usart_1.o: ..\BSP\bsp.h
-..\obj\usart_1.o: ..\FLib\inc\stm32f10x_flash.h
 ..\obj\usart_1.o: ..\FLib\inc\stm32f10x_iwdg.h
 ..\obj\usart_1.o: ..\driver\timer.h
 ..\obj\usart_1.o: ..\SYS\sys.h
