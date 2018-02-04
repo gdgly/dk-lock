@@ -65,7 +65,8 @@ u8 *p3;
 u8 *p4;
 u8 *p5;
 
-
+u8 lock_open_err_flag = 0;
+u8 lock_close_err_flag = 0;
 u8 Lock_Open=0;
 u8 Lock_Open_On=0;
 u8 Lock_Open_Off=0;
@@ -88,17 +89,24 @@ __self_calendar_obj self_calendar;	//自检日历结构体
 u8 lockbuf[16];
 u8 lockbuff[16];
 
-
+u8 gps_flag = 0;
 
 
 u8 protocol_buff[512] = {0};
-
+u8 gps_buff[512] = {0};
 
 extern u8 PARK_LOCK_Buffer[16];
 extern uint8_t gprs_status;
 
 extern u8 usart2_buff[512];
 extern u16 usart2_cnt; 
+
+
+extern u8 usart3_buff[512];
+extern u16 usart3_cnt;  
+extern u8 usart3_rx_status;
+
+
 
 u8 tmp[20];
 
@@ -109,10 +117,11 @@ void Gps_Msg_Show(void)
 	tp=gpsx.longitude;	   
 	sprintf((char *)longitudedtbuf,"%clongitude%c:%.5f %1c",'"','"',tp/=100000,gpsx.ewhemi);	
 	//USART_OUT("%s\r\n",dtbuf);	 	
-	USART_OUT(USART1,"%s\r\n",longitudedtbuf);	
+
 	tp=gpsx.latitude;	   
 	sprintf((char *)latitudedtbuf,"%clatitude%c:%.5f %1c",'"','"',tp/=100000,gpsx.nshemi);	
-	USART_OUT(USART1,"%s\r\n",latitudedtbuf);
+//	USART_OUT(USART1,"%s\r\n",latitudedtbuf);
+//	USART_OUT(USART1,"%s\r\n",longitudedtbuf);	
 	tp=gpsx.altitude;	   
  	sprintf((char *)dtbuf,"Altitude:%.1fm     ",tp/=10);	    			
 }
@@ -126,8 +135,8 @@ int main(void)
 	u8 upload=0; 
 	u8 *ret;
 //	u8 *ret1, ret2;
-	
-	
+	uint8_t status = 0;
+	u8 tt = 0;
 	
 	
 	bsp_init();
@@ -136,8 +145,52 @@ int main(void)
 	USART_OUT(USART1, "uart1 is ok\r\n");
 	
 	
-	USART_OUT(USART1, "wangzhongya\r\n");
+//	while(1)
+//	{
+//		if(timer_is_timeout_1ms(tim2_cnt, 1000) == 0)
+//		{
+//			USART_OUT(USART1, "george\r\n");
+//		}
+//	}
 	
+//	GPS_POW_HIGH();
+//	while(1)
+//	{
+//		usart3_recv_data();
+//		
+//		if(usart3_rx_status == 1)
+//		{
+//			usart3_rx_status = 0;
+//			GPS_Analysis(&gpsx, gps_buff);
+//			Gps_Msg_Show();
+//			if(gpsx.latitude>0 && gpsx.longitude>0)
+//			{
+//				memset(gps_buff, 0, 512);
+//				
+//				USART_OUT(USART1,"%s\r\n",latitudedtbuf);
+//				USART_OUT(USART1,"%s\r\n",longitudedtbuf);	
+//				memset(expressText, 0 ,512);
+//				sprintf((char *)expressText,"%c%s,%s%c",'{',(char *)longitudedtbuf,(char *)latitudedtbuf,'}',48);
+//				sprintf((char *)PublishDataGpsbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",64,2\r\n");
+//				ret = gprs_send_at(PublishDataGpsbuf, ">", 300, 0);
+//				if(ret != NULL)
+//				{
+//					memset(cipherText, 0 ,512);
+////					AES_Encrypt((char *)expressText, cipherText, aesKey);
+//					tmp[0] = 0x38;
+//					ret = gprs_send_at(tmp, "OK", 300, 0);
+//					if(ret != NULL)
+//					{
+//						
+//					}
+//					memset(PublishDataBatbuf, 0, 512);
+//				}	
+//				GPS_POW_LOW();
+//				gps_flag = 0;
+//			}
+//		}
+
+//	}
 
 	while(1)
 	{	 
@@ -153,9 +206,7 @@ int main(void)
 		usart1_recv_data();
 		usart2_recv_data();
 		
-		
-		
-		
+	
 		MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);
 	
 		// 电池信息
@@ -164,10 +215,8 @@ int main(void)
 		Bat_V=Bat_V*88/20;
 		Bat_Pre=(Bat_V-5000)*100/2400;
 		
-		if(timer_is_timeout_1ms(tim1_cnt, 100000) == 0)
-		{
-			
- 		
+		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
+		{			
 			sprintf((char *)PublishDataBatbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
 			USART_OUT(USART1, "ssss=%s\r\n", PublishDataBatbuf);
 			ret = gprs_send_at(PublishDataBatbuf, ">", 300, 0);
@@ -216,8 +265,9 @@ int main(void)
 		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
 		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
 		{
-			USART_OUT(USART1, "lock\r\n");
-			
+			USART_OUT(USART1, "lock data\r\n");
+			timer_is_timeout_1ms(timer_open_lock, 0);
+			timer_is_timeout_1ms(timer_close_lock, 0);
  			if((LOCK_ON_READ() == 0) || (LOCK_OFF_READ() == 0))
 			{
 				memset(receiveText ,0 , 512);
@@ -231,8 +281,6 @@ int main(void)
 					if(ALARM_LOCK_ON() == 0)
 					{
 						Lock_Open=1;
-						timer_is_timeout_1ms(timer_open_lock, 0);
-						Lock_Open_On=1;	
 					}
 					else
 					{
@@ -244,7 +292,6 @@ int main(void)
 					if(LOCK_OFF_READ() == 0)
 					{
 						Lock_Close=1;
-						Lock_Close_On=1;
 					}
 					else
 					{
@@ -262,42 +309,16 @@ int main(void)
 			}
 		}
 //		//
-//		if((ALARM_LOCK_ON() == 1) || (ALARM_LOCK_OFF() == 1))
-//		{
-//			
-//		}
-//		
-		p1 = strstr((char*)protocol_buff, "topic: bell/");
-		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
-		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
-		{
-			USART_OUT(USART1, "bell\r\n");
+
 		
-			
-			bell_flag=1;
-			
-			BEEP_ON();
-			timer_delay_1ms(500);
-			BEEP_OFF();
-		}
-		
-		
-		if(bell_flag == 1)
-		{
-			bell_flag = 0;
-		}
-		
-				
+		//开锁逻辑		
 		if(Lock_Open == 1)
 		{
-			if(timer_is_timeout_1ms(timer_open_lock, 3000) == 0)
+			if(timer_is_timeout_1ms(timer_open_lock, 4000) == 0)
 			{
-//				lock_close();
-				if(LOCK_ON_READ()==0 || LOCK_OFF_READ()==0)
-				{
-					Lock_Close = 1;
-					Lock_Open = 0;
-				}
+				lock_open_err_flag = 1;					
+				lock_close();
+				USART_OUT(USART1, "Lock_Open timer\r\n");
 			}
 			USART_OUT(USART1, "Lock_Open\r\n");
 			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
@@ -306,7 +327,7 @@ int main(void)
 				USART_OUT(USART1, "AAA lock_open\r\n");
 			}
 			
-			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)
+			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0) //正常开锁
 			{
 				USART_OUT(USART1, "AAA lock_stop\r\n");
 				Lock_Open = 0;
@@ -329,27 +350,80 @@ int main(void)
 						
 					}
 				}			
-			}	
+			}
+			
+			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1 && lock_open_err_flag == 1)//开锁异常处理
+			{
+				lock_open_err_flag = 0;
+				Lock_Open = 0;
+				lock_stop();
+				
+				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",1,2\r\n");
+				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
+				ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+				if(ret != NULL)
+				{
+					memset(expressText, 0 ,512);
+					memset(cipherText, 0 ,512);
+					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"1");
+					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+//						AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+					tmp[0] = 0x33;
+					ret = gprs_send_at(tmp, "OK", 300, 0);
+					if(ret == NULL)
+					{
+						
+					}
+				}
+				
+			}
 		}
-		
+		//关锁逻辑
 		if(Lock_Close == 1)
 		{
-			if(timer_is_timeout_1ms(timer_close_lock, 5000) == 0)
+			if(timer_is_timeout_1ms(timer_close_lock, 4000) == 0)
 			{
-//				lock_open();
+				lock_open();
+				lock_close_err_flag = 1;
+				USART_OUT(USART1, "Lock_Close timer\r\n");
 			}
 			USART_OUT(USART1, "BBB Lock_Close\r\n");
-			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)
+			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	//正常关锁
 			{
 				lock_close();
 				USART_OUT(USART1, "BBB lock_close\r\n");
 			}
 			
-			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
+			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)	//正常关锁
 			{
 				Lock_Close = 0;
 				lock_stop();	//停止运行
 				USART_OUT(USART1, "BBB lock_stop\r\n");
+				
+				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",1,2\r\n");
+				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
+				ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+				if(ret != NULL)
+				{
+					memset(expressText, 0 ,512);
+					memset(cipherText, 0 ,512);
+					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"0");
+					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+//					AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+					tmp[0] = 0x35;
+					ret = gprs_send_at(tmp, "OK", 300, 0);
+					if(ret == NULL)
+					{
+						
+					}
+				}
+			}
+			
+			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0 && lock_close_err_flag == 1) //关锁异常处理
+			{
+				lock_close_err_flag = 0;
+				Lock_Close = 0;
+				lock_stop();	//停止运行
 				
 				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",1,2\r\n");
 				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
@@ -368,22 +442,55 @@ int main(void)
 						
 					}
 				}
-			}
+			}		
 		}
 		
-		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1)
+		p1 = strstr((char*)protocol_buff, "topic: bell/");
+		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
+		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
+		{
+			USART_OUT(USART1, "bell\r\n");
+	
+			bell_flag=1;
+  	
+			BEEP_ON();
+			timer_delay_1ms(500);
+			BEEP_OFF();
+		}
+				
+		if(bell_flag == 1)
+		{
+			bell_flag = 0;
+		}
+		
+		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1 && Shaking==0)
+		{
+			Shaking_Alarm_Flag=1;
+			BEEP_ON();
+			timer_delay_1ms(100);
+			BEEP_OFF();
+			timer_delay_1ms(400);
+		}
+		else
+		{
+			BEEP_OFF();
+		}
+		
+		p1 = strstr((char*)protocol_buff, "MQTT CLOSE");
+		if(p1 !=NULL)
 		{
 			
-			USART_OUT(USART1, "ddddd\r\n");
 		}
-		if(BUTTON1_READ() == 0)
+		
+		if(button_get_value() == 0)
 		{
-			USART_OUT(USART1, "bbbbb\r\n");
+			USART_OUT(USART1, "button_get_value");
+			timer_is_timeout_1ms(timer_close_lock, 0);
+			Lock_Close = 1;
 		}
+			
 		
-		
-		
-		if(timer_is_timeout_1ms(tim1_cnt, 1000*60*1) == 0)
+		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*1) == 0)
 		{
 		
 			sprintf((char *)PublishDataBatbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
@@ -400,10 +507,51 @@ int main(void)
 				}
 				memset(PublishDataBatbuf, 0, 512);
 			}
+		}
+		
+		
+		if(gps_flag == 1)
+		{
+			GPS_POW_HIGH();
+			if(usart3_rx_status == 1)
+			{
+				usart3_rx_status = 0;
+				GPS_Analysis(&gpsx,(u8*)usart3_buff);
+				Gps_Msg_Show();
+				if(gpsx.latitude>0&&gpsx.longitude>0)
+				{
+					memset(expressText, 0 ,512);
+					sprintf((char *)expressText,"%c%s,%s%c",'{',(char *)longitudedtbuf,(char *)latitudedtbuf,'}',48);
+					sprintf((char *)PublishDataGpsbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",64,2\r\n");
+					ret = gprs_send_at(PublishDataBatbuf, ">", 300, 0);
+					if(ret != NULL)
+					{
+						memset(cipherText, 0 ,512);
+						AES_Encrypt((char *)expressText, cipherText, aesKey);
+						
+						tmp[0] = 0x38;
+						ret = gprs_send_at(tmp, "OK", 300, 0);
+						if(ret != NULL)
+						{
+							
+						}
+						memset(PublishDataBatbuf, 0, 512);
+					}	
+					GPS_POW_LOW();
+					gps_flag = 0;
+				}
+			}
 		
 		}
 		
-//
+		if(timer_is_timeout_1ms(timer_gps, 1000*60*1) == 0)
+		{
+			
+			gps_flag = 1;
+		}
+		
+		
+
 	}	 
 }
  
@@ -415,6 +563,10 @@ int main(void)
 
 
 
+void hand_lock(void)
+{
+	
+}
 
 
 

@@ -13,7 +13,7 @@ enum timer
 {
     tim1_cnt,
     tim2_cnt,
-	tim3_cnt,
+	timer_gps,
 	timer_close_lock,
 	timer_open_lock,
 	timer_heartbeat,

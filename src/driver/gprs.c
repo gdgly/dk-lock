@@ -259,7 +259,7 @@ void gprs_config(void)
 		
 			
 		case 4:
-			ret = gprs_send_at("AT+STATUS\r\n", "+STATUS: MQTT CONNECT OK", 800,5000);
+			ret = gprs_send_at("AT+STATUS\r\n", "MQTT CONNECT OK", 800,5000);
 			if (ret != NULL)
 			{
 				gprs_status++;
@@ -297,7 +297,7 @@ void gprs_config(void)
 		break;
 			
 		case 6:
-			ret = gprs_send_at("AT+STATUS\r\n", "+STATUS: MQTT CONNECT OK", 800,5000);
+			ret = gprs_send_at("AT+STATUS\r\n", "MQTT CONNECT OK", 800,5000);
 			if (ret != NULL)
 			{
 				gprs_status++;
@@ -350,35 +350,18 @@ void gprs_config(void)
 				}
 			}
 		break;
-		
+			
 		case 9:
-			usart2_rx_status = 2;
-			USART_OUT(USART1, "usart2_rx_status = %d\r\n", usart2_rx_status);
-				
-			ret = gprs_send_at("AT+CLIENTID?\r\n", "OK", 50, 1000);
-			if (ret != NULL)
-			{
-				USART_OUT(USART1, ret);
-				str = strstr((const char*)ret, (const char*)"+CLIENTID: ");
-				memcpy(PARK_LOCK_Buffer, str+12, 16);	//¶Á³öËøid	
-				USART_OUT(USART1, "lock_id=%s\r\n", PARK_LOCK_Buffer);
-				gprs_status=255;
-				gprs_err_cnt = 0;
-			}
-			else
-			{
-				gprs_err_cnt++;
-				if (gprs_err_cnt > 5)
-				{
-					gprs_status = 0;
-				}
-			}
-		break;			
-		
-		case 10:
-//			USART_OUT(USART1, "GPRS INIT OK\r\n");
-//		USART_OUT(USART1, "GPRS INIT OK = %d\r\n", usart2_rx_status);
-		break;	
+			gprs_status = 255;
+		break;
+			
+//		case 254:
+
+//		break;			
+//		
+//		case 255:
+
+//		break;	
 		
 		default:
 		break;				

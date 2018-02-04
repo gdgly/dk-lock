@@ -5,86 +5,86 @@
                           AREA ||i.button_get_state||, CODE, READONLY, ALIGN=2
 
                   button_get_state PROC
-;;;40     
-;;;41     button_state_e button_get_state(u8 button_name, u32 long_time)
+;;;64     
+;;;65     button_state_e button_get_state(u8 button_name, u32 long_time)
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;42     {
+;;;66     {
 000004  4604              MOV      r4,r0
 000006  460d              MOV      r5,r1
-;;;43     	
-;;;44     	u8 i = 0;
+;;;67     	
+;;;68     	u8 i = 0;
 000008  2600              MOVS     r6,#0
-;;;45     	u8 button_cnt = 0;
+;;;69     	u8 button_cnt = 0;
 00000a  2700              MOVS     r7,#0
-;;;46     	u8 button_state = 0;
+;;;70     	u8 button_state = 0;
 00000c  46b0              MOV      r8,r6
-;;;47     	
-;;;48     	
-;;;49     	for(i=0; i<BUTTON_VALID_CNT; i++)
+;;;71     	
+;;;72     	
+;;;73     	for(i=0; i<BUTTON_VALID_CNT; i++)
 00000e  bf00              NOP      
 000010  e00a              B        |L1.40|
                   |L1.18|
-;;;50     	{
-;;;51     		if(BUTTON1_READ() == 0)
+;;;74     	{
+;;;75     		if(BUTTON1_READ() == 0)
 000012  2140              MOVS     r1,#0x40
 000014  482d              LDR      r0,|L1.204|
 000016  f7fffffe          BL       GPIO_ReadInputDataBit
 00001a  b910              CBNZ     r0,|L1.34|
-;;;52     		{
-;;;53     			button_cnt++;
+;;;76     		{
+;;;77     			button_cnt++;
 00001c  1c78              ADDS     r0,r7,#1
 00001e  b2c7              UXTB     r7,r0
 000020  e000              B        |L1.36|
                   |L1.34|
-;;;54     		}
-;;;55     		else
-;;;56     		{
-;;;57     			break;
+;;;78     		}
+;;;79     		else
+;;;80     		{
+;;;81     			break;
 000022  e003              B        |L1.44|
                   |L1.36|
-000024  1c70              ADDS     r0,r6,#1              ;49
-000026  b2c6              UXTB     r6,r0                 ;49
+000024  1c70              ADDS     r0,r6,#1              ;73
+000026  b2c6              UXTB     r6,r0                 ;73
                   |L1.40|
-000028  2e0a              CMP      r6,#0xa               ;49
+000028  2e0a              CMP      r6,#0xa               ;73
 00002a  dbf2              BLT      |L1.18|
                   |L1.44|
 00002c  bf00              NOP      
-;;;58     		}
-;;;59     	}
-;;;60     	
-;;;61     	if(button_cnt >= BUTTON_VALID_CNT)
+;;;82     		}
+;;;83     	}
+;;;84     	
+;;;85     	if(button_cnt >= BUTTON_VALID_CNT)
 00002e  2f0a              CMP      r7,#0xa
 000030  db02              BLT      |L1.56|
-;;;62     	{
-;;;63     		button_state = 0;
+;;;86     	{
+;;;87     		button_state = 0;
 000032  f04f0800          MOV      r8,#0
 000036  e001              B        |L1.60|
                   |L1.56|
-;;;64     	}
-;;;65     	else
-;;;66     	{
-;;;67     		button_state = 1;
+;;;88     	}
+;;;89     	else
+;;;90     	{
+;;;91     		button_state = 1;
 000038  f04f0801          MOV      r8,#1
                   |L1.60|
-;;;68     	}
-;;;69     		
-;;;70     	if(0 == button_state)
+;;;92     	}
+;;;93     		
+;;;94     	if(0 == button_state)
 00003c  f1b80f00          CMP      r8,#0
 000040  d114              BNE      |L1.108|
-;;;71     	{
-;;;72     		button_info[button_name].butt_en = ENABLE;
+;;;95     	{
+;;;96     		button_info[button_name].butt_en = ENABLE;
 000042  2001              MOVS     r0,#1
 000044  4922              LDR      r1,|L1.208|
 000046  eb0101c4          ADD      r1,r1,r4,LSL #3
 00004a  7048              STRB     r0,[r1,#1]
-;;;73     		if(button_info[button_name].butt_cnt < 5)
+;;;97     		if(button_info[button_name].butt_cnt < 5)
 00004c  4820              LDR      r0,|L1.208|
 00004e  eb0000c4          ADD      r0,r0,r4,LSL #3
 000052  7880              LDRB     r0,[r0,#2]
 000054  2805              CMP      r0,#5
 000056  da12              BGE      |L1.126|
-;;;74     		{
-;;;75     			button_info[button_name].butt_cnt++;
+;;;98     		{
+;;;99     			button_info[button_name].butt_cnt++;
 000058  481d              LDR      r0,|L1.208|
 00005a  eb0000c4          ADD      r0,r0,r4,LSL #3
 00005e  7880              LDRB     r0,[r0,#2]
@@ -94,88 +94,156 @@
 000068  7088              STRB     r0,[r1,#2]
 00006a  e008              B        |L1.126|
                   |L1.108|
-;;;76     		}
-;;;77     	}
-;;;78     	else
-;;;79     	{
-;;;80     		button_info[button_name].butt_cnt = 0;
+;;;100    		}
+;;;101    	}
+;;;102    	else
+;;;103    	{
+;;;104    		button_info[button_name].butt_cnt = 0;
 00006c  2000              MOVS     r0,#0
 00006e  4918              LDR      r1,|L1.208|
 000070  eb0101c4          ADD      r1,r1,r4,LSL #3
 000074  7088              STRB     r0,[r1,#2]
-;;;81     		button_info[button_name].butt_long_press_timer = long_time;
+;;;105    		button_info[button_name].butt_long_press_timer = long_time;
 000076  4816              LDR      r0,|L1.208|
 000078  eb0000c4          ADD      r0,r0,r4,LSL #3
 00007c  6045              STR      r5,[r0,#4]
                   |L1.126|
-;;;82     	}
-;;;83     	
-;;;84     	if(button_info[button_name].butt_cnt <= 0)
+;;;106    	}
+;;;107    	
+;;;108    	if(button_info[button_name].butt_cnt <= 0)
 00007e  4814              LDR      r0,|L1.208|
 000080  eb0000c4          ADD      r0,r0,r4,LSL #3
 000084  7880              LDRB     r0,[r0,#2]
 000086  2800              CMP      r0,#0
 000088  dc04              BGT      |L1.148|
-;;;85     	{
-;;;86     		button_info[button_name].butt_state = button_up;
+;;;109    	{
+;;;110    		button_info[button_name].butt_state = button_up;
 00008a  2001              MOVS     r0,#1
 00008c  4910              LDR      r1,|L1.208|
 00008e  f8010034          STRB     r0,[r1,r4,LSL #3]
 000092  e016              B        |L1.194|
                   |L1.148|
-;;;87     	}
-;;;88     	else if(button_info[button_name].butt_cnt <= 5)
+;;;111    	}
+;;;112    	else if(button_info[button_name].butt_cnt <= 5)
 000094  480e              LDR      r0,|L1.208|
 000096  eb0000c4          ADD      r0,r0,r4,LSL #3
 00009a  7880              LDRB     r0,[r0,#2]
 00009c  2805              CMP      r0,#5
 00009e  dc10              BGT      |L1.194|
-;;;89     	{
-;;;90     		if(button_info[button_name].butt_state == button_up)
+;;;113    	{
+;;;114    		if(button_info[button_name].butt_state == button_up)
 0000a0  480b              LDR      r0,|L1.208|
 0000a2  f8100034          LDRB     r0,[r0,r4,LSL #3]
 0000a6  2801              CMP      r0,#1
 0000a8  d100              BNE      |L1.172|
-;;;91     		{
-;;;92     			button_info[button_name].butt_state == button_click;
+;;;115    		{
+;;;116    			button_info[button_name].butt_state == button_click;
 0000aa  e00a              B        |L1.194|
                   |L1.172|
-;;;93     		}
-;;;94     		else if(button_click == button_info[button_name].butt_state)
+;;;117    		}
+;;;118    		else if(button_click == button_info[button_name].butt_state)
 0000ac  4808              LDR      r0,|L1.208|
 0000ae  f8100034          LDRB     r0,[r0,r4,LSL #3]
 0000b2  2802              CMP      r0,#2
 0000b4  d105              BNE      |L1.194|
-;;;95     		{
-;;;96     			if(0 == button_info[button_name].butt_long_press_timer)
+;;;119    		{
+;;;120    			if(0 == button_info[button_name].butt_long_press_timer)
 0000b6  4806              LDR      r0,|L1.208|
 0000b8  eb0000c4          ADD      r0,r0,r4,LSL #3
 0000bc  6840              LDR      r0,[r0,#4]
 0000be  b900              CBNZ     r0,|L1.194|
-;;;97     			{
-;;;98     				button_info[button_name].butt_state == button_long_press;
+;;;121    			{
+;;;122    				button_info[button_name].butt_state == button_long_press;
 0000c0  bf00              NOP      
                   |L1.194|
-;;;99     			}
-;;;100    		
-;;;101    		}
-;;;102    	}
-;;;103    	
-;;;104    	
-;;;105    	
-;;;106    	
-;;;107    	return button_info[button_name].butt_state;
+;;;123    			}
+;;;124    		
+;;;125    		}
+;;;126    	}
+;;;127    	
+;;;128    	
+;;;129    	
+;;;130    	
+;;;131    	return button_info[button_name].butt_state;
 0000c2  4803              LDR      r0,|L1.208|
 0000c4  f8100034          LDRB     r0,[r0,r4,LSL #3]
-;;;108    }
+;;;132    }
 0000c8  e8bd81f0          POP      {r4-r8,pc}
-;;;109    
+;;;133    
                           ENDP
 
                   |L1.204|
                           DCD      0x40011000
                   |L1.208|
                           DCD      button_info
+
+                          AREA ||i.button_get_value||, CODE, READONLY, ALIGN=2
+
+                  button_get_value PROC
+;;;19     
+;;;20     u8 button_get_value(void)
+000000  b570              PUSH     {r4-r6,lr}
+;;;21     {
+;;;22     	u8 val = 0;
+000002  2600              MOVS     r6,#0
+;;;23     	u8 i = 0;
+000004  2400              MOVS     r4,#0
+;;;24     	u8 button_cnt = 0;
+000006  2500              MOVS     r5,#0
+;;;25     	
+;;;26     	for(i=0; i<10; i++)
+000008  bf00              NOP      
+00000a  e00a              B        |L2.34|
+                  |L2.12|
+;;;27     	{
+;;;28     		if(BUTTON1_READ() == 0)
+00000c  2140              MOVS     r1,#0x40
+00000e  4809              LDR      r0,|L2.52|
+000010  f7fffffe          BL       GPIO_ReadInputDataBit
+000014  b910              CBNZ     r0,|L2.28|
+;;;29     		{
+;;;30     			button_cnt++;
+000016  1c68              ADDS     r0,r5,#1
+000018  b2c5              UXTB     r5,r0
+00001a  e000              B        |L2.30|
+                  |L2.28|
+;;;31     		}
+;;;32     		else
+;;;33     		{
+;;;34     			button_cnt = 0;
+00001c  2500              MOVS     r5,#0
+                  |L2.30|
+00001e  1c60              ADDS     r0,r4,#1              ;26
+000020  b2c4              UXTB     r4,r0                 ;26
+                  |L2.34|
+000022  2c0a              CMP      r4,#0xa               ;26
+000024  dbf2              BLT      |L2.12|
+;;;35     		}
+;;;36     	}
+;;;37     	
+;;;38     	if(button_cnt >= 10)
+000026  2d0a              CMP      r5,#0xa
+000028  db01              BLT      |L2.46|
+;;;39     	{
+;;;40     		return 0;
+00002a  2000              MOVS     r0,#0
+                  |L2.44|
+;;;41     	}
+;;;42     	else
+;;;43     	{
+;;;44     		return 1;
+;;;45     	}
+;;;46     }
+00002c  bd70              POP      {r4-r6,pc}
+                  |L2.46|
+00002e  2001              MOVS     r0,#1                 ;44
+000030  e7fc              B        |L2.44|
+;;;47     
+                          ENDP
+
+000032  0000              DCW      0x0000
+                  |L2.52|
+                          DCD      0x40011000
 
                           AREA ||i.button_gpio_init||, CODE, READONLY, ALIGN=1
 
@@ -195,48 +263,47 @@
                           AREA ||i.button_timer_ms||, CODE, READONLY, ALIGN=2
 
                   button_timer_ms PROC
-;;;24     
-;;;25     void button_timer_ms(void)
+;;;49     
+;;;50     void button_timer_ms(void)
 000000  2000              MOVS     r0,#0
-;;;26     {
-;;;27     	u8 i = 0;
-;;;28     	
-;;;29     	for(i=0; i<BUTTON_SUM; i++)
+;;;51     {
+;;;52     	u8 i = 0;
+;;;53     	
+;;;54     	for(i=0; i<BUTTON_SUM; i++)
 000002  bf00              NOP      
-000004  e010              B        |L3.40|
-                  |L3.6|
-;;;30     	{
-;;;31     		if(button_info[i].butt_en == ENABLE)
-000006  490a              LDR      r1,|L3.48|
+000004  e010              B        |L4.40|
+                  |L4.6|
+;;;55     	{
+;;;56     		if(button_info[i].butt_en == ENABLE)
+000006  490a              LDR      r1,|L4.48|
 000008  eb0101c0          ADD      r1,r1,r0,LSL #3
 00000c  7849              LDRB     r1,[r1,#1]
 00000e  2901              CMP      r1,#1
-000010  d108              BNE      |L3.36|
-;;;32     		{
-;;;33     			button_info[i].butt_long_press_timer--;
-000012  4907              LDR      r1,|L3.48|
+000010  d108              BNE      |L4.36|
+;;;57     		{
+;;;58     			button_info[i].butt_long_press_timer--;
+000012  4907              LDR      r1,|L4.48|
 000014  eb0101c0          ADD      r1,r1,r0,LSL #3
 000018  6849              LDR      r1,[r1,#4]
 00001a  1e49              SUBS     r1,r1,#1
-00001c  4a04              LDR      r2,|L3.48|
+00001c  4a04              LDR      r2,|L4.48|
 00001e  eb0202c0          ADD      r2,r2,r0,LSL #3
 000022  6051              STR      r1,[r2,#4]
-                  |L3.36|
-000024  1c41              ADDS     r1,r0,#1              ;29
-000026  b2c8              UXTB     r0,r1                 ;29
-                  |L3.40|
-000028  2801              CMP      r0,#1                 ;29
-00002a  dbec              BLT      |L3.6|
-;;;34     		}
-;;;35     	}
-;;;36     	
-;;;37     }
+                  |L4.36|
+000024  1c41              ADDS     r1,r0,#1              ;54
+000026  b2c8              UXTB     r0,r1                 ;54
+                  |L4.40|
+000028  2801              CMP      r0,#1                 ;54
+00002a  dbec              BLT      |L4.6|
+;;;59     		}
+;;;60     	}
+;;;61     }
 00002c  4770              BX       lr
-;;;38     
+;;;62     
                           ENDP
 
 00002e  0000              DCW      0x0000
-                  |L3.48|
+                  |L4.48|
                           DCD      button_info
 
                           AREA ||.data||, DATA, ALIGN=2

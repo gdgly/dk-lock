@@ -189,6 +189,7 @@ void NMEA_GNRMC_Analysis(nmea_msg *gpsx,u8 *buf)
 	u8 posx;     
 	u32 temp;	   
 	float rs;  
+
 	p1=(u8*)strstr((const char *)buf,"$GNRMC");//"$GNRMC",经常有&和GNRMC分开的情况,故只判断GPRMC.
 	posx=NMEA_Comma_Pos(p1,1);								//得到UTC时间
 	if(posx!=0XFF)

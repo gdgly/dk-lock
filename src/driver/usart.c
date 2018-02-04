@@ -29,7 +29,7 @@
 
 
 extern u8 protocol_buff[512];
-
+extern u8 gps_buff[512];
 
 static usart_buff_t sb = SerialBuffDefault();
 
@@ -38,11 +38,12 @@ usart_buff_t *usart2_rx_buff = &sb;
 usart_buff_t *usart3_rx_buff = &sb;
 
 
-u8 usart1_buff[512] = {0};
-u8 usart2_buff[512] = {0};
+u8 usart1_buff[USART_BUFF_LENGHT] = {0};
+u8 usart2_buff[USART_BUFF_LENGHT] = {0};
+u8 usart3_buff[USART_BUFF_LENGHT] = {0};
 u16 usart1_cnt = 0;
 u16 usart2_cnt = 0;
-
+u16 usart3_cnt = 0;
 
 u8 usart1_rx_status = 0;
 u8 usart2_rx_status = 0;
@@ -152,9 +153,7 @@ void usart3_init(u32 band_rate)
 	usart_init_structre.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	USART_Init(USART3, &usart_init_structre);
 		
-
 	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-	
 	
 	USART_Cmd(USART3, ENABLE);
 	
@@ -346,8 +345,7 @@ void USART2_IRQHandler(void)
 
 
 void usart2_recv_data(void)
-{
-		
+{		
 	if(timer_is_timeout_1ms(timer_uart2, 40) == 0)	//40ms没接收到数据认为接收数据完成		
 	{
 		
@@ -379,28 +377,26 @@ void usart2_recv_data(void)
 */
 void USART3_IRQHandler(void)
 {
-
 	u8 ch = 0;	
-	u8 tmp[5] = {0};
-	  
+
    	if (USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
     {   
 	    USART_ClearITPendingBit(USART3, USART_IT_RXNE);	
-				
+		timer_is_timeout_1ms(timer_uart3, 0);
+		
 		if(usart3_rx_status == 0)
-		{
-	
+		{	
 			ch = USART_ReceiveData(USART3);	 
 
-			if (usart3_rx_buff->index < USART_BUFF_LENGHT)
+			if (usart3_cnt < USART_BUFF_LENGHT)
 			{
-				usart3_rx_buff->pdata[usart3_rx_buff->index++] = ch;
-					
-					
+				usart3_buff[usart3_cnt++] = ch;	
+				usart3_rx_status = 1;				
 			}
 			else
 			{
-				memset(usart3_rx_buff, 0, sizeof(usart_buff_t));	
+				memset(usart3_buff, 0, USART_BUFF_LENGHT);
+				usart3_cnt = 0;
 			}
 		}	
 	}
@@ -411,8 +407,6 @@ void USART3_IRQHandler(void)
   	}	
 	
 }
-
-
 
 /*
 *********************************************************************************************************
@@ -431,11 +425,15 @@ void USART3_IRQHandler(void)
 */
 void usart3_recv_data(void)
 {
-
 	
-	if(timer_is_timeout_1ms(timer_gprs, 40))	//40ms没接收到数据认为接收数据完成		
+	if(timer_is_timeout_1ms(timer_uart3, 40)==0)	//40ms没接收到数据认为接收数据完成		
 	{
-		usart3_rx_status = 1;
+
+		USART_OUT(USART1, usart3_buff);
+		memcpy(gps_buff, usart3_buff, 512);
+		
+		memset(usart3_buff, 0, 512);	
+		usart3_cnt = 0;	
 	}	
 }
 

@@ -17,8 +17,33 @@ void button_gpio_init(void)
 }
 
 
-
-
+u8 button_get_value(void)
+{
+	u8 val = 0;
+	u8 i = 0;
+	u8 button_cnt = 0;
+	
+	for(i=0; i<10; i++)
+	{
+		if(BUTTON1_READ() == 0)
+		{
+			button_cnt++;
+		}
+		else
+		{
+			button_cnt = 0;
+		}
+	}
+	
+	if(button_cnt >= 10)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
 
 
 
@@ -33,7 +58,6 @@ void button_timer_ms(void)
 			button_info[i].butt_long_press_timer--;
 		}
 	}
-	
 }
 
 

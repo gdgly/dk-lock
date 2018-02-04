@@ -210,6 +210,13 @@ void gpio_init(void)
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
 	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
   	GPIO_Init(GPIOC, &gpio_init_structure);
+	
+	
+	//GPS power enable
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_4;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
+	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
+  	GPIO_Init(GPIOC, &gpio_init_structure);
 }
 
 
@@ -302,7 +309,7 @@ void bsp_init(void)
 	usart2_init(115200);
 //	usart3_init(9600);
 	USART3_Init(9600); 
-	timer2_init(200, 40);
+	timer2_init(200, 41);
 //	RTC_Init();
 //	AT24CXX_Init();   
 	Adc_Init();

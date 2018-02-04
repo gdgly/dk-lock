@@ -5,127 +5,127 @@
                           AREA ||i.bsp_init||, CODE, READONLY, ALIGN=1
 
                   bsp_init PROC
-;;;294    */
-;;;295    void bsp_init(void)
+;;;301    */
+;;;302    void bsp_init(void)
 000000  b510              PUSH     {r4,lr}
-;;;296    {
-;;;297    	bsp_rcc_init();
+;;;303    {
+;;;304    	bsp_rcc_init();
 000002  f7fffffe          BL       bsp_rcc_init
-;;;298    	bsp_nvic_init();
+;;;305    	bsp_nvic_init();
 000006  f7fffffe          BL       bsp_nvic_init
-;;;299    	gpio_init();
+;;;306    	gpio_init();
 00000a  f7fffffe          BL       gpio_init
-;;;300    //	iwatchdog_config();
-;;;301    	usart1_init(115200, 8, 0, 1);
+;;;307    //	iwatchdog_config();
+;;;308    	usart1_init(115200, 8, 0, 1);
 00000e  2301              MOVS     r3,#1
 000010  2200              MOVS     r2,#0
 000012  2108              MOVS     r1,#8
 000014  f44f30e1          MOV      r0,#0x1c200
 000018  f7fffffe          BL       usart1_init
-;;;302    	usart2_init(115200);
+;;;309    	usart2_init(115200);
 00001c  f44f30e1          MOV      r0,#0x1c200
 000020  f7fffffe          BL       usart2_init
-;;;303    //	usart3_init(9600);
-;;;304    	USART3_Init(9600); 
+;;;310    //	usart3_init(9600);
+;;;311    	USART3_Init(9600); 
 000024  f44f5016          MOV      r0,#0x2580
 000028  f7fffffe          BL       USART3_Init
-;;;305    	timer2_init(200, 40);
-00002c  2128              MOVS     r1,#0x28
+;;;312    	timer2_init(200, 41);
+00002c  2129              MOVS     r1,#0x29
 00002e  20c8              MOVS     r0,#0xc8
 000030  f7fffffe          BL       timer2_init
-;;;306    //	RTC_Init();
-;;;307    //	AT24CXX_Init();   
-;;;308    	Adc_Init();
+;;;313    //	RTC_Init();
+;;;314    //	AT24CXX_Init();   
+;;;315    	Adc_Init();
 000034  f7fffffe          BL       Adc_Init
-;;;309    }
+;;;316    }
 000038  bd10              POP      {r4,pc}
-;;;310    
+;;;317    
                           ENDP
 
 
                           AREA ||i.bsp_nvic_init||, CODE, READONLY, ALIGN=1
 
                   bsp_nvic_init PROC
-;;;245    */
-;;;246    void bsp_nvic_init(void)
+;;;252    */
+;;;253    void bsp_nvic_init(void)
 000000  b508              PUSH     {r3,lr}
-;;;247    {
-;;;248    	NVIC_InitTypeDef nvic_init_structure;
-;;;249    
-;;;250    	
-;;;251    	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+;;;254    {
+;;;255    	NVIC_InitTypeDef nvic_init_structure;
+;;;256    
+;;;257    	
+;;;258    	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
 000002  f44f60e0          MOV      r0,#0x700
 000006  f7fffffe          BL       NVIC_PriorityGroupConfig
-;;;252    
-;;;253    	// TIM2
-;;;254    	nvic_init_structure.NVIC_IRQChannel = TIM2_IRQn;
+;;;259    
+;;;260    	// TIM2
+;;;261    	nvic_init_structure.NVIC_IRQChannel = TIM2_IRQn;
 00000a  201c              MOVS     r0,#0x1c
 00000c  f88d0000          STRB     r0,[sp,#0]
-;;;255        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 0;    //
+;;;262        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 0;    //
 000010  2000              MOVS     r0,#0
 000012  f88d0001          STRB     r0,[sp,#1]
-;;;256        nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
+;;;263        nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
 000016  2002              MOVS     r0,#2
 000018  f88d0002          STRB     r0,[sp,#2]
-;;;257        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;
+;;;264        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;
 00001c  2001              MOVS     r0,#1
 00001e  f88d0003          STRB     r0,[sp,#3]
-;;;258        NVIC_Init(&nvic_init_structure);
+;;;265        NVIC_Init(&nvic_init_structure);
 000022  4668              MOV      r0,sp
 000024  f7fffffe          BL       NVIC_Init
-;;;259    
-;;;260    	
-;;;261    	// USART1
-;;;262    	nvic_init_structure.NVIC_IRQChannel = USART1_IRQn;
+;;;266    
+;;;267    	
+;;;268    	// USART1
+;;;269    	nvic_init_structure.NVIC_IRQChannel = USART1_IRQn;
 000028  2025              MOVS     r0,#0x25
 00002a  f88d0000          STRB     r0,[sp,#0]
-;;;263        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
+;;;270        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
 00002e  2001              MOVS     r0,#1
 000030  f88d0001          STRB     r0,[sp,#1]
-;;;264        nvic_init_structure.NVIC_IRQChannelSubPriority = 1;
+;;;271        nvic_init_structure.NVIC_IRQChannelSubPriority = 1;
 000034  f88d0002          STRB     r0,[sp,#2]
-;;;265        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
+;;;272        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
 000038  f88d0003          STRB     r0,[sp,#3]
-;;;266    	NVIC_Init(&nvic_init_structure);
+;;;273    	NVIC_Init(&nvic_init_structure);
 00003c  4668              MOV      r0,sp
 00003e  f7fffffe          BL       NVIC_Init
-;;;267    	
-;;;268    	// USART2
-;;;269    	nvic_init_structure.NVIC_IRQChannel = USART2_IRQn;
+;;;274    	
+;;;275    	// USART2
+;;;276    	nvic_init_structure.NVIC_IRQChannel = USART2_IRQn;
 000042  2026              MOVS     r0,#0x26
 000044  f88d0000          STRB     r0,[sp,#0]
-;;;270        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
+;;;277        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
 000048  2001              MOVS     r0,#1
 00004a  f88d0001          STRB     r0,[sp,#1]
-;;;271        nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
+;;;278        nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
 00004e  2002              MOVS     r0,#2
 000050  f88d0002          STRB     r0,[sp,#2]
-;;;272        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
+;;;279        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
 000054  2001              MOVS     r0,#1
 000056  f88d0003          STRB     r0,[sp,#3]
-;;;273    	NVIC_Init(&nvic_init_structure);	
+;;;280    	NVIC_Init(&nvic_init_structure);	
 00005a  4668              MOV      r0,sp
 00005c  f7fffffe          BL       NVIC_Init
-;;;274    	
-;;;275    	// USART3
-;;;276    	nvic_init_structure.NVIC_IRQChannel = USART3_IRQn;
+;;;281    	
+;;;282    	// USART3
+;;;283    	nvic_init_structure.NVIC_IRQChannel = USART3_IRQn;
 000060  2027              MOVS     r0,#0x27
 000062  f88d0000          STRB     r0,[sp,#0]
-;;;277        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
+;;;284        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
 000066  2001              MOVS     r0,#1
 000068  f88d0001          STRB     r0,[sp,#1]
-;;;278        nvic_init_structure.NVIC_IRQChannelSubPriority = 3;
+;;;285        nvic_init_structure.NVIC_IRQChannelSubPriority = 3;
 00006c  2003              MOVS     r0,#3
 00006e  f88d0002          STRB     r0,[sp,#2]
-;;;279        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
+;;;286        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
 000072  2001              MOVS     r0,#1
 000074  f88d0003          STRB     r0,[sp,#3]
-;;;280    	NVIC_Init(&nvic_init_structure);	
+;;;287    	NVIC_Init(&nvic_init_structure);	
 000078  4668              MOV      r0,sp
 00007a  f7fffffe          BL       NVIC_Init
-;;;281    }
+;;;288    }
 00007e  bd08              POP      {r3,pc}
-;;;282    
+;;;289    
                           ENDP
 
 
@@ -238,7 +238,7 @@
 000012  f88d0002          STRB     r0,[sp,#2]
 ;;;146      	GPIO_Init(GPIOA, &gpio_init_structure);
 000016  4669              MOV      r1,sp
-000018  484a              LDR      r0,|L4.324|
+000018  4850              LDR      r0,|L4.348|
 00001a  f7fffffe          BL       GPIO_Init
 ;;;147    	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				
 00001e  f44f6080          MOV      r0,#0x400
@@ -251,7 +251,7 @@
 00002e  f88d0002          STRB     r0,[sp,#2]
 ;;;150      	GPIO_Init(GPIOA, &gpio_init_structure);
 000032  4669              MOV      r1,sp
-000034  4843              LDR      r0,|L4.324|
+000034  4849              LDR      r0,|L4.348|
 000036  f7fffffe          BL       GPIO_Init
 ;;;151    	
 ;;;152    	// UART2
@@ -266,7 +266,7 @@
 000048  f88d0002          STRB     r0,[sp,#2]
 ;;;156      	GPIO_Init(GPIOA, &gpio_init_structure);
 00004c  4669              MOV      r1,sp
-00004e  483d              LDR      r0,|L4.324|
+00004e  4843              LDR      r0,|L4.348|
 000050  f7fffffe          BL       GPIO_Init
 ;;;157    	gpio_init_structure.GPIO_Pin = GPIO_Pin_3;				
 000054  2008              MOVS     r0,#8
@@ -279,7 +279,7 @@
 000062  f88d0002          STRB     r0,[sp,#2]
 ;;;160      	GPIO_Init(GPIOA, &gpio_init_structure);
 000066  4669              MOV      r1,sp
-000068  4836              LDR      r0,|L4.324|
+000068  483c              LDR      r0,|L4.348|
 00006a  f7fffffe          BL       GPIO_Init
 ;;;161    
 ;;;162    
@@ -295,7 +295,7 @@
 00007e  f88d0002          STRB     r0,[sp,#2]
 ;;;167      	GPIO_Init(GPIOB, &gpio_init_structure);
 000082  4669              MOV      r1,sp
-000084  4830              LDR      r0,|L4.328|
+000084  4836              LDR      r0,|L4.352|
 000086  f7fffffe          BL       GPIO_Init
 ;;;168    	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
 00008a  f44f6000          MOV      r0,#0x800
@@ -308,7 +308,7 @@
 00009a  f88d0002          STRB     r0,[sp,#2]
 ;;;171      	GPIO_Init(GPIOB, &gpio_init_structure);
 00009e  4669              MOV      r1,sp
-0000a0  4829              LDR      r0,|L4.328|
+0000a0  482f              LDR      r0,|L4.352|
 0000a2  f7fffffe          BL       GPIO_Init
 ;;;172    	
 ;;;173    	
@@ -325,7 +325,7 @@
 0000b4  f88d0003          STRB     r0,[sp,#3]
 ;;;179      	GPIO_Init(GPIOB, &gpio_init_structure);
 0000b8  4669              MOV      r1,sp
-0000ba  4823              LDR      r0,|L4.328|
+0000ba  4829              LDR      r0,|L4.352|
 0000bc  f7fffffe          BL       GPIO_Init
 ;;;180    	
 ;;;181    	gpio_init_structure.GPIO_Pin = GPIO_Pin_1;
@@ -339,7 +339,7 @@
 0000ce  f88d0003          STRB     r0,[sp,#3]
 ;;;184      	GPIO_Init(GPIOB, &gpio_init_structure);
 0000d2  4669              MOV      r1,sp
-0000d4  481c              LDR      r0,|L4.328|
+0000d4  4822              LDR      r0,|L4.352|
 0000d6  f7fffffe          BL       GPIO_Init
 ;;;185    	
 ;;;186    	
@@ -355,7 +355,7 @@
 0000e8  f88d0003          STRB     r0,[sp,#3]
 ;;;191      	GPIO_Init(GPIOC, &gpio_init_structure);
 0000ec  4669              MOV      r1,sp
-0000ee  4817              LDR      r0,|L4.332|
+0000ee  481d              LDR      r0,|L4.356|
 0000f0  f7fffffe          BL       GPIO_Init
 ;;;192    	
 ;;;193    	
@@ -373,7 +373,7 @@
 000102  f88d0003          STRB     r0,[sp,#3]
 ;;;200      	GPIO_Init(GPIOA, &gpio_init_structure);
 000106  4669              MOV      r1,sp
-000108  480e              LDR      r0,|L4.324|
+000108  4814              LDR      r0,|L4.348|
 00010a  f7fffffe          BL       GPIO_Init
 ;;;201    	
 ;;;202    	//MOTO D+ MOTO D-
@@ -387,7 +387,7 @@
 00011a  f88d0003          STRB     r0,[sp,#3]
 ;;;206      	GPIO_Init(GPIOC, &gpio_init_structure);
 00011e  4669              MOV      r1,sp
-000120  480a              LDR      r0,|L4.332|
+000120  4810              LDR      r0,|L4.356|
 000122  f7fffffe          BL       GPIO_Init
 ;;;207    	
 ;;;208    	//BELL
@@ -402,19 +402,34 @@
 000134  f88d0003          STRB     r0,[sp,#3]
 ;;;212      	GPIO_Init(GPIOC, &gpio_init_structure);
 000138  4669              MOV      r1,sp
-00013a  4804              LDR      r0,|L4.332|
+00013a  480a              LDR      r0,|L4.356|
 00013c  f7fffffe          BL       GPIO_Init
-;;;213    }
-000140  bd08              POP      {r3,pc}
-;;;214    
+;;;213    	
+;;;214    	
+;;;215    	//GPS power enable
+;;;216    	gpio_init_structure.GPIO_Pin = GPIO_Pin_4;
+000140  2010              MOVS     r0,#0x10
+000142  f8ad0000          STRH     r0,[sp,#0]
+;;;217      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
+000146  2003              MOVS     r0,#3
+000148  f88d0002          STRB     r0,[sp,#2]
+;;;218    	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
+00014c  2010              MOVS     r0,#0x10
+00014e  f88d0003          STRB     r0,[sp,#3]
+;;;219      	GPIO_Init(GPIOC, &gpio_init_structure);
+000152  4669              MOV      r1,sp
+000154  4803              LDR      r0,|L4.356|
+000156  f7fffffe          BL       GPIO_Init
+;;;220    }
+00015a  bd08              POP      {r3,pc}
+;;;221    
                           ENDP
 
-000142  0000              DCW      0x0000
-                  |L4.324|
+                  |L4.348|
                           DCD      0x40010800
-                  |L4.328|
+                  |L4.352|
                           DCD      0x40010c00
-                  |L4.332|
+                  |L4.356|
                           DCD      0x40011000
 
                           AREA ||i.iwatchdog_clear||, CODE, READONLY, ALIGN=1
@@ -461,21 +476,21 @@
                           AREA ||i.lock_close||, CODE, READONLY, ALIGN=2
 
                   lock_close PROC
-;;;221    
-;;;222    void lock_close(void)
+;;;228    
+;;;229    void lock_close(void)
 000000  b510              PUSH     {r4,lr}
-;;;223    {
-;;;224    	MOTOA_HIGH();
+;;;230    {
+;;;231    	MOTOA_HIGH();
 000002  2101              MOVS     r1,#1
 000004  4803              LDR      r0,|L7.20|
 000006  f7fffffe          BL       GPIO_SetBits
-;;;225    	MOTOB_LOW();
+;;;232    	MOTOB_LOW();
 00000a  2102              MOVS     r1,#2
 00000c  4801              LDR      r0,|L7.20|
 00000e  f7fffffe          BL       GPIO_ResetBits
-;;;226    }
+;;;233    }
 000012  bd10              POP      {r4,pc}
-;;;227    
+;;;234    
                           ENDP
 
                   |L7.20|
@@ -484,21 +499,21 @@
                           AREA ||i.lock_open||, CODE, READONLY, ALIGN=2
 
                   lock_open PROC
-;;;215    
-;;;216    void lock_open(void)
+;;;222    
+;;;223    void lock_open(void)
 000000  b510              PUSH     {r4,lr}
-;;;217    {
-;;;218    	MOTOA_LOW();
+;;;224    {
+;;;225    	MOTOA_LOW();
 000002  2101              MOVS     r1,#1
 000004  4803              LDR      r0,|L8.20|
 000006  f7fffffe          BL       GPIO_ResetBits
-;;;219    	MOTOB_HIGH();
+;;;226    	MOTOB_HIGH();
 00000a  2102              MOVS     r1,#2
 00000c  4801              LDR      r0,|L8.20|
 00000e  f7fffffe          BL       GPIO_SetBits
-;;;220    }
+;;;227    }
 000012  bd10              POP      {r4,pc}
-;;;221    
+;;;228    
                           ENDP
 
                   |L8.20|
@@ -507,21 +522,21 @@
                           AREA ||i.lock_stop||, CODE, READONLY, ALIGN=2
 
                   lock_stop PROC
-;;;227    
-;;;228    void lock_stop(void)
+;;;234    
+;;;235    void lock_stop(void)
 000000  b510              PUSH     {r4,lr}
-;;;229    {
-;;;230    	MOTOA_LOW();
+;;;236    {
+;;;237    	MOTOA_LOW();
 000002  2101              MOVS     r1,#1
 000004  4803              LDR      r0,|L9.20|
 000006  f7fffffe          BL       GPIO_ResetBits
-;;;231    	MOTOB_LOW();
+;;;238    	MOTOB_LOW();
 00000a  2102              MOVS     r1,#2
 00000c  4801              LDR      r0,|L9.20|
 00000e  f7fffffe          BL       GPIO_ResetBits
-;;;232    }
+;;;239    }
 000012  bd10              POP      {r4,pc}
-;;;233    
+;;;240    
                           ENDP
 
                   |L9.20|

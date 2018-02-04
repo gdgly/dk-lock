@@ -24193,7 +24193,7 @@ Nenum timer
 N{
 N    tim1_cnt,
 N    tim2_cnt,
-N	tim3_cnt,
+N	timer_gps,
 N	timer_close_lock,
 N	timer_open_lock,
 N	timer_heartbeat,

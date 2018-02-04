@@ -25684,7 +25684,7 @@ Nenum timer
 N{
 N    tim1_cnt,
 N    tim2_cnt,
-N	tim3_cnt,
+N	timer_gps,
 N	timer_close_lock,
 N	timer_open_lock,
 N	timer_heartbeat,
@@ -25959,7 +25959,7 @@ N		break;
 N		
 N			
 N		case 4:
-N			ret = gprs_send_at("AT+STATUS\r\n", "+STATUS: MQTT CONNECT OK", 800,5000);
+N			ret = gprs_send_at("AT+STATUS\r\n", "MQTT CONNECT OK", 800,5000);
 N			if (ret != NULL)
 X			if (ret != 0)
 N			{
@@ -26001,7 +26001,7 @@ N			}
 N		break;
 N			
 N		case 6:
-N			ret = gprs_send_at("AT+STATUS\r\n", "+STATUS: MQTT CONNECT OK", 800,5000);
+N			ret = gprs_send_at("AT+STATUS\r\n", "MQTT CONNECT OK", 800,5000);
 N			if (ret != NULL)
 X			if (ret != 0)
 N			{
@@ -26059,39 +26059,18 @@ N					gprs_status = 0;
 N				}
 N			}
 N		break;
-N		
+N			
 N		case 9:
-N			usart2_rx_status = 2;
-N			USART_OUT(USART1, "usart2_rx_status = %d\r\n", usart2_rx_status);
-X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "usart2_rx_status = %d\r\n", usart2_rx_status);
-N				
-N			ret = gprs_send_at("AT+CLIENTID?\r\n", "OK", 50, 1000);
-N			if (ret != NULL)
-X			if (ret != 0)
-N			{
-N				USART_OUT(USART1, ret);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), ret);
-N				str = strstr((const char*)ret, (const char*)"+CLIENTID: ");
-N				memcpy(PARK_LOCK_Buffer, str+12, 16);	//¶Á³öËøid	
-N				USART_OUT(USART1, "lock_id=%s\r\n", PARK_LOCK_Buffer);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "lock_id=%s\r\n", PARK_LOCK_Buffer);
-N				gprs_status=255;
-N				gprs_err_cnt = 0;
-N			}
-N			else
-N			{
-N				gprs_err_cnt++;
-N				if (gprs_err_cnt > 5)
-N				{
-N					gprs_status = 0;
-N				}
-N			}
-N		break;			
-N		
-N		case 10:
-N//			USART_OUT(USART1, "GPRS INIT OK\r\n");
-N//		USART_OUT(USART1, "GPRS INIT OK = %d\r\n", usart2_rx_status);
-N		break;	
+N			gprs_status = 255;
+N		break;
+N			
+N//		case 254:
+N
+N//		break;			
+N//		
+N//		case 255:
+N
+N//		break;	
 N		
 N		default:
 N		break;				

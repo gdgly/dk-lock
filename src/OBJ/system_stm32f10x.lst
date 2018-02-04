@@ -24614,8 +24614,8 @@ N    RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE |
 X    ((RCC_TypeDef *) ((((uint32_t)0x40000000) + 0x20000) + 0x1000))->CFGR &= (uint32_t)((uint32_t)~(((uint32_t)0x00010000) | ((uint32_t)0x00020000) |
 N                                        RCC_CFGR_PLLMULL));
 X                                        ((uint32_t)0x003C0000)));
-N    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL9);
-X    ((RCC_TypeDef *) ((((uint32_t)0x40000000) + 0x20000) + 0x1000))->CFGR |= (uint32_t)(((uint32_t)0x00010000) | ((uint32_t)0x001C0000));
+N    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL6);
+X    ((RCC_TypeDef *) ((((uint32_t)0x40000000) + 0x20000) + 0x1000))->CFGR |= (uint32_t)(((uint32_t)0x00010000) | ((uint32_t)0x00100000));
 N#endif /* STM32F10X_CL */
 N
 N    /* Enable PLL */

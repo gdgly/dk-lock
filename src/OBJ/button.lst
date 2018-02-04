@@ -23519,6 +23519,7 @@ N	button_long_press
 N	
 N} button_state_e;
 N
+N
 Ntypedef struct
 N{
 N	button_state_e  butt_state;
@@ -23538,6 +23539,9 @@ N
 N#define BUTTON_VALID_CNT			10
 N#define BUTTON_SUM					1
 N
+N
+N
+Nu8 button_get_value(void);
 Nvoid button_timer_ms(void);
 Nbutton_state_e button_get_state(u8 button_name, u32 long_time);
 N
@@ -23791,8 +23795,34 @@ N
 N}
 N
 N
-N
-N
+Nu8 button_get_value(void)
+N{
+N	u8 val = 0;
+N	u8 i = 0;
+N	u8 button_cnt = 0;
+N	
+N	for(i=0; i<10; i++)
+N	{
+N		if(BUTTON1_READ() == 0)
+X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0040)) == 0)
+N		{
+N			button_cnt++;
+N		}
+N		else
+N		{
+N			button_cnt = 0;
+N		}
+N	}
+N	
+N	if(button_cnt >= 10)
+N	{
+N		return 0;
+N	}
+N	else
+N	{
+N		return 1;
+N	}
+N}
 N
 N
 N
@@ -23809,7 +23839,6 @@ N		{
 N			button_info[i].butt_long_press_timer--;
 N		}
 N	}
-N	
 N}
 N
 N

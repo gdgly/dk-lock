@@ -14,6 +14,7 @@ typedef enum
 	
 } button_state_e;
 
+
 typedef struct
 {
 	button_state_e  butt_state;
@@ -33,6 +34,9 @@ typedef struct
 #define BUTTON_VALID_CNT			10
 #define BUTTON_SUM					1
 
+
+
+u8 button_get_value(void);
 void button_timer_ms(void);
 button_state_e button_get_state(u8 button_name, u32 long_time);
 

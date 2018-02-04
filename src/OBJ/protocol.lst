@@ -25506,14 +25506,25 @@ N
 Nextern u8 usart2_buff[512];
 Nextern u16 usart2_cnt;
 Nextern u8 PARK_LOCK_Buffer[16];
+Nextern u8 protocol_buff[512];
+N
 N
 Nvoid protocol_analyze(void)
 N{
 N	u8 topic[100] = {0};
-N	
+N	u8 *par = NULL;
+X	u8 *par = 0;
 N	usart2_recv_data();
+N		
+N	//topic: lock/0018131408143929,1
+N	par = strstr((char *)protocol_buff, "topic:");
 N	
-N	memcpy(topic, "topic: lock/", 12);
+N	if(par != NULL)
+X	if(par != 0)
+N	{
+N		memcpy(topic, "topic: lock/", 12);
+N	}
+N	
 N	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);
 N	
 N	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)

@@ -5,24 +5,24 @@
                           AREA ||i.GPS_Analysis||, CODE, READONLY, ALIGN=1
 
                   GPS_Analysis PROC
-;;;247    //buf:接收到的GPS数据缓冲区首地址
-;;;248    void GPS_Analysis(nmea_msg *gpsx,u8 *buf)
+;;;248    //buf:接收到的GPS数据缓冲区首地址
+;;;249    void GPS_Analysis(nmea_msg *gpsx,u8 *buf)
 000000  b570              PUSH     {r4-r6,lr}
-;;;249    {
+;;;250    {
 000002  4604              MOV      r4,r0
 000004  460d              MOV      r5,r1
-;;;250    //	NMEA_GPGSV_Analysis(gpsx,buf);	//GPGSV解析
-;;;251    //	NMEA_BDGSV_Analysis(gpsx,buf);	//BDGSV解析
-;;;252    //	NMEA_GNGGA_Analysis(gpsx,buf);	//GNGGA解析 	
-;;;253    //	NMEA_GNGSA_Analysis(gpsx,buf);	//GPNSA解析
-;;;254    	NMEA_GNRMC_Analysis(gpsx,buf);	//GPNMC解析
+;;;251    //	NMEA_GPGSV_Analysis(gpsx,buf);	//GPGSV解析
+;;;252    //	NMEA_BDGSV_Analysis(gpsx,buf);	//BDGSV解析
+;;;253    //	NMEA_GNGGA_Analysis(gpsx,buf);	//GNGGA解析 	
+;;;254    //	NMEA_GNGSA_Analysis(gpsx,buf);	//GPNSA解析
+;;;255    	NMEA_GNRMC_Analysis(gpsx,buf);	//GPNMC解析
 000006  4629              MOV      r1,r5
 000008  4620              MOV      r0,r4
 00000a  f7fffffe          BL       NMEA_GNRMC_Analysis
-;;;255    //	NMEA_GNVTG_Analysis(gpsx,buf);	//GPNTG解析
-;;;256    }
+;;;256    //	NMEA_GNVTG_Analysis(gpsx,buf);	//GPNTG解析
+;;;257    }
 00000e  bd70              POP      {r4-r6,pc}
-;;;257    ///////////////////////////////////////////UBLOX 配置代码/////////////////////////////////////
+;;;258    ///////////////////////////////////////////UBLOX 配置代码/////////////////////////////////////
                           ENDP
 
 
@@ -441,21 +441,22 @@
 ;;;189    	u8 posx;     
 ;;;190    	u32 temp;	   
 ;;;191    	float rs;  
-;;;192    	p1=(u8*)strstr((const char *)buf,"$GNRMC");//"$GNRMC",经常有&和GNRMC分开的情况,故只判断GPRMC.
+;;;192    
+;;;193    	p1=(u8*)strstr((const char *)buf,"$GNRMC");//"$GNRMC",经常有&和GNRMC分开的情况,故只判断GPRMC.
 00000a  a17e              ADR      r1,|L6.516|
 00000c  4640              MOV      r0,r8
 00000e  f7fffffe          BL       strstr
 000012  4607              MOV      r7,r0
-;;;193    	posx=NMEA_Comma_Pos(p1,1);								//得到UTC时间
+;;;194    	posx=NMEA_Comma_Pos(p1,1);								//得到UTC时间
 000014  2101              MOVS     r1,#1
 000016  4638              MOV      r0,r7
 000018  f7fffffe          BL       NMEA_Comma_Pos
 00001c  4606              MOV      r6,r0
-;;;194    	if(posx!=0XFF)
+;;;195    	if(posx!=0XFF)
 00001e  2eff              CMP      r6,#0xff
 000020  d023              BEQ      |L6.106|
-;;;195    	{
-;;;196    		temp=NMEA_Str2num(p1+posx,&dx)/NMEA_Pow(10,dx);	 	//得到UTC时间,去掉ms
+;;;196    	{
+;;;197    		temp=NMEA_Str2num(p1+posx,&dx)/NMEA_Pow(10,dx);	 	//得到UTC时间,去掉ms
 000022  19b8              ADDS     r0,r7,r6
 000024  a904              ADD      r1,sp,#0x10
 000026  f7fffffe          BL       NMEA_Str2num
@@ -464,13 +465,13 @@
 000030  200a              MOVS     r0,#0xa
 000032  f7fffffe          BL       NMEA_Pow
 000036  fbbaf5f0          UDIV     r5,r10,r0
-;;;197    		gpsx->utc.hour=temp/10000;
+;;;198    		gpsx->utc.hour=temp/10000;
 00003a  f2427010          MOV      r0,#0x2710
 00003e  fbb5f0f0          UDIV     r0,r5,r0
 000042  b2c1              UXTB     r1,r0
 000044  207e              MOVS     r0,#0x7e
 000046  5501              STRB     r1,[r0,r4]
-;;;198    		gpsx->utc.min=(temp/100)%100;
+;;;199    		gpsx->utc.min=(temp/100)%100;
 000048  2064              MOVS     r0,#0x64
 00004a  fbb5f0f0          UDIV     r0,r5,r0
 00004e  2164              MOVS     r1,#0x64
@@ -478,29 +479,29 @@
 000054  fb010112          MLS      r1,r1,r2,r0
 000058  207f              MOVS     r0,#0x7f
 00005a  5501              STRB     r1,[r0,r4]
-;;;199    		gpsx->utc.sec=temp%100;	 	 
+;;;200    		gpsx->utc.sec=temp%100;	 	 
 00005c  2064              MOVS     r0,#0x64
 00005e  fbb5f1f0          UDIV     r1,r5,r0
 000062  fb005111          MLS      r1,r0,r1,r5
 000066  2080              MOVS     r0,#0x80
 000068  5501              STRB     r1,[r0,r4]
                   |L6.106|
-;;;200    	}	
-;;;201    	posx=NMEA_Comma_Pos(p1,3);								//得到纬度
+;;;201    	}	
+;;;202    	posx=NMEA_Comma_Pos(p1,3);								//得到纬度
 00006a  2103              MOVS     r1,#3
 00006c  4638              MOV      r0,r7
 00006e  f7fffffe          BL       NMEA_Comma_Pos
 000072  4606              MOV      r6,r0
-;;;202    	if(posx!=0XFF)
+;;;203    	if(posx!=0XFF)
 000074  2eff              CMP      r6,#0xff
 000076  d045              BEQ      |L6.260|
-;;;203    	{
-;;;204    		temp=NMEA_Str2num(p1+posx,&dx);		 	 
+;;;204    	{
+;;;205    		temp=NMEA_Str2num(p1+posx,&dx);		 	 
 000078  19b8              ADDS     r0,r7,r6
 00007a  a904              ADD      r1,sp,#0x10
 00007c  f7fffffe          BL       NMEA_Str2num
 000080  4605              MOV      r5,r0
-;;;205    		gpsx->latitude=temp/NMEA_Pow(10,dx+2);	//得到°
+;;;206    		gpsx->latitude=temp/NMEA_Pow(10,dx+2);	//得到°
 000082  f89d0010          LDRB     r0,[sp,#0x10]
 000086  1c80              ADDS     r0,r0,#2
 000088  b2c1              UXTB     r1,r0
@@ -508,7 +509,7 @@
 00008c  f7fffffe          BL       NMEA_Pow
 000090  fbb5f0f0          UDIV     r0,r5,r0
 000094  f8440f81          STR      r0,[r4,#0x81]!
-;;;206    		rs=temp%NMEA_Pow(10,dx+2);				//得到'		 
+;;;207    		rs=temp%NMEA_Pow(10,dx+2);				//得到'		 
 000098  f89d0010          LDRB     r0,[sp,#0x10]
 00009c  1c80              ADDS     r0,r0,#2
 00009e  b2c1              UXTB     r1,r0
@@ -519,7 +520,7 @@
 0000ae  4650              MOV      r0,r10
 0000b0  f7fffffe          BL       __aeabi_ui2f
 0000b4  4681              MOV      r9,r0
-;;;207    		gpsx->latitude=gpsx->latitude*NMEA_Pow(10,5)+(rs*NMEA_Pow(10,5-dx))/60;//转换为° 
+;;;208    		gpsx->latitude=gpsx->latitude*NMEA_Pow(10,5)+(rs*NMEA_Pow(10,5-dx))/60;//转换为° 
 0000b6  f89d0010          LDRB     r0,[sp,#0x10]
 0000ba  f1c00005          RSB      r0,r0,#5
 0000be  b2c1              UXTB     r1,r0
@@ -548,28 +549,28 @@
 0000fc  f7fffffe          BL       __aeabi_f2uiz
 000100  f8440981          STR      r0,[r4],#-0x81
                   |L6.260|
-;;;208    	}
-;;;209    	posx=NMEA_Comma_Pos(p1,4);								//南纬还是北纬 
+;;;209    	}
+;;;210    	posx=NMEA_Comma_Pos(p1,4);								//南纬还是北纬 
 000104  2104              MOVS     r1,#4
 000106  4638              MOV      r0,r7
 000108  f7fffffe          BL       NMEA_Comma_Pos
 00010c  4606              MOV      r6,r0
-;;;210    	//if(posx!=0XFF)gpsx->nshemi=*(p1+posx);					 
-;;;211     	posx=NMEA_Comma_Pos(p1,5);								//得到经度
+;;;211    	//if(posx!=0XFF)gpsx->nshemi=*(p1+posx);					 
+;;;212     	posx=NMEA_Comma_Pos(p1,5);								//得到经度
 00010e  2105              MOVS     r1,#5
 000110  4638              MOV      r0,r7
 000112  f7fffffe          BL       NMEA_Comma_Pos
 000116  4606              MOV      r6,r0
-;;;212    	if(posx!=0XFF)
+;;;213    	if(posx!=0XFF)
 000118  2eff              CMP      r6,#0xff
 00011a  d045              BEQ      |L6.424|
-;;;213    	{												  
-;;;214    		temp=NMEA_Str2num(p1+posx,&dx);		 	 
+;;;214    	{												  
+;;;215    		temp=NMEA_Str2num(p1+posx,&dx);		 	 
 00011c  19b8              ADDS     r0,r7,r6
 00011e  a904              ADD      r1,sp,#0x10
 000120  f7fffffe          BL       NMEA_Str2num
 000124  4605              MOV      r5,r0
-;;;215    		gpsx->longitude=temp/NMEA_Pow(10,dx+2);	//得到°
+;;;216    		gpsx->longitude=temp/NMEA_Pow(10,dx+2);	//得到°
 000126  f89d0010          LDRB     r0,[sp,#0x10]
 00012a  1c80              ADDS     r0,r0,#2
 00012c  b2c1              UXTB     r1,r0
@@ -577,7 +578,7 @@
 000130  f7fffffe          BL       NMEA_Pow
 000134  fbb5f0f0          UDIV     r0,r5,r0
 000138  f8440f86          STR      r0,[r4,#0x86]!
-;;;216    		rs=temp%NMEA_Pow(10,dx+2);				//得到'		 
+;;;217    		rs=temp%NMEA_Pow(10,dx+2);				//得到'		 
 00013c  f89d0010          LDRB     r0,[sp,#0x10]
 000140  1c80              ADDS     r0,r0,#2
 000142  b2c1              UXTB     r1,r0
@@ -588,7 +589,7 @@
 000152  4650              MOV      r0,r10
 000154  f7fffffe          BL       __aeabi_ui2f
 000158  4681              MOV      r9,r0
-;;;217    		gpsx->longitude=gpsx->longitude*NMEA_Pow(10,5)+(rs*NMEA_Pow(10,5-dx))/60;//转换为° 
+;;;218    		gpsx->longitude=gpsx->longitude*NMEA_Pow(10,5)+(rs*NMEA_Pow(10,5-dx))/60;//转换为° 
 00015a  f89d0010          LDRB     r0,[sp,#0x10]
 00015e  f1c00005          RSB      r0,r0,#5
 000162  b2c1              UXTB     r1,r0
@@ -617,34 +618,34 @@
 0001a0  f7fffffe          BL       __aeabi_f2uiz
 0001a4  f8440986          STR      r0,[r4],#-0x86
                   |L6.424|
-;;;218    	}
-;;;219    	posx=NMEA_Comma_Pos(p1,6);								//东经还是西经
+;;;219    	}
+;;;220    	posx=NMEA_Comma_Pos(p1,6);								//东经还是西经
 0001a8  2106              MOVS     r1,#6
 0001aa  4638              MOV      r0,r7
 0001ac  f7fffffe          BL       NMEA_Comma_Pos
 0001b0  4606              MOV      r6,r0
-;;;220    	//if(posx!=0XFF)gpsx->ewhemi=*(p1+posx);		 
-;;;221    	posx=NMEA_Comma_Pos(p1,9);								//得到UTC日期
+;;;221    	//if(posx!=0XFF)gpsx->ewhemi=*(p1+posx);		 
+;;;222    	posx=NMEA_Comma_Pos(p1,9);								//得到UTC日期
 0001b2  2109              MOVS     r1,#9
 0001b4  4638              MOV      r0,r7
 0001b6  f7fffffe          BL       NMEA_Comma_Pos
 0001ba  4606              MOV      r6,r0
-;;;222    	if(posx!=0XFF)
+;;;223    	if(posx!=0XFF)
 0001bc  2eff              CMP      r6,#0xff
 0001be  d01e              BEQ      |L6.510|
-;;;223    	{
-;;;224    		temp=NMEA_Str2num(p1+posx,&dx);		 				//得到UTC日期
+;;;224    	{
+;;;225    		temp=NMEA_Str2num(p1+posx,&dx);		 				//得到UTC日期
 0001c0  19b8              ADDS     r0,r7,r6
 0001c2  a904              ADD      r1,sp,#0x10
 0001c4  f7fffffe          BL       NMEA_Str2num
 0001c8  4605              MOV      r5,r0
-;;;225    		gpsx->utc.date=temp/10000;
+;;;226    		gpsx->utc.date=temp/10000;
 0001ca  f2427010          MOV      r0,#0x2710
 0001ce  fbb5f0f0          UDIV     r0,r5,r0
 0001d2  b2c1              UXTB     r1,r0
 0001d4  207d              MOVS     r0,#0x7d
 0001d6  5501              STRB     r1,[r0,r4]
-;;;226    		gpsx->utc.month=(temp/100)%100;
+;;;227    		gpsx->utc.month=(temp/100)%100;
 0001d8  2064              MOVS     r0,#0x64
 0001da  fbb5f0f0          UDIV     r0,r5,r0
 0001de  2164              MOVS     r1,#0x64
@@ -652,18 +653,18 @@
 0001e4  fb010112          MLS      r1,r1,r2,r0
 0001e8  207c              MOVS     r0,#0x7c
 0001ea  5501              STRB     r1,[r0,r4]
-;;;227    		gpsx->utc.year=2000+temp%100;	 	 
+;;;228    		gpsx->utc.year=2000+temp%100;	 	 
 0001ec  2064              MOVS     r0,#0x64
 0001ee  fbb5f1f0          UDIV     r1,r5,r0
 0001f2  fb005011          MLS      r0,r0,r1,r5
 0001f6  f50060fa          ADD      r0,r0,#0x7d0
 0001fa  f8a4007a          STRH     r0,[r4,#0x7a]
                   |L6.510|
-;;;228    	} 
-;;;229    }
+;;;229    	} 
+;;;230    }
 0001fe  b005              ADD      sp,sp,#0x14
 000200  e8bd8ff0          POP      {r4-r11,pc}
-;;;230    //分析GNVTG信息
+;;;231    //分析GNVTG信息
                           ENDP
 
                   |L6.516|
@@ -676,34 +677,34 @@
                           AREA ||i.NMEA_GNVTG_Analysis||, CODE, READONLY, ALIGN=2
 
                   NMEA_GNVTG_Analysis PROC
-;;;232    //buf:接收到的GPS数据缓冲区首地址
-;;;233    void NMEA_GNVTG_Analysis(nmea_msg *gpsx,u8 *buf)
+;;;233    //buf:接收到的GPS数据缓冲区首地址
+;;;234    void NMEA_GNVTG_Analysis(nmea_msg *gpsx,u8 *buf)
 000000  b5f8              PUSH     {r3-r7,lr}
-;;;234    {
+;;;235    {
 000002  4604              MOV      r4,r0
 000004  460d              MOV      r5,r1
-;;;235    	u8 *p1,dx;			 
-;;;236    	u8 posx;    
-;;;237    	p1=(u8*)strstr((const char *)buf,"$GNVTG");							 
+;;;236    	u8 *p1,dx;			 
+;;;237    	u8 posx;    
+;;;238    	p1=(u8*)strstr((const char *)buf,"$GNVTG");							 
 000006  a112              ADR      r1,|L7.80|
 000008  4628              MOV      r0,r5
 00000a  f7fffffe          BL       strstr
 00000e  4606              MOV      r6,r0
-;;;238    	posx=NMEA_Comma_Pos(p1,7);								//得到地面速率
+;;;239    	posx=NMEA_Comma_Pos(p1,7);								//得到地面速率
 000010  2107              MOVS     r1,#7
 000012  4630              MOV      r0,r6
 000014  f7fffffe          BL       NMEA_Comma_Pos
 000018  4607              MOV      r7,r0
-;;;239    	if(posx!=0XFF)
+;;;240    	if(posx!=0XFF)
 00001a  2fff              CMP      r7,#0xff
 00001c  d016              BEQ      |L7.76|
-;;;240    	{
-;;;241    		gpsx->speed=NMEA_Str2num(p1+posx,&dx);
+;;;241    	{
+;;;242    		gpsx->speed=NMEA_Str2num(p1+posx,&dx);
 00001e  19f0              ADDS     r0,r6,r7
 000020  4669              MOV      r1,sp
 000022  f7fffffe          BL       NMEA_Str2num
 000026  f8a400a4          STRH     r0,[r4,#0xa4]
-;;;242    		if(dx<3)gpsx->speed*=NMEA_Pow(10,3-dx);	 	 		//确保扩大1000倍
+;;;243    		if(dx<3)gpsx->speed*=NMEA_Pow(10,3-dx);	 	 		//确保扩大1000倍
 00002a  f89d0000          LDRB     r0,[sp,#0]
 00002e  2803              CMP      r0,#3
 000030  da0c              BGE      |L7.76|
@@ -716,10 +717,10 @@
 000046  4348              MULS     r0,r1,r0
 000048  f8a400a4          STRH     r0,[r4,#0xa4]
                   |L7.76|
-;;;243    	}
-;;;244    }  
+;;;244    	}
+;;;245    }  
 00004c  bdf8              POP      {r3-r7,pc}
-;;;245    //提取NMEA-0183信息
+;;;246    //提取NMEA-0183信息
                           ENDP
 
 00004e  0000              DCW      0x0000
@@ -1092,18 +1093,18 @@
                           AREA ||i.SkyTra_Send_Date||, CODE, READONLY, ALIGN=2
 
                   SkyTra_Send_Date PROC
-;;;346    //len：要发送的字节数
-;;;347    void SkyTra_Send_Date(u8* dbuf,u16 len)
+;;;347    //len：要发送的字节数
+;;;348    void SkyTra_Send_Date(u8* dbuf,u16 len)
 000000  b510              PUSH     {r4,lr}
-;;;348    {
+;;;349    {
 000002  4602              MOV      r2,r0
-;;;349    	u16 j;
-;;;350    	for(j=0;j<len;j++)//循环发送数据
+;;;350    	u16 j;
+;;;351    	for(j=0;j<len;j++)//循环发送数据
 000004  2000              MOVS     r0,#0
 000006  e00c              B        |L11.34|
                   |L11.8|
-;;;351    	{
-;;;352    		while((USART2->SR&0X40)==0);//循环发送,直到发送完毕   
+;;;352    	{
+;;;353    		while((USART2->SR&0X40)==0);//循环发送,直到发送完毕   
 000008  bf00              NOP      
                   |L11.10|
 00000a  4b07              LDR      r3,|L11.40|
@@ -1111,20 +1112,20 @@
 00000e  f0030340          AND      r3,r3,#0x40
 000012  2b00              CMP      r3,#0
 000014  d0f9              BEQ      |L11.10|
-;;;353    		USART2->DR=dbuf[j];  
+;;;354    		USART2->DR=dbuf[j];  
 000016  5c13              LDRB     r3,[r2,r0]
 000018  4c03              LDR      r4,|L11.40|
 00001a  1d24              ADDS     r4,r4,#4
 00001c  8023              STRH     r3,[r4,#0]
-00001e  1c43              ADDS     r3,r0,#1              ;350
-000020  b298              UXTH     r0,r3                 ;350
+00001e  1c43              ADDS     r3,r0,#1              ;351
+000020  b298              UXTH     r0,r3                 ;351
                   |L11.34|
-000022  4288              CMP      r0,r1                 ;350
+000022  4288              CMP      r0,r1                 ;351
 000024  dbf0              BLT      |L11.8|
-;;;354    	}	
-;;;355    }
+;;;355    	}	
+;;;356    }
 000026  bd10              POP      {r4,pc}
-;;;356    
+;;;357    
                           ENDP
 
                   |L11.40|

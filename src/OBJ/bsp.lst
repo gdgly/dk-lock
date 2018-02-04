@@ -23877,7 +23877,7 @@ Nenum timer
 N{
 N    tim1_cnt,
 N    tim2_cnt,
-N	tim3_cnt,
+N	timer_gps,
 N	timer_close_lock,
 N	timer_open_lock,
 N	timer_heartbeat,
@@ -24770,6 +24770,15 @@ N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
 N	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
 N  	GPIO_Init(GPIOC, &gpio_init_structure);
 X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), &gpio_init_structure);
+N	
+N	
+N	//GPS power enable
+N	gpio_init_structure.GPIO_Pin = GPIO_Pin_4;
+X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0010);
+N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
+N	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
+N  	GPIO_Init(GPIOC, &gpio_init_structure);
+X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), &gpio_init_structure);
 N}
 N
 N
@@ -24873,7 +24882,7 @@ N	usart1_init(115200, 8, 0, 1);
 N	usart2_init(115200);
 N//	usart3_init(9600);
 N	USART3_Init(9600); 
-N	timer2_init(200, 40);
+N	timer2_init(200, 41);
 N//	RTC_Init();
 N//	AT24CXX_Init();   
 N	Adc_Init();

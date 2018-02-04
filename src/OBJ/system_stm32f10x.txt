@@ -171,10 +171,10 @@
 000088  f420107c          BIC      r0,r0,#0x3f0000
 00008c  6048              STR      r0,[r1,#4]
 ;;;1055                                           RCC_CFGR_PLLMULL));
-;;;1056       RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL9);
+;;;1056       RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLMULL6);
 00008e  4608              MOV      r0,r1
 000090  6840              LDR      r0,[r0,#4]
-000092  f44010e8          ORR      r0,r0,#0x1d0000
+000092  f4401088          ORR      r0,r0,#0x110000
 000096  6048              STR      r0,[r1,#4]
 ;;;1057   #endif /* STM32F10X_CL */
 ;;;1058   
