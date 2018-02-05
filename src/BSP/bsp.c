@@ -191,9 +191,7 @@ void gpio_init(void)
   	GPIO_Init(GPIOC, &gpio_init_structure);
 	
 	
-	
 	//LOCK ON   OFF
-	
 	gpio_init_structure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
 	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
@@ -238,18 +236,44 @@ void lock_stop(void)
 	MOTOB_LOW();
 }
 
+u8 lock_get_on(void)
+{
+	u8 i = 0;
+	u8 ret = 0;
+	u8 cnt = 0;
+	for(i=0;i<10;i++)
+	{
+		if(LOCK_ON_READ() == 0)
+		{
+			cnt++;
+		}
+		else
+		{
+			cnt = 0;
+		}
+	}
+	
+	if(cnt >= 10)
+	{
+		ret = 0;
+	}
+	else
+	{
+		ret = 1;
+	}
+	
+	return ret;
+}
 
-/*
-*Function: nvic_config      
-*Description: 中断向量配置  
-*Calls: 无  
-*Data Accessed: 无  
-*Data Updated: 无    
-*Input: 无
-*Output: 无
-*Return: 无     
-*Others: 无    
-*/
+
+u8 lock_get_off(void)
+{
+	
+	
+}
+
+
+
 void bsp_nvic_init(void)
 {
 	NVIC_InitTypeDef nvic_init_structure;

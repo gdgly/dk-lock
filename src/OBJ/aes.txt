@@ -2,9 +2,8 @@
 ; commandline ArmCC [--list --split_sections --debug -c --asm --interleave -o..\obj\aes.o --asm_dir=..\OBJ\ --list_dir=..\OBJ\ --depend=..\obj\aes.d --cpu=Cortex-M3 --apcs=interwork -O0 --diag_suppress=9931 -I..\USER -I..\FLib\inc -I..\CORE -I..\driver -I..\BSP -I..\SYS -I..\tplib -IE:\github\dk-lock\src\Proj\RTE -ID:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include -ID:\Keil_v5\ARM\CMSIS\Include -D__UVISION_VERSION=518 -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER -DSTM32F10X_HD -W --omf_browse=..\obj\aes.crf ..\tplib\aes.c]
                           THUMB
 
-                          AREA ||i.AES_Decrypt||, CODE, READONLY, ALIGN=2
+                          AREA ||i.AES_Decrypt||, CODE, READONLY, ALIGN=1
 
-                          REQUIRE _printf_percent
                   AES_Decrypt PROC
 ;;;628    */
 ;;;629    void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
@@ -38,51 +37,43 @@
 00002a  f7fffffe          BL       Base64Decode
 00002e  b284              UXTH     r4,r0
 ;;;640    	
-;;;641      printf("decoded result:  ");
-000030  a01e              ADR      r0,|L1.172|
-000032  f7fffffe          BL       __2printf
-;;;642      printf(newstr);
-000036  4658              MOV      r0,r11
-000038  f7fffffe          BL       __2printf
-;;;643      printf("\r\n");
-00003c  a020              ADR      r0,|L1.192|
-00003e  f7fffffe          BL       __2printf
+;;;641    //  printf("decoded result:  ");
+;;;642    //  printf(newstr);
+;;;643    //  printf("\r\n");
 ;;;644    	
 ;;;645    	
 ;;;646    	//send_buff：待解密的数据  ，pkey：密钥   str2：解密后的数据
 ;;;647      str2 = decrypt(newstr, pAeskey , aesDataLen);
-000042  4622              MOV      r2,r4
-000044  4641              MOV      r1,r8
-000046  4658              MOV      r0,r11
-000048  f7fffffe          BL       decrypt
-00004c  4605              MOV      r5,r0
+000030  4622              MOV      r2,r4
+000032  4641              MOV      r1,r8
+000034  4658              MOV      r0,r11
+000036  f7fffffe          BL       decrypt
+00003a  4605              MOV      r5,r0
 ;;;648    	free(newstr);
-00004e  4658              MOV      r0,r11
-000050  f7fffffe          BL       free
+00003c  4658              MOV      r0,r11
+00003e  f7fffffe          BL       free
 ;;;649    	//去除末尾补码
 ;;;650    	buIndex = str2[aesDataLen-1];
-000054  1e60              SUBS     r0,r4,#1
-000056  f8159000          LDRB     r9,[r5,r0]
+000042  1e60              SUBS     r0,r4,#1
+000044  f8159000          LDRB     r9,[r5,r0]
 ;;;651    
 ;;;652    	for(i=0; i<buIndex; i++)
-00005a  2600              MOVS     r6,#0
-00005c  e012              B        |L1.132|
-                  |L1.94|
+000048  2600              MOVS     r6,#0
+00004a  e00f              B        |L1.108|
+                  |L1.76|
 ;;;653    	{
 ;;;654    		if(str2[aesDataLen-i-1] != buIndex)
-00005e  1ba0              SUBS     r0,r4,r6
-000060  1e40              SUBS     r0,r0,#1
-000062  5c28              LDRB     r0,[r5,r0]
-000064  4548              CMP      r0,r9
-000066  d007              BEQ      |L1.120|
+00004c  1ba0              SUBS     r0,r4,r6
+00004e  1e40              SUBS     r0,r0,#1
+000050  5c28              LDRB     r0,[r5,r0]
+000052  4548              CMP      r0,r9
+000054  d004              BEQ      |L1.96|
 ;;;655    		{
-;;;656    			printf("\nit is a wrong data. \n");
-000068  a016              ADR      r0,|L1.196|
-00006a  f7fffffe          BL       __2printf
+;;;656    //			printf("\nit is a wrong data. \n");
 ;;;657    			free(str2);
-00006e  4628              MOV      r0,r5
-000070  f7fffffe          BL       free
-                  |L1.116|
+000056  4628              MOV      r0,r5
+000058  f7fffffe          BL       free
+                  |L1.92|
 ;;;658    			return;
 ;;;659    		}
 ;;;660    		else
@@ -91,64 +82,30 @@
 ;;;663    	strcpy(pExpressText , str2);
 ;;;664    	free(str2);
 ;;;665    	
-;;;666      printf ("AES decrypt result:  ");
-;;;667      printf (pExpressText);
-;;;668      printf ("\r\n");
+;;;666    //  printf ("AES decrypt result:  ");
+;;;667    //  printf (pExpressText);
+;;;668    //  printf ("\r\n");
 ;;;669    }
-000074  e8bd9ff0          POP      {r4-r12,pc}
-                  |L1.120|
-000078  2100              MOVS     r1,#0                 ;661
-00007a  1ba0              SUBS     r0,r4,r6              ;661
-00007c  1e40              SUBS     r0,r0,#1              ;661
-00007e  5429              STRB     r1,[r5,r0]            ;661
-000080  1c70              ADDS     r0,r6,#1              ;652
-000082  b2c6              UXTB     r6,r0                 ;652
-                  |L1.132|
-000084  454e              CMP      r6,r9                 ;652
-000086  dbea              BLT      |L1.94|
-000088  4629              MOV      r1,r5                 ;663
-00008a  4650              MOV      r0,r10                ;663
-00008c  f7fffffe          BL       strcpy
-000090  4628              MOV      r0,r5                 ;664
-000092  f7fffffe          BL       free
-000096  a011              ADR      r0,|L1.220|
-000098  f7fffffe          BL       __2printf
-00009c  4650              MOV      r0,r10                ;667
-00009e  f7fffffe          BL       __2printf
-0000a2  a007              ADR      r0,|L1.192|
-0000a4  f7fffffe          BL       __2printf
-0000a8  bf00              NOP      
-0000aa  e7e3              B        |L1.116|
+00005c  e8bd9ff0          POP      {r4-r12,pc}
+                  |L1.96|
+000060  2100              MOVS     r1,#0                 ;661
+000062  1ba0              SUBS     r0,r4,r6              ;661
+000064  1e40              SUBS     r0,r0,#1              ;661
+000066  5429              STRB     r1,[r5,r0]            ;661
+000068  1c70              ADDS     r0,r6,#1              ;652
+00006a  b2c6              UXTB     r6,r0                 ;652
+                  |L1.108|
+00006c  454e              CMP      r6,r9                 ;652
+00006e  dbed              BLT      |L1.76|
+000070  4629              MOV      r1,r5                 ;663
+000072  4650              MOV      r0,r10                ;663
+000074  f7fffffe          BL       strcpy
+000078  4628              MOV      r0,r5                 ;664
+00007a  f7fffffe          BL       free
+00007e  bf00              NOP      
+000080  e7ec              B        |L1.92|
                           ENDP
 
-                  |L1.172|
-0000ac  6465636f          DCB      "decoded result:  ",0
-0000b0  64656420
-0000b4  72657375
-0000b8  6c743a20
-0000bc  2000    
-0000be  00                DCB      0
-0000bf  00                DCB      0
-                  |L1.192|
-0000c0  0d0a00            DCB      "\r\n",0
-0000c3  00                DCB      0
-                  |L1.196|
-0000c4  0a697420          DCB      "\nit is a wrong data. \n",0
-0000c8  69732061
-0000cc  2077726f
-0000d0  6e672064
-0000d4  6174612e
-0000d8  200a00  
-0000db  00                DCB      0
-                  |L1.220|
-0000dc  41455320          DCB      "AES decrypt result:  ",0
-0000e0  64656372
-0000e4  79707420
-0000e8  72657375
-0000ec  6c743a20
-0000f0  2000    
-0000f2  00                DCB      0
-0000f3  00                DCB      0
 
                           AREA ||i.AES_Encrypt||, CODE, READONLY, ALIGN=1
 
@@ -527,7 +484,7 @@
 
 0000ba  0000              DCW      0x0000
                   |L5.188|
-                          DCD      |symbol_number.64|
+                          DCD      |symbol_number.63|
 
                           AREA ||i.Cipher||, CODE, READONLY, ALIGN=2
 
@@ -2657,7 +2614,7 @@
                           DCD      0x00000000
                   ||Nc||
                           DCD      0x00000080
-                  |symbol_number.64|
+                  |symbol_number.63|
 00000c  41424344          DCB      0x41,0x42,0x43,0x44
 000010  45464748          DCB      0x45,0x46,0x47,0x48
 000014  494a4b4c          DCB      0x49,0x4a,0x4b,0x4c

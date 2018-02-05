@@ -23,7 +23,7 @@ void protocol_analyze(void)
 	
 	if(par != NULL)
 	{
-		memcpy(topic, "topic: lock/", 12);
+//		memcpy(topic, "topic: lock/", 12);
 	}
 	
 	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);

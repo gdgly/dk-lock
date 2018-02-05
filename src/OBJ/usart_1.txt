@@ -5,22 +5,22 @@
                           AREA ||i.SendCmd||, CODE, READONLY, ALIGN=2
 
                   SendCmd PROC
-;;;463    
-;;;464    void SendCmd(char* cmd, char* result, int timeOut)
+;;;446    
+;;;447    void SendCmd(char* cmd, char* result, int timeOut)
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;465    {
+;;;448    {
 000004  4604              MOV      r4,r0
 000006  460e              MOV      r6,r1
 000008  4615              MOV      r5,r2
-;;;466    	USART2_Clear();
+;;;449    	USART2_Clear();
 00000a  f7fffffe          BL       USART2_Clear
-;;;467        while(1)
+;;;450        while(1)
 00000e  e016              B        |L1.62|
                   |L1.16|
-;;;468        { 
-;;;469    		USART2_Clear();
+;;;451        { 
+;;;452    		USART2_Clear();
 000010  f7fffffe          BL       USART2_Clear
-;;;470            USART2_Write(USART2, cmd, strlen(cmd));
+;;;453            USART2_Write(USART2, cmd, strlen(cmd));
 000014  4620              MOV      r0,r4
 000016  f7fffffe          BL       strlen
 00001a  b2c7              UXTB     r7,r0
@@ -28,42 +28,42 @@
 00001e  4621              MOV      r1,r4
 000020  4809              LDR      r0,|L1.72|
 000022  f7fffffe          BL       USART2_Write
-;;;471            timer_delay_1ms(timeOut);
+;;;454            timer_delay_1ms(timeOut);
 000026  4628              MOV      r0,r5
 000028  f7fffffe          BL       timer_delay_1ms
-;;;472    
-;;;473    //		delay_ms(timeOut);
-;;;474    //		printf("send_cmd:%s\r\n", usart2_rcv_buf);
-;;;475            if((NULL != strstr(usart2_buff, result)))	//??????????
+;;;455    
+;;;456    //		delay_ms(timeOut);
+;;;457    //		printf("send_cmd:%s\r\n", usart2_rcv_buf);
+;;;458            if((NULL != strstr(usart2_buff, result)))	//??????????
 00002c  4631              MOV      r1,r6
 00002e  4807              LDR      r0,|L1.76|
 000030  f7fffffe          BL       strstr
 000034  b118              CBZ      r0,|L1.62|
-;;;476            {
-;;;477    					  usart2_cnt=0;
+;;;459            {
+;;;460    					  usart2_cnt=0;
 000036  2000              MOVS     r0,#0
 000038  4905              LDR      r1,|L1.80|
 00003a  8008              STRH     r0,[r1,#0]
-;;;478    			
-;;;479    //					  myfree(usart2_rcv_buf);
-;;;480    //					  myfree(cmd);
-;;;481    //					  myfree(result);
-;;;482                break;
+;;;461    			
+;;;462    //					  myfree(usart2_rcv_buf);
+;;;463    //					  myfree(cmd);
+;;;464    //					  myfree(result);
+;;;465                break;
 00003c  e000              B        |L1.64|
                   |L1.62|
 00003e  e7e7              B        |L1.16|
                   |L1.64|
 000040  bf00              NOP      
-;;;483            }
-;;;484    //        else
-;;;485    //        {
-;;;486    //            delay_ms(200);
-;;;487    ////			timer_delay_1ms(200);
-;;;488    //        }
-;;;489        }
-;;;490    }
+;;;466            }
+;;;467    //        else
+;;;468    //        {
+;;;469    //            delay_ms(200);
+;;;470    ////			timer_delay_1ms(200);
+;;;471    //        }
+;;;472        }
+;;;473    }
 000042  e8bd81f0          POP      {r4-r8,pc}
-;;;491    
+;;;474    
                           ENDP
 
 000046  0000              DCW      0x0000
@@ -103,7 +103,7 @@
 ;;;233    		
 ;;;234    		timer_is_timeout_1ms(timer_uart1, 0);
 000022  2100              MOVS     r1,#0
-000024  2007              MOVS     r0,#7
+000024  2008              MOVS     r0,#8
 000026  f7fffffe          BL       timer_is_timeout_1ms
 ;;;235    		
 ;;;236    //		if(usart1_rx_status == 0)
@@ -188,24 +188,24 @@
                           AREA ||i.USART2_Clear||, CODE, READONLY, ALIGN=2
 
                   USART2_Clear PROC
-;;;440    
-;;;441    void USART2_Clear(void)
+;;;423    
+;;;424    void USART2_Clear(void)
 000000  b510              PUSH     {r4,lr}
-;;;442    {
-;;;443    	memset(usart2_buff, 0, strlen(usart2_buff));
+;;;425    {
+;;;426    	memset(usart2_buff, 0, strlen(usart2_buff));
 000002  4806              LDR      r0,|L3.28|
 000004  f7fffffe          BL       strlen
 000008  4604              MOV      r4,r0
 00000a  4621              MOV      r1,r4
 00000c  4803              LDR      r0,|L3.28|
 00000e  f7fffffe          BL       __aeabi_memclr
-;;;444        usart2_cnt = 0;
+;;;427        usart2_cnt = 0;
 000012  2000              MOVS     r0,#0
 000014  4902              LDR      r1,|L3.32|
 000016  8008              STRH     r0,[r1,#0]
-;;;445    }
+;;;428    }
 000018  bd10              POP      {r4,pc}
-;;;446    
+;;;429    
                           ENDP
 
 00001a  0000              DCW      0x0000
@@ -221,174 +221,125 @@
 ;;;293    void USART2_IRQHandler(void)
 000000  b510              PUSH     {r4,lr}
 ;;;294    {
-;;;295    
-;;;296    	u8 ch = 0;	
+;;;295    	u8 ch = 0;	
 000002  2400              MOVS     r4,#0
-;;;297    
-;;;298       	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
+;;;296    
+;;;297       	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
 000004  f2405125          MOV      r1,#0x525
-000008  482c              LDR      r0,|L4.188|
+000008  481b              LDR      r0,|L4.120|
 00000a  f7fffffe          BL       USART_GetITStatus
-00000e  2800              CMP      r0,#0
-000010  d047              BEQ      |L4.162|
-;;;299        {   
-;;;300    	    USART_ClearITPendingBit(USART2, USART_IT_RXNE);	
-000012  f2405125          MOV      r1,#0x525
-000016  4829              LDR      r0,|L4.188|
-000018  f7fffffe          BL       USART_ClearITPendingBit
-;;;301    		
-;;;302    		timer_is_timeout_1ms(timer_uart2, 0);		//定时器清零
-00001c  2100              MOVS     r1,#0
-00001e  2008              MOVS     r0,#8
-000020  f7fffffe          BL       timer_is_timeout_1ms
-;;;303    		
-;;;304    		if(usart2_rx_status == 0)
-000024  4826              LDR      r0,|L4.192|
-000026  7800              LDRB     r0,[r0,#0]  ; usart2_rx_status
-000028  b9d0              CBNZ     r0,|L4.96|
-;;;305    		{
-;;;306    			ch = USART_ReceiveData(USART2);	 
-00002a  4824              LDR      r0,|L4.188|
-00002c  f7fffffe          BL       USART_ReceiveData
-000030  b2c4              UXTB     r4,r0
-;;;307    			
-;;;308    			if (usart2_cnt < USART_BUFF_LENGHT)
-000032  4824              LDR      r0,|L4.196|
-000034  8800              LDRH     r0,[r0,#0]  ; usart2_cnt
-000036  f5b07f00          CMP      r0,#0x200
-00003a  da08              BGE      |L4.78|
-;;;309    			{			
-;;;310    				usart2_buff[usart2_cnt++] = ch;
-00003c  4821              LDR      r0,|L4.196|
-00003e  8801              LDRH     r1,[r0,#0]  ; usart2_cnt
-000040  8800              LDRH     r0,[r0,#0]  ; usart2_cnt
-000042  1c40              ADDS     r0,r0,#1
-000044  4a1f              LDR      r2,|L4.196|
-000046  8010              STRH     r0,[r2,#0]
-000048  481f              LDR      r0,|L4.200|
-00004a  5444              STRB     r4,[r0,r1]
-00004c  e029              B        |L4.162|
-                  |L4.78|
-;;;311    
-;;;312    			}
-;;;313    			else
-;;;314    			{
-;;;315    //				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-;;;316    				memset(usart2_buff, 0, 512);	
-00004e  f44f7100          MOV      r1,#0x200
-000052  481d              LDR      r0,|L4.200|
-000054  f7fffffe          BL       __aeabi_memclr
-;;;317    				usart2_cnt = 0;			
-000058  2000              MOVS     r0,#0
-00005a  491a              LDR      r1,|L4.196|
-00005c  8008              STRH     r0,[r1,#0]
-00005e  e020              B        |L4.162|
-                  |L4.96|
-;;;318    			}
-;;;319    		}
-;;;320    		else if(usart2_rx_status == 2)	//uart 接收模式2
-000060  4817              LDR      r0,|L4.192|
-000062  7800              LDRB     r0,[r0,#0]  ; usart2_rx_status
-000064  2802              CMP      r0,#2
-000066  d11c              BNE      |L4.162|
-;;;321    		{
-;;;322    			ch = USART_ReceiveData(USART2);	 
-000068  4814              LDR      r0,|L4.188|
-00006a  f7fffffe          BL       USART_ReceiveData
-00006e  b2c4              UXTB     r4,r0
-;;;323    			
-;;;324    			if (usart2_cnt < USART_BUFF_LENGHT)
-000070  4814              LDR      r0,|L4.196|
-000072  8800              LDRH     r0,[r0,#0]  ; usart2_cnt
-000074  f5b07f00          CMP      r0,#0x200
-000078  da0b              BGE      |L4.146|
-;;;325    			{			
-;;;326    				usart2_buff[usart2_cnt++] = ch;
-00007a  4812              LDR      r0,|L4.196|
-00007c  8801              LDRH     r1,[r0,#0]  ; usart2_cnt
-00007e  8800              LDRH     r0,[r0,#0]  ; usart2_cnt
-000080  1c40              ADDS     r0,r0,#1
-000082  4a10              LDR      r2,|L4.196|
-000084  8010              STRH     r0,[r2,#0]
-000086  4810              LDR      r0,|L4.200|
-000088  5444              STRB     r4,[r0,r1]
-;;;327    				usart2_rx_status = 1;
-00008a  2001              MOVS     r0,#1
-00008c  490c              LDR      r1,|L4.192|
-00008e  7008              STRB     r0,[r1,#0]
-000090  e007              B        |L4.162|
-                  |L4.146|
-;;;328    			}
-;;;329    			else
-;;;330    			{
-;;;331    //				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-;;;332    				memset(usart2_buff, 0, 512);	
-000092  f44f7100          MOV      r1,#0x200
-000096  480c              LDR      r0,|L4.200|
-000098  f7fffffe          BL       __aeabi_memclr
-;;;333    				usart2_cnt = 0;			
-00009c  2000              MOVS     r0,#0
-00009e  4909              LDR      r1,|L4.196|
-0000a0  8008              STRH     r0,[r1,#0]
-                  |L4.162|
-;;;334    			}
-;;;335    		
-;;;336    		}
-;;;337    	}
-;;;338    	
-;;;339    	if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET)                  
-0000a2  f2407127          MOV      r1,#0x727
-0000a6  4805              LDR      r0,|L4.188|
-0000a8  f7fffffe          BL       USART_GetITStatus
-0000ac  b128              CBZ      r0,|L4.186|
-;;;340      	{ 
-;;;341         	USART_ITConfig(USART2, USART_IT_TXE, DISABLE);					   
-0000ae  2200              MOVS     r2,#0
-0000b0  f2407127          MOV      r1,#0x727
-0000b4  4801              LDR      r0,|L4.188|
-0000b6  f7fffffe          BL       USART_ITConfig
-                  |L4.186|
-;;;342      	}	
-;;;343    	 	
-;;;344    }
-0000ba  bd10              POP      {r4,pc}
-;;;345    
+00000e  b328              CBZ      r0,|L4.92|
+;;;298        {   
+;;;299    	    USART_ClearITPendingBit(USART2, USART_IT_RXNE);	
+000010  f2405125          MOV      r1,#0x525
+000014  4818              LDR      r0,|L4.120|
+000016  f7fffffe          BL       USART_ClearITPendingBit
+;;;300    		
+;;;301    		timer_is_timeout_1ms(timer_uart2, 0);		//定时器清零
+00001a  2100              MOVS     r1,#0
+00001c  2009              MOVS     r0,#9
+00001e  f7fffffe          BL       timer_is_timeout_1ms
+;;;302    		
+;;;303    		if(usart2_rx_status == 0)
+000022  4816              LDR      r0,|L4.124|
+000024  7800              LDRB     r0,[r0,#0]  ; usart2_rx_status
+000026  b9c8              CBNZ     r0,|L4.92|
+;;;304    		{
+;;;305    			ch = USART_ReceiveData(USART2);	 
+000028  4813              LDR      r0,|L4.120|
+00002a  f7fffffe          BL       USART_ReceiveData
+00002e  b2c4              UXTB     r4,r0
+;;;306    			
+;;;307    			if (usart2_cnt < USART_BUFF_LENGHT)
+000030  4813              LDR      r0,|L4.128|
+000032  8800              LDRH     r0,[r0,#0]  ; usart2_cnt
+000034  f5b07f00          CMP      r0,#0x200
+000038  da08              BGE      |L4.76|
+;;;308    			{			
+;;;309    				usart2_buff[usart2_cnt++] = ch;
+00003a  4811              LDR      r0,|L4.128|
+00003c  8801              LDRH     r1,[r0,#0]  ; usart2_cnt
+00003e  8800              LDRH     r0,[r0,#0]  ; usart2_cnt
+000040  1c40              ADDS     r0,r0,#1
+000042  4a0f              LDR      r2,|L4.128|
+000044  8010              STRH     r0,[r2,#0]
+000046  480f              LDR      r0,|L4.132|
+000048  5444              STRB     r4,[r0,r1]
+00004a  e007              B        |L4.92|
+                  |L4.76|
+;;;310    
+;;;311    			}
+;;;312    			else
+;;;313    			{
+;;;314    //				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
+;;;315    				memset(usart2_buff, 0, 512);	
+00004c  f44f7100          MOV      r1,#0x200
+000050  480c              LDR      r0,|L4.132|
+000052  f7fffffe          BL       __aeabi_memclr
+;;;316    				usart2_cnt = 0;			
+000056  2000              MOVS     r0,#0
+000058  4909              LDR      r1,|L4.128|
+00005a  8008              STRH     r0,[r1,#0]
+                  |L4.92|
+;;;317    			}
+;;;318    		}
+;;;319    
+;;;320    	}
+;;;321    	
+;;;322    	if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET)                  
+00005c  f2407127          MOV      r1,#0x727
+000060  4805              LDR      r0,|L4.120|
+000062  f7fffffe          BL       USART_GetITStatus
+000066  b128              CBZ      r0,|L4.116|
+;;;323      	{ 
+;;;324         	USART_ITConfig(USART2, USART_IT_TXE, DISABLE);					   
+000068  2200              MOVS     r2,#0
+00006a  f2407127          MOV      r1,#0x727
+00006e  4802              LDR      r0,|L4.120|
+000070  f7fffffe          BL       USART_ITConfig
+                  |L4.116|
+;;;325      	}	
+;;;326    	 	
+;;;327    }
+000074  bd10              POP      {r4,pc}
+;;;328    
                           ENDP
 
-                  |L4.188|
+000076  0000              DCW      0x0000
+                  |L4.120|
                           DCD      0x40004400
-                  |L4.192|
+                  |L4.124|
                           DCD      usart2_rx_status
-                  |L4.196|
+                  |L4.128|
                           DCD      usart2_cnt
-                  |L4.200|
+                  |L4.132|
                           DCD      usart2_buff
 
                           AREA ||i.USART2_Write||, CODE, READONLY, ALIGN=1
 
                   USART2_Write PROC
-;;;449    */
-;;;450    void USART2_Write(USART_TypeDef* USARTx, uint8_t *Data, uint8_t len)
+;;;432    */
+;;;433    void USART2_Write(USART_TypeDef* USARTx, uint8_t *Data, uint8_t len)
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;451    {
+;;;434    {
 000004  4607              MOV      r7,r0
 000006  460c              MOV      r4,r1
 000008  4615              MOV      r5,r2
-;;;452        uint8_t i;
-;;;453        USART_ClearFlag(USARTx, USART_FLAG_TC);
+;;;435        uint8_t i;
+;;;436        USART_ClearFlag(USARTx, USART_FLAG_TC);
 00000a  2140              MOVS     r1,#0x40
 00000c  4638              MOV      r0,r7
 00000e  f7fffffe          BL       USART_ClearFlag
-;;;454        for(i = 0; i < len; i++)
+;;;437        for(i = 0; i < len; i++)
 000012  2600              MOVS     r6,#0
 000014  e00d              B        |L5.50|
                   |L5.22|
-;;;455        {
-;;;456            USART_SendData(USARTx, *Data++);
+;;;438        {
+;;;439            USART_SendData(USARTx, *Data++);
 000016  f8141b01          LDRB     r1,[r4],#1
 00001a  4638              MOV      r0,r7
 00001c  f7fffffe          BL       USART_SendData
-;;;457            while( USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET );
+;;;440            while( USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET );
 000020  bf00              NOP      
                   |L5.34|
 000022  2140              MOVS     r1,#0x40
@@ -396,118 +347,115 @@
 000026  f7fffffe          BL       USART_GetFlagStatus
 00002a  2800              CMP      r0,#0
 00002c  d0f9              BEQ      |L5.34|
-00002e  1c70              ADDS     r0,r6,#1              ;454
-000030  b2c6              UXTB     r6,r0                 ;454
+00002e  1c70              ADDS     r0,r6,#1              ;437
+000030  b2c6              UXTB     r6,r0                 ;437
                   |L5.50|
-000032  42ae              CMP      r6,r5                 ;454
+000032  42ae              CMP      r6,r5                 ;437
 000034  dbef              BLT      |L5.22|
-;;;458        }
-;;;459    }
+;;;441        }
+;;;442    }
 000036  e8bd81f0          POP      {r4-r8,pc}
-;;;460    
+;;;443    
                           ENDP
 
 
                           AREA ||i.USART3_IRQHandler||, CODE, READONLY, ALIGN=2
 
                   USART3_IRQHandler PROC
-;;;377    */
-;;;378    void USART3_IRQHandler(void)
+;;;360    */
+;;;361    void USART3_IRQHandler(void)
 000000  b510              PUSH     {r4,lr}
-;;;379    {
-;;;380    	u8 ch = 0;	
+;;;362    {
+;;;363    	u8 ch = 0;	
 000002  2400              MOVS     r4,#0
-;;;381    
-;;;382       	if (USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
+;;;364    
+;;;365       	if (USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
 000004  f2405125          MOV      r1,#0x525
-000008  481c              LDR      r0,|L6.124|
+000008  481b              LDR      r0,|L6.120|
 00000a  f7fffffe          BL       USART_GetITStatus
-00000e  b1f8              CBZ      r0,|L6.80|
-;;;383        {   
-;;;384    	    USART_ClearITPendingBit(USART3, USART_IT_RXNE);	
+00000e  b328              CBZ      r0,|L6.92|
+;;;366        {   
+;;;367    	    USART_ClearITPendingBit(USART3, USART_IT_RXNE);	
 000010  f2405125          MOV      r1,#0x525
-000014  4819              LDR      r0,|L6.124|
+000014  4818              LDR      r0,|L6.120|
 000016  f7fffffe          BL       USART_ClearITPendingBit
-;;;385    		timer_is_timeout_1ms(timer_uart3, 0);
+;;;368    		timer_is_timeout_1ms(timer_uart3, 0);
 00001a  2100              MOVS     r1,#0
-00001c  2009              MOVS     r0,#9
+00001c  200a              MOVS     r0,#0xa
 00001e  f7fffffe          BL       timer_is_timeout_1ms
-;;;386    		
-;;;387    		if(usart3_rx_status == 0)
-000022  4817              LDR      r0,|L6.128|
-000024  7800              LDRB     r0,[r0,#0]  ; usart3_rx_status
-000026  b998              CBNZ     r0,|L6.80|
-;;;388    		{	
-;;;389    			ch = USART_ReceiveData(USART3);	 
-000028  4814              LDR      r0,|L6.124|
-00002a  f7fffffe          BL       USART_ReceiveData
-00002e  b2c4              UXTB     r4,r0
-;;;390    
-;;;391    			if (usart3_cnt < USART_BUFF_LENGHT)
-000030  4814              LDR      r0,|L6.132|
-000032  8800              LDRH     r0,[r0,#0]  ; usart3_cnt
-000034  f5b07f00          CMP      r0,#0x200
-000038  da0b              BGE      |L6.82|
-;;;392    			{
-;;;393    				usart3_buff[usart3_cnt++] = ch;	
-00003a  4812              LDR      r0,|L6.132|
-00003c  8801              LDRH     r1,[r0,#0]  ; usart3_cnt
-00003e  8800              LDRH     r0,[r0,#0]  ; usart3_cnt
-000040  1c40              ADDS     r0,r0,#1
-000042  4a10              LDR      r2,|L6.132|
-000044  8010              STRH     r0,[r2,#0]
-000046  4810              LDR      r0,|L6.136|
-000048  5444              STRB     r4,[r0,r1]
-;;;394    				usart3_rx_status = 1;				
-00004a  2001              MOVS     r0,#1
-00004c  490c              LDR      r1,|L6.128|
-00004e  7008              STRB     r0,[r1,#0]
-                  |L6.80|
-000050  e007              B        |L6.98|
-                  |L6.82|
-;;;395    			}
-;;;396    			else
-;;;397    			{
-;;;398    				memset(usart3_buff, 0, USART_BUFF_LENGHT);
-000052  f44f7100          MOV      r1,#0x200
-000056  480c              LDR      r0,|L6.136|
-000058  f7fffffe          BL       __aeabi_memclr
-;;;399    				usart3_cnt = 0;
-00005c  2000              MOVS     r0,#0
-00005e  4909              LDR      r1,|L6.132|
-000060  8008              STRH     r0,[r1,#0]
-                  |L6.98|
-;;;400    			}
-;;;401    		}	
-;;;402    	}
-;;;403    	
-;;;404    	if(USART_GetITStatus(USART3, USART_IT_TXE) != RESET)                  
-000062  f2407127          MOV      r1,#0x727
-000066  4805              LDR      r0,|L6.124|
-000068  f7fffffe          BL       USART_GetITStatus
-00006c  b128              CBZ      r0,|L6.122|
-;;;405      	{ 
-;;;406         	USART_ITConfig(USART3, USART_IT_TXE, DISABLE);					   
-00006e  2200              MOVS     r2,#0
-000070  f2407127          MOV      r1,#0x727
-000074  4801              LDR      r0,|L6.124|
-000076  f7fffffe          BL       USART_ITConfig
-                  |L6.122|
-;;;407      	}	
-;;;408    	
-;;;409    }
-00007a  bd10              POP      {r4,pc}
-;;;410    
+;;;369    		
+;;;370    //		if(usart3_rx_status == 0)
+;;;371    		{	
+;;;372    			ch = USART_ReceiveData(USART3);	 
+000022  4815              LDR      r0,|L6.120|
+000024  f7fffffe          BL       USART_ReceiveData
+000028  b2c4              UXTB     r4,r0
+;;;373    
+;;;374    			if (usart3_cnt < USART_BUFF_LENGHT)
+00002a  4814              LDR      r0,|L6.124|
+00002c  8800              LDRH     r0,[r0,#0]  ; usart3_cnt
+00002e  f5b07f00          CMP      r0,#0x200
+000032  da0b              BGE      |L6.76|
+;;;375    			{
+;;;376    				usart3_buff[usart3_cnt++] = ch;	
+000034  4811              LDR      r0,|L6.124|
+000036  8801              LDRH     r1,[r0,#0]  ; usart3_cnt
+000038  8800              LDRH     r0,[r0,#0]  ; usart3_cnt
+00003a  1c40              ADDS     r0,r0,#1
+00003c  4a0f              LDR      r2,|L6.124|
+00003e  8010              STRH     r0,[r2,#0]
+000040  480f              LDR      r0,|L6.128|
+000042  5444              STRB     r4,[r0,r1]
+;;;377    				usart3_rx_status = 1;				
+000044  2001              MOVS     r0,#1
+000046  490f              LDR      r1,|L6.132|
+000048  7008              STRB     r0,[r1,#0]
+00004a  e007              B        |L6.92|
+                  |L6.76|
+;;;378    			}
+;;;379    			else
+;;;380    			{
+;;;381    				memset(usart3_buff, 0, USART_BUFF_LENGHT);
+00004c  f44f7100          MOV      r1,#0x200
+000050  480b              LDR      r0,|L6.128|
+000052  f7fffffe          BL       __aeabi_memclr
+;;;382    				usart3_cnt = 0;
+000056  2000              MOVS     r0,#0
+000058  4908              LDR      r1,|L6.124|
+00005a  8008              STRH     r0,[r1,#0]
+                  |L6.92|
+;;;383    			}
+;;;384    		}	
+;;;385    	}
+;;;386    	
+;;;387    	if(USART_GetITStatus(USART3, USART_IT_TXE) != RESET)                  
+00005c  f2407127          MOV      r1,#0x727
+000060  4805              LDR      r0,|L6.120|
+000062  f7fffffe          BL       USART_GetITStatus
+000066  b128              CBZ      r0,|L6.116|
+;;;388      	{ 
+;;;389         	USART_ITConfig(USART3, USART_IT_TXE, DISABLE);					   
+000068  2200              MOVS     r2,#0
+00006a  f2407127          MOV      r1,#0x727
+00006e  4802              LDR      r0,|L6.120|
+000070  f7fffffe          BL       USART_ITConfig
+                  |L6.116|
+;;;390      	}	
+;;;391    	
+;;;392    }
+000074  bd10              POP      {r4,pc}
+;;;393    
                           ENDP
 
-                  |L6.124|
+000076  0000              DCW      0x0000
+                  |L6.120|
                           DCD      0x40004800
-                  |L6.128|
-                          DCD      usart3_rx_status
-                  |L6.132|
+                  |L6.124|
                           DCD      usart3_cnt
-                  |L6.136|
+                  |L6.128|
                           DCD      usart3_buff
+                  |L6.132|
+                          DCD      usart3_rx_status
 
                           AREA ||i.USART_OUT||, CODE, READONLY, ALIGN=2
 
@@ -515,38 +463,38 @@
                           REQUIRE _printf_d
                           REQUIRE _printf_int_dec
                   USART_OUT PROC
-;;;509    */
-;;;510    void USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...)
+;;;492    */
+;;;493    void USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...)
 000000  b40f              PUSH     {r0-r3}
-;;;511    { 
+;;;494    { 
 000002  b570              PUSH     {r4-r6,lr}
 000004  b08a              SUB      sp,sp,#0x28
 000006  4606              MOV      r6,r0
-;;;512    	const char *s;
-;;;513        int d;  
-;;;514        char buf[32];
-;;;515        
-;;;516    	va_list ap;
-;;;517        __va_start(ap, Data);
+;;;495    	const char *s;
+;;;496        int d;  
+;;;497        char buf[32];
+;;;498        
+;;;499    	va_list ap;
+;;;500        __va_start(ap, Data);
 000008  a810              ADD      r0,sp,#0x40
 00000a  9001              STR      r0,[sp,#4]
-;;;518    	
-;;;519    	
-;;;520    	USART_GetFlagStatus(USARTx, USART_FLAG_TC);	//
+;;;501    	
+;;;502    	
+;;;503    	USART_GetFlagStatus(USARTx, USART_FLAG_TC);	//
 00000c  2140              MOVS     r1,#0x40
 00000e  4630              MOV      r0,r6
 000010  f7fffffe          BL       USART_GetFlagStatus
-;;;521    	while(*Data != '\0')
+;;;504    	while(*Data != '\0')
 000014  e073              B        |L7.254|
                   |L7.22|
-;;;522    	{				                         
-;;;523    		if(*Data==0x5c)
+;;;505    	{				                         
+;;;506    		if(*Data==0x5c)
 000016  980f              LDR      r0,[sp,#0x3c]
 000018  7800              LDRB     r0,[r0,#0]
 00001a  285c              CMP      r0,#0x5c
 00001c  d11c              BNE      |L7.88|
-;;;524    		{									
-;;;525    			switch (*++Data)
+;;;507    		{									
+;;;508    			switch (*++Data)
 00001e  980f              LDR      r0,[sp,#0x3c]
 000020  1c40              ADDS     r0,r0,#1
 000022  900f              STR      r0,[sp,#0x3c]
@@ -555,51 +503,51 @@
 000028  d009              BEQ      |L7.62|
 00002a  2872              CMP      r0,#0x72
 00002c  d10f              BNE      |L7.78|
-;;;526    			{
-;;;527    				case 'r':							          
-;;;528    					USART_SendData(USARTx, 0x0d);	   
+;;;509    			{
+;;;510    				case 'r':							          
+;;;511    					USART_SendData(USARTx, 0x0d);	   
 00002e  210d              MOVS     r1,#0xd
 000030  4630              MOV      r0,r6
 000032  f7fffffe          BL       USART_SendData
-;;;529    					Data++;
+;;;512    					Data++;
 000036  980f              LDR      r0,[sp,#0x3c]
 000038  1c40              ADDS     r0,r0,#1
 00003a  900f              STR      r0,[sp,#0x3c]
-;;;530    				break;
+;;;513    				break;
 00003c  e00b              B        |L7.86|
                   |L7.62|
-;;;531    				case 'n':							          
-;;;532    					USART_SendData(USARTx, 0x0a);	
+;;;514    				case 'n':							          
+;;;515    					USART_SendData(USARTx, 0x0a);	
 00003e  210a              MOVS     r1,#0xa
 000040  4630              MOV      r0,r6
 000042  f7fffffe          BL       USART_SendData
-;;;533    					Data++;
+;;;516    					Data++;
 000046  980f              LDR      r0,[sp,#0x3c]
 000048  1c40              ADDS     r0,r0,#1
 00004a  900f              STR      r0,[sp,#0x3c]
-;;;534    				break;
+;;;517    				break;
 00004c  e003              B        |L7.86|
                   |L7.78|
-;;;535    				
-;;;536    				default:
-;;;537    					Data++;
+;;;518    				
+;;;519    				default:
+;;;520    					Data++;
 00004e  980f              LDR      r0,[sp,#0x3c]
 000050  1c40              ADDS     r0,r0,#1
 000052  900f              STR      r0,[sp,#0x3c]
-;;;538    			    break;
+;;;521    			    break;
 000054  bf00              NOP      
                   |L7.86|
 000056  e04b              B        |L7.240|
                   |L7.88|
-;;;539    			}						 
-;;;540    		}
-;;;541    		else if(*Data=='%')
+;;;522    			}						 
+;;;523    		}
+;;;524    		else if(*Data=='%')
 000058  980f              LDR      r0,[sp,#0x3c]
 00005a  7800              LDRB     r0,[r0,#0]
 00005c  2825              CMP      r0,#0x25
 00005e  d140              BNE      |L7.226|
-;;;542    		{									  //
-;;;543    			switch (*++Data){				
+;;;525    		{									  //
+;;;526    			switch (*++Data){				
 000060  980f              LDR      r0,[sp,#0x3c]
 000062  1c40              ADDS     r0,r0,#1
 000064  900f              STR      r0,[sp,#0x3c]
@@ -608,20 +556,20 @@
 00006a  d018              BEQ      |L7.158|
 00006c  2873              CMP      r0,#0x73
 00006e  d133              BNE      |L7.216|
-;;;544    				case 's':										  
-;;;545                    	s = __va_arg(ap, const char *);
+;;;527    				case 's':										  
+;;;528                    	s = __va_arg(ap, const char *);
 000070  9801              LDR      r0,[sp,#4]
 000072  c810              LDM      r0!,{r4}
 000074  9001              STR      r0,[sp,#4]
-;;;546                    	for ( ; *s; s++) 
+;;;529                    	for ( ; *s; s++) 
 000076  e00b              B        |L7.144|
                   |L7.120|
-;;;547    					{
-;;;548                        	USART_SendData(USARTx,*s);
+;;;530    					{
+;;;531                        	USART_SendData(USARTx,*s);
 000078  7821              LDRB     r1,[r4,#0]
 00007a  4630              MOV      r0,r6
 00007c  f7fffffe          BL       USART_SendData
-;;;549    						while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
+;;;532    						while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
 000080  bf00              NOP      
                   |L7.130|
 000082  2140              MOVS     r1,#0x40
@@ -629,40 +577,40 @@
 000086  f7fffffe          BL       USART_GetFlagStatus
 00008a  2800              CMP      r0,#0
 00008c  d0f9              BEQ      |L7.130|
-00008e  1c64              ADDS     r4,r4,#1              ;546
+00008e  1c64              ADDS     r4,r4,#1              ;529
                   |L7.144|
-000090  7820              LDRB     r0,[r4,#0]            ;546
-000092  2800              CMP      r0,#0                 ;546
+000090  7820              LDRB     r0,[r4,#0]            ;529
+000092  2800              CMP      r0,#0                 ;529
 000094  d1f0              BNE      |L7.120|
-;;;550                    	}
-;;;551    					Data++;
+;;;533                    	}
+;;;534    					Data++;
 000096  980f              LDR      r0,[sp,#0x3c]
 000098  1c40              ADDS     r0,r0,#1
 00009a  900f              STR      r0,[sp,#0x3c]
-;;;552                    	break;
+;;;535                    	break;
 00009c  e020              B        |L7.224|
                   |L7.158|
-;;;553                	case 'd':										 
-;;;554                    	d = __va_arg(ap, int);
+;;;536                	case 'd':										 
+;;;537                    	d = __va_arg(ap, int);
 00009e  9801              LDR      r0,[sp,#4]
 0000a0  c820              LDM      r0!,{r5}
 0000a2  9001              STR      r0,[sp,#4]
-;;;555    					
-;;;556    					sprintf(buf, "%d", d);
+;;;538    					
+;;;539    					sprintf(buf, "%d", d);
 0000a4  462a              MOV      r2,r5
 0000a6  a11a              ADR      r1,|L7.272|
 0000a8  a802              ADD      r0,sp,#8
 0000aa  f7fffffe          BL       __2sprintf
-;;;557                    	for (s = buf; *s; s++) 
+;;;540                    	for (s = buf; *s; s++) 
 0000ae  ac02              ADD      r4,sp,#8
 0000b0  e00b              B        |L7.202|
                   |L7.178|
-;;;558    					{
-;;;559                        	USART_SendData(USARTx,*s);
+;;;541    					{
+;;;542                        	USART_SendData(USARTx,*s);
 0000b2  7821              LDRB     r1,[r4,#0]
 0000b4  4630              MOV      r0,r6
 0000b6  f7fffffe          BL       USART_SendData
-;;;560    						while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
+;;;543    						while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
 0000ba  bf00              NOP      
                   |L7.188|
 0000bc  2140              MOVS     r1,#0x40
@@ -670,40 +618,40 @@
 0000c0  f7fffffe          BL       USART_GetFlagStatus
 0000c4  2800              CMP      r0,#0
 0000c6  d0f9              BEQ      |L7.188|
-0000c8  1c64              ADDS     r4,r4,#1              ;557
+0000c8  1c64              ADDS     r4,r4,#1              ;540
                   |L7.202|
-0000ca  7820              LDRB     r0,[r4,#0]            ;557
-0000cc  2800              CMP      r0,#0                 ;557
+0000ca  7820              LDRB     r0,[r4,#0]            ;540
+0000cc  2800              CMP      r0,#0                 ;540
 0000ce  d1f0              BNE      |L7.178|
-;;;561                    	}
-;;;562    					Data++;
+;;;544                    	}
+;;;545    					Data++;
 0000d0  980f              LDR      r0,[sp,#0x3c]
 0000d2  1c40              ADDS     r0,r0,#1
 0000d4  900f              STR      r0,[sp,#0x3c]
-;;;563                    	break;
+;;;546                    	break;
 0000d6  e003              B        |L7.224|
                   |L7.216|
-;;;564    				default:
-;;;565    					Data++;
+;;;547    				default:
+;;;548    					Data++;
 0000d8  980f              LDR      r0,[sp,#0x3c]
 0000da  1c40              ADDS     r0,r0,#1
 0000dc  900f              STR      r0,[sp,#0x3c]
-;;;566    				    break;
+;;;549    				    break;
 0000de  bf00              NOP      
                   |L7.224|
 0000e0  e006              B        |L7.240|
                   |L7.226|
-;;;567    			}		 
-;;;568    		}
-;;;569    		else 
-;;;570    			USART_SendData(USARTx, *Data++);
+;;;550    			}		 
+;;;551    		}
+;;;552    		else 
+;;;553    			USART_SendData(USARTx, *Data++);
 0000e2  980f              LDR      r0,[sp,#0x3c]
 0000e4  f8101b01          LDRB     r1,[r0],#1
 0000e8  900f              STR      r0,[sp,#0x3c]
 0000ea  4630              MOV      r0,r6
 0000ec  f7fffffe          BL       USART_SendData
                   |L7.240|
-;;;571    		while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
+;;;554    		while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
 0000f0  bf00              NOP      
                   |L7.242|
 0000f2  2140              MOVS     r1,#0x40
@@ -712,16 +660,16 @@
 0000fa  2800              CMP      r0,#0
 0000fc  d0f9              BEQ      |L7.242|
                   |L7.254|
-0000fe  980f              LDR      r0,[sp,#0x3c]         ;521
-000100  7800              LDRB     r0,[r0,#0]            ;521
-000102  2800              CMP      r0,#0                 ;521
+0000fe  980f              LDR      r0,[sp,#0x3c]         ;504
+000100  7800              LDRB     r0,[r0,#0]            ;504
+000102  2800              CMP      r0,#0                 ;504
 000104  d187              BNE      |L7.22|
-;;;572    	}
-;;;573    }
+;;;555    	}
+;;;556    }
 000106  b00a              ADD      sp,sp,#0x28
 000108  bc70              POP      {r4-r6}
 00010a  f85dfb14          LDR      pc,[sp],#0x14
-;;;574    
+;;;557    
                           ENDP
 
 00010e  0000              DCW      0x0000
@@ -792,7 +740,7 @@
 ;;;265    
 ;;;266    	if(timer_is_timeout_1ms(timer_uart1, 40) == 0)	//40ms没接收到数据认为接收数据完成		
 000002  2128              MOVS     r1,#0x28
-000004  2007              MOVS     r0,#7
+000004  2008              MOVS     r0,#8
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b978              CBNZ     r0,|L9.44|
 ;;;267    	{
@@ -883,41 +831,41 @@
                           AREA ||i.usart2_recv_data||, CODE, READONLY, ALIGN=2
 
                   usart2_recv_data PROC
-;;;346    
-;;;347    void usart2_recv_data(void)
+;;;329    
+;;;330    void usart2_recv_data(void)
 000000  b510              PUSH     {r4,lr}
-;;;348    {		
-;;;349    	if(timer_is_timeout_1ms(timer_uart2, 40) == 0)	//40ms没接收到数据认为接收数据完成		
+;;;331    {		
+;;;332    	if(timer_is_timeout_1ms(timer_uart2, 40) == 0)	//40ms没接收到数据认为接收数据完成		
 000002  2128              MOVS     r1,#0x28
-000004  2008              MOVS     r0,#8
+000004  2009              MOVS     r0,#9
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b988              CBNZ     r0,|L11.48|
-;;;350    	{
-;;;351    		
-;;;352    		USART_OUT(USART1, usart2_buff);
+;;;333    	{
+;;;334    		
+;;;335    		USART_OUT(USART1, usart2_buff);
 00000c  4909              LDR      r1,|L11.52|
 00000e  480a              LDR      r0,|L11.56|
 000010  f7fffffe          BL       USART_OUT
-;;;353    		memcpy(protocol_buff, usart2_buff, 512);
+;;;336    		memcpy(protocol_buff, usart2_buff, 512);
 000014  f44f7200          MOV      r2,#0x200
 000018  4906              LDR      r1,|L11.52|
 00001a  4808              LDR      r0,|L11.60|
 00001c  f7fffffe          BL       __aeabi_memcpy
-;;;354    		
-;;;355    		memset(usart2_buff, 0, 512);	
+;;;337    		
+;;;338    		memset(usart2_buff, 0, 512);	
 000020  f44f7100          MOV      r1,#0x200
 000024  4803              LDR      r0,|L11.52|
 000026  f7fffffe          BL       __aeabi_memclr
-;;;356    		usart2_cnt = 0;	
+;;;339    		usart2_cnt = 0;	
 00002a  2000              MOVS     r0,#0
 00002c  4904              LDR      r1,|L11.64|
 00002e  8008              STRH     r0,[r1,#0]
                   |L11.48|
-;;;357    		
-;;;358    	}	
-;;;359    }
+;;;340    		
+;;;341    	}	
+;;;342    }
 000030  bd10              POP      {r4,pc}
-;;;360    
+;;;343    
                           ENDP
 
 000032  0000              DCW      0x0000
@@ -983,41 +931,41 @@
                           AREA ||i.usart3_recv_data||, CODE, READONLY, ALIGN=2
 
                   usart3_recv_data PROC
-;;;425    */
-;;;426    void usart3_recv_data(void)
+;;;408    */
+;;;409    void usart3_recv_data(void)
 000000  b510              PUSH     {r4,lr}
-;;;427    {
-;;;428    	
-;;;429    	if(timer_is_timeout_1ms(timer_uart3, 40)==0)	//40ms没接收到数据认为接收数据完成		
-000002  2128              MOVS     r1,#0x28
-000004  2009              MOVS     r0,#9
+;;;410    {
+;;;411    	
+;;;412    	if(timer_is_timeout_1ms(timer_uart3, 50)==0)	//40ms没接收到数据认为接收数据完成		
+000002  2132              MOVS     r1,#0x32
+000004  200a              MOVS     r0,#0xa
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b988              CBNZ     r0,|L13.48|
-;;;430    	{
-;;;431    
-;;;432    		USART_OUT(USART1, usart3_buff);
+;;;413    	{
+;;;414    
+;;;415    		USART_OUT(USART1, usart3_buff);
 00000c  4909              LDR      r1,|L13.52|
 00000e  480a              LDR      r0,|L13.56|
 000010  f7fffffe          BL       USART_OUT
-;;;433    		memcpy(gps_buff, usart3_buff, 512);
+;;;416    		memcpy(gps_buff, usart3_buff, 512);
 000014  f44f7200          MOV      r2,#0x200
 000018  4906              LDR      r1,|L13.52|
 00001a  4808              LDR      r0,|L13.60|
 00001c  f7fffffe          BL       __aeabi_memcpy
-;;;434    		
-;;;435    		memset(usart3_buff, 0, 512);	
+;;;417    		
+;;;418    		memset(usart3_buff, 0, 512);	
 000020  f44f7100          MOV      r1,#0x200
 000024  4803              LDR      r0,|L13.52|
 000026  f7fffffe          BL       __aeabi_memclr
-;;;436    		usart3_cnt = 0;	
+;;;419    		usart3_cnt = 0;	
 00002a  2000              MOVS     r0,#0
 00002c  4904              LDR      r1,|L13.64|
 00002e  8008              STRH     r0,[r1,#0]
                   |L13.48|
-;;;437    	}	
-;;;438    }
+;;;420    	}	
+;;;421    }
 000030  bd10              POP      {r4,pc}
-;;;439    
+;;;422    
                           ENDP
 
 000032  0000              DCW      0x0000
@@ -1088,39 +1036,39 @@
                           REQUIRE _printf_d
                           REQUIRE _printf_int_dec
                   usart_printf PROC
-;;;577    
-;;;578    void usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...)
+;;;560    
+;;;561    void usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...)
 000000  b40f              PUSH     {r0-r3}
-;;;579    { 
+;;;562    { 
 000002  b5f0              PUSH     {r4-r7,lr}
 000004  b089              SUB      sp,sp,#0x24
 000006  4607              MOV      r7,r0
 000008  460d              MOV      r5,r1
-;;;580    	const char *s;
-;;;581        int d;  
-;;;582        char buf[32];
-;;;583        
-;;;584    	va_list ap;
-;;;585        __va_start(ap, data);
+;;;563    	const char *s;
+;;;564        int d;  
+;;;565        char buf[32];
+;;;566        
+;;;567    	va_list ap;
+;;;568        __va_start(ap, data);
 00000a  a811              ADD      r0,sp,#0x44
 00000c  9000              STR      r0,[sp,#0]
-;;;586    	
-;;;587    	
-;;;588    	USART_GetFlagStatus(USARTx, USART_FLAG_TC);	//
+;;;569    	
+;;;570    	
+;;;571    	USART_GetFlagStatus(USARTx, USART_FLAG_TC);	//
 00000e  2140              MOVS     r1,#0x40
 000010  4638              MOV      r0,r7
 000012  f7fffffe          BL       USART_GetFlagStatus
-;;;589    	while(data_size--)
+;;;572    	while(data_size--)
 000016  e073              B        |L15.256|
                   |L15.24|
-;;;590    	{				                         
-;;;591    		if(*data==0x5c)
+;;;573    	{				                         
+;;;574    		if(*data==0x5c)
 000018  9810              LDR      r0,[sp,#0x40]
 00001a  7800              LDRB     r0,[r0,#0]
 00001c  285c              CMP      r0,#0x5c
 00001e  d11c              BNE      |L15.90|
-;;;592    		{									
-;;;593    			switch (*++data)
+;;;575    		{									
+;;;576    			switch (*++data)
 000020  9810              LDR      r0,[sp,#0x40]
 000022  1c40              ADDS     r0,r0,#1
 000024  9010              STR      r0,[sp,#0x40]
@@ -1129,51 +1077,51 @@
 00002a  d009              BEQ      |L15.64|
 00002c  2872              CMP      r0,#0x72
 00002e  d10f              BNE      |L15.80|
-;;;594    			{
-;;;595    				case 'r':							          
-;;;596    					USART_SendData(USARTx, 0x0d);	   
+;;;577    			{
+;;;578    				case 'r':							          
+;;;579    					USART_SendData(USARTx, 0x0d);	   
 000030  210d              MOVS     r1,#0xd
 000032  4638              MOV      r0,r7
 000034  f7fffffe          BL       USART_SendData
-;;;597    					data++;
+;;;580    					data++;
 000038  9810              LDR      r0,[sp,#0x40]
 00003a  1c40              ADDS     r0,r0,#1
 00003c  9010              STR      r0,[sp,#0x40]
-;;;598    				break;
+;;;581    				break;
 00003e  e00b              B        |L15.88|
                   |L15.64|
-;;;599    				case 'n':							          
-;;;600    					USART_SendData(USARTx, 0x0a);	
+;;;582    				case 'n':							          
+;;;583    					USART_SendData(USARTx, 0x0a);	
 000040  210a              MOVS     r1,#0xa
 000042  4638              MOV      r0,r7
 000044  f7fffffe          BL       USART_SendData
-;;;601    					data++;
+;;;584    					data++;
 000048  9810              LDR      r0,[sp,#0x40]
 00004a  1c40              ADDS     r0,r0,#1
 00004c  9010              STR      r0,[sp,#0x40]
-;;;602    				break;
+;;;585    				break;
 00004e  e003              B        |L15.88|
                   |L15.80|
-;;;603    				
-;;;604    				default:
-;;;605    					data++;
+;;;586    				
+;;;587    				default:
+;;;588    					data++;
 000050  9810              LDR      r0,[sp,#0x40]
 000052  1c40              ADDS     r0,r0,#1
 000054  9010              STR      r0,[sp,#0x40]
-;;;606    			    break;
+;;;589    			    break;
 000056  bf00              NOP      
                   |L15.88|
 000058  e04b              B        |L15.242|
                   |L15.90|
-;;;607    			}						 
-;;;608    		}
-;;;609    		else if(*data=='%')
+;;;590    			}						 
+;;;591    		}
+;;;592    		else if(*data=='%')
 00005a  9810              LDR      r0,[sp,#0x40]
 00005c  7800              LDRB     r0,[r0,#0]
 00005e  2825              CMP      r0,#0x25
 000060  d140              BNE      |L15.228|
-;;;610    		{									  //
-;;;611    			switch (*++data){				
+;;;593    		{									  //
+;;;594    			switch (*++data){				
 000062  9810              LDR      r0,[sp,#0x40]
 000064  1c40              ADDS     r0,r0,#1
 000066  9010              STR      r0,[sp,#0x40]
@@ -1182,20 +1130,20 @@
 00006c  d018              BEQ      |L15.160|
 00006e  2873              CMP      r0,#0x73
 000070  d133              BNE      |L15.218|
-;;;612    				case 's':										  
-;;;613                    	s = __va_arg(ap, const char *);
+;;;595    				case 's':										  
+;;;596                    	s = __va_arg(ap, const char *);
 000072  9800              LDR      r0,[sp,#0]
 000074  c810              LDM      r0!,{r4}
 000076  9000              STR      r0,[sp,#0]
-;;;614                    	for ( ; *s; s++) 
+;;;597                    	for ( ; *s; s++) 
 000078  e00b              B        |L15.146|
                   |L15.122|
-;;;615    					{
-;;;616                        	USART_SendData(USARTx,*s);
+;;;598    					{
+;;;599                        	USART_SendData(USARTx,*s);
 00007a  7821              LDRB     r1,[r4,#0]
 00007c  4638              MOV      r0,r7
 00007e  f7fffffe          BL       USART_SendData
-;;;617    						while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
+;;;600    						while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
 000082  bf00              NOP      
                   |L15.132|
 000084  2140              MOVS     r1,#0x40
@@ -1203,40 +1151,40 @@
 000088  f7fffffe          BL       USART_GetFlagStatus
 00008c  2800              CMP      r0,#0
 00008e  d0f9              BEQ      |L15.132|
-000090  1c64              ADDS     r4,r4,#1              ;614
+000090  1c64              ADDS     r4,r4,#1              ;597
                   |L15.146|
-000092  7820              LDRB     r0,[r4,#0]            ;614
-000094  2800              CMP      r0,#0                 ;614
+000092  7820              LDRB     r0,[r4,#0]            ;597
+000094  2800              CMP      r0,#0                 ;597
 000096  d1f0              BNE      |L15.122|
-;;;618                    	}
-;;;619    					data++;
+;;;601                    	}
+;;;602    					data++;
 000098  9810              LDR      r0,[sp,#0x40]
 00009a  1c40              ADDS     r0,r0,#1
 00009c  9010              STR      r0,[sp,#0x40]
-;;;620                    	break;
+;;;603                    	break;
 00009e  e020              B        |L15.226|
                   |L15.160|
-;;;621                	case 'd':										 
-;;;622                    	d = __va_arg(ap, int);
+;;;604                	case 'd':										 
+;;;605                    	d = __va_arg(ap, int);
 0000a0  9800              LDR      r0,[sp,#0]
 0000a2  c840              LDM      r0!,{r6}
 0000a4  9000              STR      r0,[sp,#0]
-;;;623    					
-;;;624    					sprintf(buf, "%d", d);
+;;;606    					
+;;;607    					sprintf(buf, "%d", d);
 0000a6  4632              MOV      r2,r6
 0000a8  a11a              ADR      r1,|L15.276|
 0000aa  a801              ADD      r0,sp,#4
 0000ac  f7fffffe          BL       __2sprintf
-;;;625                    	for (s = buf; *s; s++) 
+;;;608                    	for (s = buf; *s; s++) 
 0000b0  ac01              ADD      r4,sp,#4
 0000b2  e00b              B        |L15.204|
                   |L15.180|
-;;;626    					{
-;;;627                        	USART_SendData(USARTx,*s);
+;;;609    					{
+;;;610                        	USART_SendData(USARTx,*s);
 0000b4  7821              LDRB     r1,[r4,#0]
 0000b6  4638              MOV      r0,r7
 0000b8  f7fffffe          BL       USART_SendData
-;;;628    						while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
+;;;611    						while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
 0000bc  bf00              NOP      
                   |L15.190|
 0000be  2140              MOVS     r1,#0x40
@@ -1244,40 +1192,40 @@
 0000c2  f7fffffe          BL       USART_GetFlagStatus
 0000c6  2800              CMP      r0,#0
 0000c8  d0f9              BEQ      |L15.190|
-0000ca  1c64              ADDS     r4,r4,#1              ;625
+0000ca  1c64              ADDS     r4,r4,#1              ;608
                   |L15.204|
-0000cc  7820              LDRB     r0,[r4,#0]            ;625
-0000ce  2800              CMP      r0,#0                 ;625
+0000cc  7820              LDRB     r0,[r4,#0]            ;608
+0000ce  2800              CMP      r0,#0                 ;608
 0000d0  d1f0              BNE      |L15.180|
-;;;629                    	}
-;;;630    					data++;
+;;;612                    	}
+;;;613    					data++;
 0000d2  9810              LDR      r0,[sp,#0x40]
 0000d4  1c40              ADDS     r0,r0,#1
 0000d6  9010              STR      r0,[sp,#0x40]
-;;;631                    	break;
+;;;614                    	break;
 0000d8  e003              B        |L15.226|
                   |L15.218|
-;;;632    				default:
-;;;633    					data++;
+;;;615    				default:
+;;;616    					data++;
 0000da  9810              LDR      r0,[sp,#0x40]
 0000dc  1c40              ADDS     r0,r0,#1
 0000de  9010              STR      r0,[sp,#0x40]
-;;;634    				    break;
+;;;617    				    break;
 0000e0  bf00              NOP      
                   |L15.226|
 0000e2  e006              B        |L15.242|
                   |L15.228|
-;;;635    			}		 
-;;;636    		}
-;;;637    		else 
-;;;638    			USART_SendData(USARTx, *data++);
+;;;618    			}		 
+;;;619    		}
+;;;620    		else 
+;;;621    			USART_SendData(USARTx, *data++);
 0000e4  9810              LDR      r0,[sp,#0x40]
 0000e6  f8101b01          LDRB     r1,[r0],#1
 0000ea  9010              STR      r0,[sp,#0x40]
 0000ec  4638              MOV      r0,r7
 0000ee  f7fffffe          BL       USART_SendData
                   |L15.242|
-;;;639    		while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
+;;;622    		while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
 0000f2  bf00              NOP      
                   |L15.244|
 0000f4  2140              MOVS     r1,#0x40
@@ -1286,16 +1234,16 @@
 0000fc  2800              CMP      r0,#0
 0000fe  d0f9              BEQ      |L15.244|
                   |L15.256|
-000100  1e28              SUBS     r0,r5,#0              ;589
-000102  f1a50101          SUB      r1,r5,#1              ;589
-000106  b28d              UXTH     r5,r1                 ;589
+000100  1e28              SUBS     r0,r5,#0              ;572
+000102  f1a50101          SUB      r1,r5,#1              ;572
+000106  b28d              UXTH     r5,r1                 ;572
 000108  d186              BNE      |L15.24|
-;;;640    	}
-;;;641    }
+;;;623    	}
+;;;624    }
 00010a  b009              ADD      sp,sp,#0x24
 00010c  bcf0              POP      {r4-r7}
 00010e  f85dfb14          LDR      pc,[sp],#0x14
-;;;642    
+;;;625    
                           ENDP
 
 000112  0000              DCW      0x0000

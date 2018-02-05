@@ -25369,8 +25369,8 @@ N
 N
 N
 N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
 N
 N
@@ -25399,6 +25399,7 @@ N
 N
 Nvoid lock_on(void);
 Nvoid lock_off(void);
+Nvoid lock_close(void);
 N
 N#endif
 N
@@ -25522,7 +25523,7 @@ N
 N	if(par != NULL)
 X	if(par != 0)
 N	{
-N		memcpy(topic, "topic: lock/", 12);
+N//		memcpy(topic, "topic: lock/", 12);
 N	}
 N	
 N	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);

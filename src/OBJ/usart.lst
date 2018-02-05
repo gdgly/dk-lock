@@ -25990,8 +25990,8 @@ N
 N
 N
 N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
 N
 N
@@ -26020,6 +26020,7 @@ N
 N
 Nvoid lock_on(void);
 Nvoid lock_off(void);
+Nvoid lock_close(void);
 N
 N#endif
 N
@@ -26167,7 +26168,8 @@ Nenum timer
 N{
 N    tim1_cnt,
 N    tim2_cnt,
-N	timer_gps,
+N	timer_gps_cycle,
+N	tiemr_gps_location,
 N	timer_close_lock,
 N	timer_open_lock,
 N	timer_heartbeat,
@@ -26508,7 +26510,6 @@ N*******************************************************************************
 N*/
 Nvoid USART2_IRQHandler(void)
 N{
-N
 N	u8 ch = 0;	
 N
 N   	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
@@ -26537,25 +26538,7 @@ N				memset(usart2_buff, 0, 512);
 N				usart2_cnt = 0;			
 N			}
 N		}
-N		else if(usart2_rx_status == 2)	//uart 接收模式2
-N		{
-N			ch = USART_ReceiveData(USART2);	 
-X			ch = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)));	 
-N			
-N			if (usart2_cnt < USART_BUFF_LENGHT)
-X			if (usart2_cnt < 512)
-N			{			
-N				usart2_buff[usart2_cnt++] = ch;
-N				usart2_rx_status = 1;
-N			}
-N			else
-N			{
-N//				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-N				memset(usart2_buff, 0, 512);	
-N				usart2_cnt = 0;			
-N			}
-N		
-N		}
+N
 N	}
 N	
 N	if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET)                  
@@ -26611,7 +26594,7 @@ N	    USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 X	    USART_ClearITPendingBit(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)), ((uint16_t)0x0525));	
 N		timer_is_timeout_1ms(timer_uart3, 0);
 N		
-N		if(usart3_rx_status == 0)
+N//		if(usart3_rx_status == 0)
 N		{	
 N			ch = USART_ReceiveData(USART3);	 
 X			ch = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4800)));	 
@@ -26658,7 +26641,7 @@ N*/
 Nvoid usart3_recv_data(void)
 N{
 N	
-N	if(timer_is_timeout_1ms(timer_uart3, 40)==0)	//40ms没接收到数据认为接收数据完成		
+N	if(timer_is_timeout_1ms(timer_uart3, 50)==0)	//40ms没接收到数据认为接收数据完成		
 N	{
 N
 N		USART_OUT(USART1, usart3_buff);

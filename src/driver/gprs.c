@@ -53,6 +53,7 @@ uint8_t gprs_rx_flag = 0;
 
 
 u8 PARK_LOCK_Buffer[16] = {0};
+
 u8 topic_id = 0;
 
 /*
@@ -137,7 +138,6 @@ u8 *gprs_check_cmd(u8 *p_str)
 */
 u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 {
-
 	u8 res = 1;
 	u8 *buff;
 	
@@ -171,9 +171,7 @@ u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 			usart2_rx_status = 0;	//数据处理完 开始接收数据
 			return NULL;
 		}
-		
-	}
-	
+	}	
 }
 
 

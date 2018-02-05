@@ -24,52 +24,46 @@
 ;;;20     		
 ;;;21     	//topic: lock/0018131408143929,1
 ;;;22     	par = strstr((char *)protocol_buff, "topic:");
-000012  a112              ADR      r1,|L1.92|
-000014  4813              LDR      r0,|L1.100|
+000012  a110              ADR      r1,|L1.84|
+000014  4811              LDR      r0,|L1.92|
 000016  f7fffffe          BL       strstr
 00001a  4604              MOV      r4,r0
 ;;;23     	
 ;;;24     	if(par != NULL)
-00001c  b11c              CBZ      r4,|L1.38|
 ;;;25     	{
-;;;26     		memcpy(topic, "topic: lock/", 12);
-00001e  a212              ADR      r2,|L1.104|
-000020  ca07              LDM      r2,{r0-r2}
-000022  ab01              ADD      r3,sp,#4
-000024  c307              STM      r3!,{r0-r2}
-                  |L1.38|
+;;;26     //		memcpy(topic, "topic: lock/", 12);
 ;;;27     	}
 ;;;28     	
 ;;;29     	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);
-000026  4b14              LDR      r3,|L1.120|
-000028  a20f              ADR      r2,|L1.104|
-00002a  a114              ADR      r1,|L1.124|
-00002c  a801              ADD      r0,sp,#4
-00002e  f7fffffe          BL       __2sprintf
+00001c  4b10              LDR      r3,|L1.96|
+00001e  a211              ADR      r2,|L1.100|
+000020  a114              ADR      r1,|L1.116|
+000022  a801              ADD      r0,sp,#4
+000024  f7fffffe          BL       __2sprintf
 ;;;30     	
 ;;;31     	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
-000032  a114              ADR      r1,|L1.132|
-000034  4818              LDR      r0,|L1.152|
-000036  f7fffffe          BL       strstr
-00003a  b968              CBNZ     r0,|L1.88|
+000028  a114              ADR      r1,|L1.124|
+00002a  4819              LDR      r0,|L1.144|
+00002c  f7fffffe          BL       strstr
+000030  b968              CBNZ     r0,|L1.78|
 ;;;32     	{
 ;;;33     		
 ;;;34     	}
 ;;;35     	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
-00003c  a901              ADD      r1,sp,#4
-00003e  4816              LDR      r0,|L1.152|
-000040  f7fffffe          BL       strstr
-000044  b140              CBZ      r0,|L1.88|
+000032  a901              ADD      r1,sp,#4
+000034  4816              LDR      r0,|L1.144|
+000036  f7fffffe          BL       strstr
+00003a  b140              CBZ      r0,|L1.78|
 ;;;36     	{
 ;;;37     		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
-000046  2110              MOVS     r1,#0x10
-000048  4814              LDR      r0,|L1.156|
+00003c  2110              MOVS     r1,#0x10
+00003e  4815              LDR      r0,|L1.148|
+000040  f7fffffe          BL       GPIO_ReadInputDataBit
+000044  b118              CBZ      r0,|L1.78|
+000046  2120              MOVS     r1,#0x20
+000048  4812              LDR      r0,|L1.148|
 00004a  f7fffffe          BL       GPIO_ReadInputDataBit
-00004e  b118              CBZ      r0,|L1.88|
-000050  2120              MOVS     r1,#0x20
-000052  4812              LDR      r0,|L1.156|
-000054  f7fffffe          BL       GPIO_ReadInputDataBit
-                  |L1.88|
+                  |L1.78|
 ;;;38     		{
 ;;;39     			
 ;;;40     			
@@ -78,40 +72,41 @@
 ;;;43     
 ;;;44     
 ;;;45     }
-000058  b01a              ADD      sp,sp,#0x68
-00005a  bd10              POP      {r4,pc}
+00004e  b01a              ADD      sp,sp,#0x68
+000050  bd10              POP      {r4,pc}
 ;;;46     
                           ENDP
 
+000052  0000              DCW      0x0000
+                  |L1.84|
+000054  746f7069          DCB      "topic:",0
+000058  633a00  
+00005b  00                DCB      0
                   |L1.92|
-00005c  746f7069          DCB      "topic:",0
-000060  633a00  
-000063  00                DCB      0
-                  |L1.100|
                           DCD      protocol_buff
-                  |L1.104|
-000068  746f7069          DCB      "topic: lock/",0
-00006c  633a206c
-000070  6f636b2f
-000074  00      
-000075  00                DCB      0
-000076  00                DCB      0
-000077  00                DCB      0
-                  |L1.120|
+                  |L1.96|
                           DCD      PARK_LOCK_Buffer
+                  |L1.100|
+000064  746f7069          DCB      "topic: lock/",0
+000068  633a206c
+00006c  6f636b2f
+000070  00      
+000071  00                DCB      0
+000072  00                DCB      0
+000073  00                DCB      0
+                  |L1.116|
+000074  25732573          DCB      "%s%s",0
+000078  00      
+000079  00                DCB      0
+00007a  00                DCB      0
+00007b  00                DCB      0
                   |L1.124|
-00007c  25732573          DCB      "%s%s",0
-000080  00      
-000081  00                DCB      0
-000082  00                DCB      0
-000083  00                DCB      0
-                  |L1.132|
-000084  2b535441          DCB      "+STATUS: MQTT CLOSE",0
-000088  5455533a
-00008c  204d5154
-000090  5420434c
-000094  4f534500
-                  |L1.152|
+00007c  2b535441          DCB      "+STATUS: MQTT CLOSE",0
+000080  5455533a
+000084  204d5154
+000088  5420434c
+00008c  4f534500
+                  |L1.144|
                           DCD      usart2_buff
-                  |L1.156|
+                  |L1.148|
                           DCD      0x40010800

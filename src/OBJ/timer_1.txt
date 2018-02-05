@@ -53,7 +53,7 @@
 00003a  1c60              ADDS     r0,r4,#1              ;82
 00003c  b284              UXTH     r4,r0                 ;82
                   |L1.62|
-00003e  2c0c              CMP      r4,#0xc               ;82
+00003e  2c0d              CMP      r4,#0xd               ;82
 000040  dbf4              BLT      |L1.44|
                   |L1.66|
 ;;;85             }	
@@ -193,7 +193,7 @@
                           AREA ||.bss||, DATA, NOINIT, ALIGN=2
 
                   g_timer_cnt
-                          %        48
+                          %        52
 
                           AREA ||.data||, DATA, ALIGN=2
 

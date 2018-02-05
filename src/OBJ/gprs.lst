@@ -25404,8 +25404,8 @@ N
 N
 N
 N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
 N
 N
@@ -25434,6 +25434,7 @@ N
 N
 Nvoid lock_on(void);
 Nvoid lock_off(void);
+Nvoid lock_close(void);
 N
 N#endif
 N
@@ -25684,7 +25685,8 @@ Nenum timer
 N{
 N    tim1_cnt,
 N    tim2_cnt,
-N	timer_gps,
+N	timer_gps_cycle,
+N	tiemr_gps_location,
 N	timer_close_lock,
 N	timer_open_lock,
 N	timer_heartbeat,
@@ -25745,6 +25747,7 @@ N
 N
 N
 Nu8 PARK_LOCK_Buffer[16] = {0};
+N
 Nu8 topic_id = 0;
 N
 N/*
@@ -25829,7 +25832,6 @@ N*******************************************************************************
 N*/
 Nu8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 N{
-N
 N	u8 res = 1;
 N	u8 *buff;
 N	
@@ -25866,9 +25868,7 @@ N			usart2_rx_status = 0;	//数据处理完 开始接收数据
 N			return NULL;
 X			return 0;
 N		}
-N		
-N	}
-N	
+N	}	
 N}
 N
 N

@@ -23705,8 +23705,8 @@ N
 N
 N
 N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
 N
 N
@@ -23735,6 +23735,7 @@ N
 N
 Nvoid lock_on(void);
 Nvoid lock_off(void);
+Nvoid lock_close(void);
 N
 N#endif
 N
@@ -26203,72 +26204,71 @@ N
 N
 N
 N
-Nextern u8 PARK_LOCK_Buffer[16];
+N//extern u8 PARK_LOCK_Buffer[16];
 N
-Nu8 batt_state = 0;
-Nextern u8 aesKey[16];
+N//u8 batt_state = 0;
+N//extern u8 aesKey[16];
 N
 N
-Nu16 batt_get_volume(void)
-N{
-N	
-N	
-N	u16  batt_value = 0, res = 0;
-N	
-N//	batt_value = adc_average_value(ADC_Channel_0, 10);
-N	batt_value = Get_Adc_Average(ADC_Channel_0, 10);
-X	batt_value = Get_Adc_Average(((uint8_t)0x00), 10);
-N	
-N	batt_value = batt_value * 3300 / 4096;
-N	
-N	batt_value = batt_value * 88 / 20;
-N	
-N	res = (batt_value-5000) * 100 / 1024;
-N	
+N//u16 batt_get_volume(void)
+N//{
+N//	
+N//	
+N//	u16  batt_value = 0, res = 0;
+N//	
+N////	batt_value = adc_average_value(ADC_Channel_0, 10);
+N//	batt_value = Get_Adc_Average(ADC_Channel_0, 10);
+N//	
+N//	batt_value = batt_value * 3300 / 4096;
+N//	
+N//	batt_value = batt_value * 88 / 20;
+N//	
+N//	res = (batt_value-5000) * 100 / 1024;
+N//	
 N
-N	return res;
-N}
+N//	return res;
+N//}
 N
-Nvoid batt_dev_to_svr(void)
-N{
-N	u16 val = 0;
-N	
-N	u8 publish_buff[512] = {0};
-N	u8 tmp[512] = {0};
-N	u8 aes_data[512] = {0};
-N	
-N	val = batt_get_volume();
-N	
-N	if(val < 20 && val > 10 && batt_state == 0)
-N	{
-N		batt_state = 1;
-N		sprintf((char *)publish_buff, "%s%s%s", "AT+PUBLISH=lockdata/", PARK_LOCK_Buffer, ",24,2\r\n");
-N				
-N		gprs_send_at(publish_buff, ">", 30, 0);
-N		memset(tmp, 0 , 512);
-N		memset(aes_data, 0 ,512);
-N		sprintf((char *)tmp, "{%c%s%c:%s}", '"',"battery", '"', "20");
-N		AES_Encrypt((char *)tmp, (char*)aes_data, (char*)aesKey);
-N		gprs_send_at(aes_data, "OK", 30, 0);
-N		
-N	}
-N	
-N	
-N	if(val < 0 && batt_state == 1)
-N	{
-N		batt_state = 0;
-N		
-N		sprintf((char *)publish_buff, "%s%s%s", "AT+PUBLISH=lockdata/", PARK_LOCK_Buffer, ",24,2\r\n");
-N				
-N		gprs_send_at(publish_buff, ">", 30, 0);
-N		memset(tmp, 0 , 512);
-N		memset(aes_data, 0 ,512);
-N		sprintf((char *)tmp, "{%c%s%c:%s}", '"',"battery", '"', "10");
-N		AES_Encrypt((char *)tmp, (char*)aes_data, (char*)aesKey);
-N		gprs_send_at(aes_data, "OK", 30, 0);
-N	}
-N	
-N}
+N//void batt_dev_to_svr(void)
+N//{
+N//	u16 val = 0;
+N//	
+N//	u8 publish_buff[512] = {0};
+N//	u8 tmp[512] = {0};
+N//	u8 aes_data[512] = {0};
+N//	
+N//	val = batt_get_volume();
+N//	
+N//	if(val < 20 && val > 10 && batt_state == 0)
+N//	{
+N//		batt_state = 1;
+N//		sprintf((char *)publish_buff, "%s%s%s", "AT+PUBLISH=lockdata/", PARK_LOCK_Buffer, ",24,2\r\n");
+N//				
+N//		gprs_send_at(publish_buff, ">", 30, 0);
+N//		memset(tmp, 0 , 512);
+N//		memset(aes_data, 0 ,512);
+N//		sprintf((char *)tmp, "{%c%s%c:%s}", '"',"battery", '"', "20");
+N//		AES_Encrypt((char *)tmp, (char*)aes_data, (char*)aesKey);
+N//		gprs_send_at(aes_data, "OK", 30, 0);
+N//		
+N//	}
+N//	
+N//	
+N//	if(val < 0 && batt_state == 1)
+N//	{
+N//		batt_state = 0;
+N//		
+N//		sprintf((char *)publish_buff, "%s%s%s", "AT+PUBLISH=lockdata/", PARK_LOCK_Buffer, ",24,2\r\n");
+N//				
+N//		gprs_send_at(publish_buff, ">", 30, 0);
+N//		memset(tmp, 0 , 512);
+N//		memset(aes_data, 0 ,512);
+N//		sprintf((char *)tmp, "{%c%s%c:%s}", '"',"battery", '"', "10");
+N//		AES_Encrypt((char *)tmp, (char*)aes_data, (char*)aesKey);
+N//		gprs_send_at(aes_data, "OK", 30, 0);
+N//	}
+N//	
+N//}
 N
 N
 N

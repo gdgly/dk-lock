@@ -292,7 +292,6 @@ void usart1_recv_data(void)
 */
 void USART2_IRQHandler(void)
 {
-
 	u8 ch = 0;	
 
    	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
@@ -317,23 +316,7 @@ void USART2_IRQHandler(void)
 				usart2_cnt = 0;			
 			}
 		}
-		else if(usart2_rx_status == 2)	//uart 接收模式2
-		{
-			ch = USART_ReceiveData(USART2);	 
-			
-			if (usart2_cnt < USART_BUFF_LENGHT)
-			{			
-				usart2_buff[usart2_cnt++] = ch;
-				usart2_rx_status = 1;
-			}
-			else
-			{
-//				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-				memset(usart2_buff, 0, 512);	
-				usart2_cnt = 0;			
-			}
-		
-		}
+
 	}
 	
 	if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET)                  
@@ -384,7 +367,7 @@ void USART3_IRQHandler(void)
 	    USART_ClearITPendingBit(USART3, USART_IT_RXNE);	
 		timer_is_timeout_1ms(timer_uart3, 0);
 		
-		if(usart3_rx_status == 0)
+//		if(usart3_rx_status == 0)
 		{	
 			ch = USART_ReceiveData(USART3);	 
 
@@ -426,7 +409,7 @@ void USART3_IRQHandler(void)
 void usart3_recv_data(void)
 {
 	
-	if(timer_is_timeout_1ms(timer_uart3, 40)==0)	//40ms没接收到数据认为接收数据完成		
+	if(timer_is_timeout_1ms(timer_uart3, 50)==0)	//40ms没接收到数据认为接收数据完成		
 	{
 
 		USART_OUT(USART1, usart3_buff);

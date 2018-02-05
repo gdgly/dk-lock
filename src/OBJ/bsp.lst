@@ -23709,8 +23709,8 @@ N
 N
 N
 N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)// ÷∂Ø ‰»Î
-N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//πÿÀ¯±®æØ
-N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//ø™À¯±®æØ
+N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//πÿÀ¯±®æØ
+N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//ø™À¯±®æØ
 N
 N
 N
@@ -23739,6 +23739,7 @@ N
 N
 Nvoid lock_on(void);
 Nvoid lock_off(void);
+Nvoid lock_close(void);
 N
 N#endif
 N
@@ -23877,7 +23878,8 @@ Nenum timer
 N{
 N    tim1_cnt,
 N    tim2_cnt,
-N	timer_gps,
+N	timer_gps_cycle,
+N	tiemr_gps_location,
 N	timer_close_lock,
 N	timer_open_lock,
 N	timer_heartbeat,
@@ -24745,9 +24747,7 @@ N  	GPIO_Init(GPIOC, &gpio_init_structure);
 X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), &gpio_init_structure);
 N	
 N	
-N	
 N	//LOCK ON   OFF
-N	
 N	gpio_init_structure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
 X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0010) | ((uint16_t)0x0020);
 N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -24806,18 +24806,45 @@ N	MOTOB_LOW();
 X	GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0002));
 N}
 N
+Nu8 lock_get_on(void)
+N{
+N	u8 i = 0;
+N	u8 ret = 0;
+N	u8 cnt = 0;
+N	for(i=0;i<10;i++)
+N	{
+N		if(LOCK_ON_READ() == 0)
+X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010)) == 0)
+N		{
+N			cnt++;
+N		}
+N		else
+N		{
+N			cnt = 0;
+N		}
+N	}
+N	
+N	if(cnt >= 10)
+N	{
+N		ret = 0;
+N	}
+N	else
+N	{
+N		ret = 1;
+N	}
+N	
+N	return ret;
+N}
 N
-N/*
-N*Function: nvic_config      
-N*Description: ‰∏≠Êñ≠ÂêëÈáèÈÖçÁΩÆ  
-N*Calls: Êó†  
-N*Data Accessed: Êó†  
-N*Data Updated: Êó†    
-N*Input: Êó†
-N*Output: Êó†
-N*Return: Êó†     
-N*Others: Êó†    
-N*/
+N
+Nu8 lock_get_off(void)
+N{
+N	
+N	
+N}
+N
+N
+N
 Nvoid bsp_nvic_init(void)
 N{
 N	NVIC_InitTypeDef nvic_init_structure;

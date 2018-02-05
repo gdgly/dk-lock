@@ -25508,8 +25508,8 @@ N
 N
 N
 N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
-N#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
-N#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
+N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
+N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
 N
 N
@@ -25538,6 +25538,7 @@ N
 N
 Nvoid lock_on(void);
 Nvoid lock_off(void);
+Nvoid lock_close(void);
 N
 N#endif
 N
@@ -26000,7 +26001,7 @@ N///////////////////////////////////////////////////////////////////////////////
 NMD5_CHECK MakeFile_MD5_Checksum(u8 *pPacket, u32 pPacket_len)   
 N{   
 N	MD5_CTX md5; 
-N  u8 i,j;  
+N	u8 i,j;  
 N	unsigned char decrypt[MD5_CODE_LEN]; //存放加密后的结果 
 X	unsigned char decrypt[8]; 
 N	u8 aes[16];
@@ -26008,17 +26009,15 @@ N
 N	MD5Init(&md5); //初始化用于md5加密的结构  
 N	MD5Update(&md5,(pPacket),pPacket_len); //对欲加密的字符进行加密   
 N	MD5Final(decrypt,&md5); //获得最终结果   
-N	//printf("str:%s:\r\n",decrypt);
+N
 N	for(i=0;i<8;i++)  
 N  {  
 N		
 N		aesKey[2*i]=bcd2ascii[decrypt[i]>>4];
 N		aesKey[2*i+1]=bcd2ascii[decrypt[i]&0x0f];
-N		
-N//    printf("%02x",decrypt[i]);  
+N	
 N		
 N  } 				
 N	
-N//	printf("123456:%s\r\n",aesKey);
 N
 N}   

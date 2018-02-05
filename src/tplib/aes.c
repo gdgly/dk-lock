@@ -638,9 +638,9 @@ void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
 	memset(newstr , 0 , aesDataLen);
 	aesDataLen = Base64Decode(newstr , pCipherText, aesDataLen, true);
 	
-  printf("decoded result:  ");
-  printf(newstr);
-  printf("\r\n");
+//  printf("decoded result:  ");
+//  printf(newstr);
+//  printf("\r\n");
 	
 	
 	//send_buff：待解密的数据  ，pkey：密钥   str2：解密后的数据
@@ -653,7 +653,7 @@ void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
 	{
 		if(str2[aesDataLen-i-1] != buIndex)
 		{
-			printf("\nit is a wrong data. \n");
+//			printf("\nit is a wrong data. \n");
 			free(str2);
 			return;
 		}
@@ -663,7 +663,7 @@ void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
 	strcpy(pExpressText , str2);
 	free(str2);
 	
-  printf ("AES decrypt result:  ");
-  printf (pExpressText);
-  printf ("\r\n");
+//  printf ("AES decrypt result:  ");
+//  printf (pExpressText);
+//  printf ("\r\n");
 }

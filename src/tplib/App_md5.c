@@ -347,24 +347,22 @@ u32  BCD2ASC (u8 *asc, const u8 *bcd, u32 len)
 MD5_CHECK MakeFile_MD5_Checksum(u8 *pPacket, u32 pPacket_len)   
 {   
 	MD5_CTX md5; 
-  u8 i,j;  
+	u8 i,j;  
 	unsigned char decrypt[MD5_CODE_LEN]; //存放加密后的结果 
 	u8 aes[16];
 
 	MD5Init(&md5); //初始化用于md5加密的结构  
 	MD5Update(&md5,(pPacket),pPacket_len); //对欲加密的字符进行加密   
 	MD5Final(decrypt,&md5); //获得最终结果   
-	//printf("str:%s:\r\n",decrypt);
+
 	for(i=0;i<8;i++)  
   {  
 		
 		aesKey[2*i]=bcd2ascii[decrypt[i]>>4];
 		aesKey[2*i+1]=bcd2ascii[decrypt[i]&0x0f];
-		
-//    printf("%02x",decrypt[i]);  
+	
 		
   } 				
 	
-//	printf("123456:%s\r\n",aesKey);
 
 }   
