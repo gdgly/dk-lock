@@ -25436,6 +25436,10 @@ Nvoid lock_on(void);
 Nvoid lock_off(void);
 Nvoid lock_close(void);
 N
+N
+Nu8 lock_on_status_get(void);
+Nu8 lock_off_status_get(void);
+N
 N#endif
 N
 N
@@ -25691,6 +25695,8 @@ N	timer_close_lock,
 N	timer_open_lock,
 N	timer_heartbeat,
 N	timer_lock,
+N	timer_bell_1,
+N	timer_bell_2,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
@@ -25746,8 +25752,8 @@ Nuint8_t gprs_rx_flag = 0;
 N
 N
 N
-Nu8 PARK_LOCK_Buffer[16] = {0};
-N
+Nu8 PARK_LOCK_Buffer[17] = {0};
+Nextern u8 lock_id[16];
 Nu8 topic_id = 0;
 N
 N/*
@@ -25927,7 +25933,11 @@ N				{
 N					gprs_status = 4;
 N					gprs_err_cnt = 0;
 N				}
-N		
+N				else if(strstr((char*)ret, "MQTT CLOSE") != NULL)
+X				else if(strstr((char*)ret, "MQTT CLOSE") != 0)
+N				{
+N					gprs_status = 0;
+N				}
 N			}
 N			else
 N			{

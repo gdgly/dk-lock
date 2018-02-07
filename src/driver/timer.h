@@ -19,6 +19,8 @@ enum timer
 	timer_open_lock,
 	timer_heartbeat,
 	timer_lock,
+	timer_bell_1,
+	timer_bell_2,
 	timer_uart1,
 	timer_uart2,
 	timer_uart3,

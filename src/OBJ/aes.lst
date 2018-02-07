@@ -28367,6 +28367,10 @@ Nvoid lock_on(void);
 Nvoid lock_off(void);
 Nvoid lock_close(void);
 N
+N
+Nu8 lock_on_status_get(void);
+Nu8 lock_off_status_get(void);
+N
 N#endif
 N
 N
@@ -29028,17 +29032,10 @@ N
 N	aesDataLen = strlen(pExpressText);
 N	//pExpressText:待加密的明文数据，pkey：加密密钥  str：加密后的数据
 N	str = encrypt(pExpressText, pAeskey);  //aesTempBuff[AES_TEMP_BUFF_LEN]
-N	
-N//	printf ("encrypt result:  ");
-N//	printf (str);
-N//  printf ("\r\n");
 N
 N	//str:待编码的数据  pCipherText：编码后的数据  aesDataLen：待编码的长度
 N	Base64Encode(str, pCipherText,aesDataLen);
 N	free(str);
-N//  printf("Base64 encoded result:  ");
-N//	printf(pCipherText);
-N//  printf("\r\n");
 N
 N}
 N
@@ -29060,10 +29057,7 @@ N	newstr = (char *)malloc(aesDataLen);
 N	memset(newstr , 0 , aesDataLen);
 N	aesDataLen = Base64Decode(newstr , pCipherText, aesDataLen, true);
 X	aesDataLen = Base64Decode(newstr , pCipherText, aesDataLen, 1);
-N	
-N//  printf("decoded result:  ");
-N//  printf(newstr);
-N//  printf("\r\n");
+N
 N	
 N	
 N	//send_buff：待解密的数据  ，pkey：密钥   str2：解密后的数据
@@ -29076,7 +29070,6 @@ N	for(i=0; i<buIndex; i++)
 N	{
 N		if(str2[aesDataLen-i-1] != buIndex)
 N		{
-N//			printf("\nit is a wrong data. \n");
 N			free(str2);
 N			return;
 N		}
@@ -29086,7 +29079,5 @@ N	}
 N	strcpy(pExpressText , str2);
 N	free(str2);
 N	
-N//  printf ("AES decrypt result:  ");
-N//  printf (pExpressText);
-N//  printf ("\r\n");
+N
 N}

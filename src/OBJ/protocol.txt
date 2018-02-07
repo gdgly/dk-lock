@@ -2,111 +2,42 @@
 ; commandline ArmCC [--list --split_sections --debug -c --asm --interleave -o..\obj\protocol.o --asm_dir=..\OBJ\ --list_dir=..\OBJ\ --depend=..\obj\protocol.d --cpu=Cortex-M3 --apcs=interwork -O0 --diag_suppress=9931 -I..\USER -I..\FLib\inc -I..\CORE -I..\driver -I..\BSP -I..\SYS -I..\tplib -IE:\github\dk-lock\src\Proj\RTE -ID:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include -ID:\Keil_v5\ARM\CMSIS\Include -D__UVISION_VERSION=518 -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER -DSTM32F10X_HD -W --omf_browse=..\obj\protocol.crf ..\USER\protocol.c]
                           THUMB
 
-                          AREA ||i.protocol_analyze||, CODE, READONLY, ALIGN=2
+                          AREA ||i.protocol_analyze||, CODE, READONLY, ALIGN=1
 
-                          REQUIRE _printf_percent
-                          REQUIRE _printf_s
-                          REQUIRE _printf_str
                   protocol_analyze PROC
 ;;;14     
 ;;;15     void protocol_analyze(void)
-000000  b510              PUSH     {r4,lr}
+000000  4770              BX       lr
 ;;;16     {
-000002  b09a              SUB      sp,sp,#0x68
-;;;17     	u8 topic[100] = {0};
-000004  2164              MOVS     r1,#0x64
-000006  a801              ADD      r0,sp,#4
-000008  f7fffffe          BL       __aeabi_memclr4
-;;;18     	u8 *par = NULL;
-00000c  2400              MOVS     r4,#0
-;;;19     	usart2_recv_data();
-00000e  f7fffffe          BL       usart2_recv_data
-;;;20     		
-;;;21     	//topic: lock/0018131408143929,1
-;;;22     	par = strstr((char *)protocol_buff, "topic:");
-000012  a110              ADR      r1,|L1.84|
-000014  4811              LDR      r0,|L1.92|
-000016  f7fffffe          BL       strstr
-00001a  4604              MOV      r4,r0
-;;;23     	
-;;;24     	if(par != NULL)
-;;;25     	{
-;;;26     //		memcpy(topic, "topic: lock/", 12);
-;;;27     	}
-;;;28     	
-;;;29     	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);
-00001c  4b10              LDR      r3,|L1.96|
-00001e  a211              ADR      r2,|L1.100|
-000020  a114              ADR      r1,|L1.116|
-000022  a801              ADD      r0,sp,#4
-000024  f7fffffe          BL       __2sprintf
-;;;30     	
-;;;31     	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
-000028  a114              ADR      r1,|L1.124|
-00002a  4819              LDR      r0,|L1.144|
-00002c  f7fffffe          BL       strstr
-000030  b968              CBNZ     r0,|L1.78|
-;;;32     	{
-;;;33     		
-;;;34     	}
-;;;35     	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
-000032  a901              ADD      r1,sp,#4
-000034  4816              LDR      r0,|L1.144|
-000036  f7fffffe          BL       strstr
-00003a  b140              CBZ      r0,|L1.78|
-;;;36     	{
-;;;37     		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
-00003c  2110              MOVS     r1,#0x10
-00003e  4815              LDR      r0,|L1.148|
-000040  f7fffffe          BL       GPIO_ReadInputDataBit
-000044  b118              CBZ      r0,|L1.78|
-000046  2120              MOVS     r1,#0x20
-000048  4812              LDR      r0,|L1.148|
-00004a  f7fffffe          BL       GPIO_ReadInputDataBit
-                  |L1.78|
-;;;38     		{
-;;;39     			
-;;;40     			
-;;;41     		}
-;;;42     	}
+;;;17     //	u8 topic[100] = {0};
+;;;18     //	u8 *par = NULL;
+;;;19     //	usart2_recv_data();
+;;;20     //		
+;;;21     //	//topic: lock/0018131408143929,1
+;;;22     //	par = strstr((char *)protocol_buff, "topic:");
+;;;23     //	
+;;;24     //	if(par != NULL)
+;;;25     //	{
+;;;26     ////		memcpy(topic, "topic: lock/", 12);
+;;;27     //	}
+;;;28     //	
+;;;29     ////	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);
+;;;30     //	
+;;;31     //	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
+;;;32     //	{
+;;;33     //		
+;;;34     //	}
+;;;35     //	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
+;;;36     //	{
+;;;37     //		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
+;;;38     //		{
+;;;39     //			
+;;;40     //			
+;;;41     //		}
+;;;42     //	}
 ;;;43     
 ;;;44     
 ;;;45     }
-00004e  b01a              ADD      sp,sp,#0x68
-000050  bd10              POP      {r4,pc}
 ;;;46     
                           ENDP
 
-000052  0000              DCW      0x0000
-                  |L1.84|
-000054  746f7069          DCB      "topic:",0
-000058  633a00  
-00005b  00                DCB      0
-                  |L1.92|
-                          DCD      protocol_buff
-                  |L1.96|
-                          DCD      PARK_LOCK_Buffer
-                  |L1.100|
-000064  746f7069          DCB      "topic: lock/",0
-000068  633a206c
-00006c  6f636b2f
-000070  00      
-000071  00                DCB      0
-000072  00                DCB      0
-000073  00                DCB      0
-                  |L1.116|
-000074  25732573          DCB      "%s%s",0
-000078  00      
-000079  00                DCB      0
-00007a  00                DCB      0
-00007b  00                DCB      0
-                  |L1.124|
-00007c  2b535441          DCB      "+STATUS: MQTT CLOSE",0
-000080  5455533a
-000084  204d5154
-000088  5420434c
-00008c  4f534500
-                  |L1.144|
-                          DCD      usart2_buff
-                  |L1.148|
-                          DCD      0x40010800

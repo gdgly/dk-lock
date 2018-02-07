@@ -13,7 +13,7 @@
 
 
 
-//extern u8 PARK_LOCK_Buffer[16];
+
 
 //u8 batt_state = 0;
 //extern u8 aesKey[16];

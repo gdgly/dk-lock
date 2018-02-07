@@ -14,12 +14,10 @@
 ..\obj\main.o: ..\FLib\inc\stm32f10x_usart.h
 ..\obj\main.o: ..\FLib\inc\misc.h
 ..\obj\main.o: ..\SYS\delay.h
-..\obj\main.o: ..\driver\rtc.h
 ..\obj\main.o: ..\driver\gps.h
 ..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\main.o: ..\driver\usart3.h
-..\obj\main.o: ..\driver\usart2.h
 ..\obj\main.o: ..\driver\24cxx.h
 ..\obj\main.o: ..\driver\myiic.h
 ..\obj\main.o: ..\driver\adc.h
@@ -31,5 +29,6 @@
 ..\obj\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 ..\obj\main.o: ..\driver\usart.h
 ..\obj\main.o: ..\tplib\aes.h
+..\obj\main.o: ..\tplib\aes128.h
 ..\obj\main.o: ..\driver\led.h
 ..\obj\main.o: ..\tplib\app_md5.h

@@ -5,102 +5,96 @@
                           AREA ||i.AES_Decrypt||, CODE, READONLY, ALIGN=1
 
                   AES_Decrypt PROC
-;;;628    */
-;;;629    void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
+;;;621    */
+;;;622    void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
 000000  e92d5ff0          PUSH     {r4-r12,lr}
-;;;630    {
+;;;623    {
 000004  4682              MOV      r10,r0
 000006  460f              MOV      r7,r1
 000008  4690              MOV      r8,r2
-;;;631    	char* str2;
-;;;632    	uint8_t buIndex , i;
-;;;633    	uint16_t aesDataLen;  //待解密的数据长度	
-;;;634    	char *newstr;
-;;;635    	
-;;;636    	aesDataLen = strlen(pCipherText);
+;;;624    	char* str2;
+;;;625    	uint8_t buIndex , i;
+;;;626    	uint16_t aesDataLen;  //待解密的数据长度	
+;;;627    	char *newstr;
+;;;628    	
+;;;629    	aesDataLen = strlen(pCipherText);
 00000a  4638              MOV      r0,r7
 00000c  f7fffffe          BL       strlen
 000010  b284              UXTH     r4,r0
-;;;637    	newstr = (char *)malloc(aesDataLen);	
+;;;630    	newstr = (char *)malloc(aesDataLen);	
 000012  4620              MOV      r0,r4
 000014  f7fffffe          BL       malloc
 000018  4683              MOV      r11,r0
-;;;638    	memset(newstr , 0 , aesDataLen);
+;;;631    	memset(newstr , 0 , aesDataLen);
 00001a  4621              MOV      r1,r4
 00001c  4658              MOV      r0,r11
 00001e  f7fffffe          BL       __aeabi_memclr
-;;;639    	aesDataLen = Base64Decode(newstr , pCipherText, aesDataLen, true);
+;;;632    	aesDataLen = Base64Decode(newstr , pCipherText, aesDataLen, true);
 000022  2301              MOVS     r3,#1
 000024  4622              MOV      r2,r4
 000026  4639              MOV      r1,r7
 000028  4658              MOV      r0,r11
 00002a  f7fffffe          BL       Base64Decode
 00002e  b284              UXTH     r4,r0
-;;;640    	
-;;;641    //  printf("decoded result:  ");
-;;;642    //  printf(newstr);
-;;;643    //  printf("\r\n");
-;;;644    	
-;;;645    	
-;;;646    	//send_buff：待解密的数据  ，pkey：密钥   str2：解密后的数据
-;;;647      str2 = decrypt(newstr, pAeskey , aesDataLen);
+;;;633    
+;;;634    	
+;;;635    	
+;;;636    	//send_buff：待解密的数据  ，pkey：密钥   str2：解密后的数据
+;;;637      str2 = decrypt(newstr, pAeskey , aesDataLen);
 000030  4622              MOV      r2,r4
 000032  4641              MOV      r1,r8
 000034  4658              MOV      r0,r11
 000036  f7fffffe          BL       decrypt
 00003a  4605              MOV      r5,r0
-;;;648    	free(newstr);
+;;;638    	free(newstr);
 00003c  4658              MOV      r0,r11
 00003e  f7fffffe          BL       free
-;;;649    	//去除末尾补码
-;;;650    	buIndex = str2[aesDataLen-1];
+;;;639    	//去除末尾补码
+;;;640    	buIndex = str2[aesDataLen-1];
 000042  1e60              SUBS     r0,r4,#1
 000044  f8159000          LDRB     r9,[r5,r0]
-;;;651    
-;;;652    	for(i=0; i<buIndex; i++)
+;;;641    
+;;;642    	for(i=0; i<buIndex; i++)
 000048  2600              MOVS     r6,#0
 00004a  e00f              B        |L1.108|
                   |L1.76|
-;;;653    	{
-;;;654    		if(str2[aesDataLen-i-1] != buIndex)
+;;;643    	{
+;;;644    		if(str2[aesDataLen-i-1] != buIndex)
 00004c  1ba0              SUBS     r0,r4,r6
 00004e  1e40              SUBS     r0,r0,#1
 000050  5c28              LDRB     r0,[r5,r0]
 000052  4548              CMP      r0,r9
 000054  d004              BEQ      |L1.96|
-;;;655    		{
-;;;656    //			printf("\nit is a wrong data. \n");
-;;;657    			free(str2);
+;;;645    		{
+;;;646    			free(str2);
 000056  4628              MOV      r0,r5
 000058  f7fffffe          BL       free
                   |L1.92|
-;;;658    			return;
-;;;659    		}
-;;;660    		else
-;;;661    			str2[aesDataLen-i-1] = '\0';
-;;;662    	}
-;;;663    	strcpy(pExpressText , str2);
-;;;664    	free(str2);
-;;;665    	
-;;;666    //  printf ("AES decrypt result:  ");
-;;;667    //  printf (pExpressText);
-;;;668    //  printf ("\r\n");
-;;;669    }
+;;;647    			return;
+;;;648    		}
+;;;649    		else
+;;;650    			str2[aesDataLen-i-1] = '\0';
+;;;651    	}
+;;;652    	strcpy(pExpressText , str2);
+;;;653    	free(str2);
+;;;654    	
+;;;655    
+;;;656    }
 00005c  e8bd9ff0          POP      {r4-r12,pc}
                   |L1.96|
-000060  2100              MOVS     r1,#0                 ;661
-000062  1ba0              SUBS     r0,r4,r6              ;661
-000064  1e40              SUBS     r0,r0,#1              ;661
-000066  5429              STRB     r1,[r5,r0]            ;661
-000068  1c70              ADDS     r0,r6,#1              ;652
-00006a  b2c6              UXTB     r6,r0                 ;652
+000060  2100              MOVS     r1,#0                 ;650
+000062  1ba0              SUBS     r0,r4,r6              ;650
+000064  1e40              SUBS     r0,r0,#1              ;650
+000066  5429              STRB     r1,[r5,r0]            ;650
+000068  1c70              ADDS     r0,r6,#1              ;642
+00006a  b2c6              UXTB     r6,r0                 ;642
                   |L1.108|
-00006c  454e              CMP      r6,r9                 ;652
+00006c  454e              CMP      r6,r9                 ;642
 00006e  dbed              BLT      |L1.76|
-000070  4629              MOV      r1,r5                 ;663
-000072  4650              MOV      r0,r10                ;663
+000070  4629              MOV      r1,r5                 ;652
+000072  4650              MOV      r0,r10                ;652
 000074  f7fffffe          BL       strcpy
-000078  4628              MOV      r0,r5                 ;664
+000078  4628              MOV      r0,r5                 ;653
 00007a  f7fffffe          BL       free
 00007e  bf00              NOP      
 000080  e7ec              B        |L1.92|
@@ -149,27 +143,20 @@
 00003a  4628              MOV      r0,r5
 00003c  f7fffffe          BL       encrypt
 000040  4681              MOV      r9,r0
-;;;609    	
-;;;610    //	printf ("encrypt result:  ");
-;;;611    //	printf (str);
-;;;612    //  printf ("\r\n");
-;;;613    
-;;;614    	//str:待编码的数据  pCipherText：编码后的数据  aesDataLen：待编码的长度
-;;;615    	Base64Encode(str, pCipherText,aesDataLen);
+;;;609    
+;;;610    	//str:待编码的数据  pCipherText：编码后的数据  aesDataLen：待编码的长度
+;;;611    	Base64Encode(str, pCipherText,aesDataLen);
 000042  4622              MOV      r2,r4
 000044  4641              MOV      r1,r8
 000046  4648              MOV      r0,r9
 000048  f7fffffe          BL       Base64Encode
-;;;616    	free(str);
+;;;612    	free(str);
 00004c  4648              MOV      r0,r9
 00004e  f7fffffe          BL       free
-;;;617    //  printf("Base64 encoded result:  ");
-;;;618    //	printf(pCipherText);
-;;;619    //  printf("\r\n");
-;;;620    
-;;;621    }
+;;;613    
+;;;614    }
 000052  e8bd87f0          POP      {r4-r10,pc}
-;;;622    
+;;;615    
                           ENDP
 
 

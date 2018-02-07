@@ -5,127 +5,127 @@
                           AREA ||i.bsp_init||, CODE, READONLY, ALIGN=1
 
                   bsp_init PROC
-;;;325    */
-;;;326    void bsp_init(void)
+;;;348    */
+;;;349    void bsp_init(void)
 000000  b510              PUSH     {r4,lr}
-;;;327    {
-;;;328    	bsp_rcc_init();
+;;;350    {
+;;;351    	bsp_rcc_init();
 000002  f7fffffe          BL       bsp_rcc_init
-;;;329    	bsp_nvic_init();
+;;;352    	bsp_nvic_init();
 000006  f7fffffe          BL       bsp_nvic_init
-;;;330    	gpio_init();
+;;;353    	gpio_init();
 00000a  f7fffffe          BL       gpio_init
-;;;331    //	iwatchdog_config();
-;;;332    	usart1_init(115200, 8, 0, 1);
+;;;354    //	iwatchdog_config();
+;;;355    	usart1_init(115200, 8, 0, 1);
 00000e  2301              MOVS     r3,#1
 000010  2200              MOVS     r2,#0
 000012  2108              MOVS     r1,#8
 000014  f44f30e1          MOV      r0,#0x1c200
 000018  f7fffffe          BL       usart1_init
-;;;333    	usart2_init(115200);
+;;;356    	usart2_init(115200);
 00001c  f44f30e1          MOV      r0,#0x1c200
 000020  f7fffffe          BL       usart2_init
-;;;334    //	usart3_init(9600);
-;;;335    	USART3_Init(9600); 
+;;;357    //	usart3_init(9600);
+;;;358    	USART3_Init(9600); 
 000024  f44f5016          MOV      r0,#0x2580
 000028  f7fffffe          BL       USART3_Init
-;;;336    	timer2_init(200, 41);
+;;;359    	timer2_init(200, 41);
 00002c  2129              MOVS     r1,#0x29
 00002e  20c8              MOVS     r0,#0xc8
 000030  f7fffffe          BL       timer2_init
-;;;337    //	RTC_Init();
-;;;338    //	AT24CXX_Init();   
-;;;339    	Adc_Init();
+;;;360    //	RTC_Init();
+;;;361    //	AT24CXX_Init();   
+;;;362    	Adc_Init();
 000034  f7fffffe          BL       Adc_Init
-;;;340    }
+;;;363    }
 000038  bd10              POP      {r4,pc}
-;;;341    
+;;;364    
                           ENDP
 
 
                           AREA ||i.bsp_nvic_init||, CODE, READONLY, ALIGN=1
 
                   bsp_nvic_init PROC
-;;;276    
-;;;277    void bsp_nvic_init(void)
+;;;299    
+;;;300    void bsp_nvic_init(void)
 000000  b508              PUSH     {r3,lr}
-;;;278    {
-;;;279    	NVIC_InitTypeDef nvic_init_structure;
-;;;280    
-;;;281    	
-;;;282    	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+;;;301    {
+;;;302    	NVIC_InitTypeDef nvic_init_structure;
+;;;303    
+;;;304    	
+;;;305    	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
 000002  f44f60e0          MOV      r0,#0x700
 000006  f7fffffe          BL       NVIC_PriorityGroupConfig
-;;;283    
-;;;284    	// TIM2
-;;;285    	nvic_init_structure.NVIC_IRQChannel = TIM2_IRQn;
+;;;306    
+;;;307    	// TIM2
+;;;308    	nvic_init_structure.NVIC_IRQChannel = TIM2_IRQn;
 00000a  201c              MOVS     r0,#0x1c
 00000c  f88d0000          STRB     r0,[sp,#0]
-;;;286        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 0;    //
+;;;309        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 0;    //
 000010  2000              MOVS     r0,#0
 000012  f88d0001          STRB     r0,[sp,#1]
-;;;287        nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
+;;;310        nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
 000016  2002              MOVS     r0,#2
 000018  f88d0002          STRB     r0,[sp,#2]
-;;;288        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;
+;;;311        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;
 00001c  2001              MOVS     r0,#1
 00001e  f88d0003          STRB     r0,[sp,#3]
-;;;289        NVIC_Init(&nvic_init_structure);
+;;;312        NVIC_Init(&nvic_init_structure);
 000022  4668              MOV      r0,sp
 000024  f7fffffe          BL       NVIC_Init
-;;;290    
-;;;291    	
-;;;292    	// USART1
-;;;293    	nvic_init_structure.NVIC_IRQChannel = USART1_IRQn;
+;;;313    
+;;;314    	
+;;;315    	// USART1
+;;;316    	nvic_init_structure.NVIC_IRQChannel = USART1_IRQn;
 000028  2025              MOVS     r0,#0x25
 00002a  f88d0000          STRB     r0,[sp,#0]
-;;;294        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
+;;;317        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
 00002e  2001              MOVS     r0,#1
 000030  f88d0001          STRB     r0,[sp,#1]
-;;;295        nvic_init_structure.NVIC_IRQChannelSubPriority = 1;
+;;;318        nvic_init_structure.NVIC_IRQChannelSubPriority = 1;
 000034  f88d0002          STRB     r0,[sp,#2]
-;;;296        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
+;;;319        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
 000038  f88d0003          STRB     r0,[sp,#3]
-;;;297    	NVIC_Init(&nvic_init_structure);
+;;;320    	NVIC_Init(&nvic_init_structure);
 00003c  4668              MOV      r0,sp
 00003e  f7fffffe          BL       NVIC_Init
-;;;298    	
-;;;299    	// USART2
-;;;300    	nvic_init_structure.NVIC_IRQChannel = USART2_IRQn;
+;;;321    	
+;;;322    	// USART2
+;;;323    	nvic_init_structure.NVIC_IRQChannel = USART2_IRQn;
 000042  2026              MOVS     r0,#0x26
 000044  f88d0000          STRB     r0,[sp,#0]
-;;;301        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
+;;;324        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
 000048  2001              MOVS     r0,#1
 00004a  f88d0001          STRB     r0,[sp,#1]
-;;;302        nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
+;;;325        nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
 00004e  2002              MOVS     r0,#2
 000050  f88d0002          STRB     r0,[sp,#2]
-;;;303        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
+;;;326        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
 000054  2001              MOVS     r0,#1
 000056  f88d0003          STRB     r0,[sp,#3]
-;;;304    	NVIC_Init(&nvic_init_structure);	
+;;;327    	NVIC_Init(&nvic_init_structure);	
 00005a  4668              MOV      r0,sp
 00005c  f7fffffe          BL       NVIC_Init
-;;;305    	
-;;;306    	// USART3
-;;;307    	nvic_init_structure.NVIC_IRQChannel = USART3_IRQn;
+;;;328    	
+;;;329    	// USART3
+;;;330    	nvic_init_structure.NVIC_IRQChannel = USART3_IRQn;
 000060  2027              MOVS     r0,#0x27
 000062  f88d0000          STRB     r0,[sp,#0]
-;;;308        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
+;;;331        nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
 000066  2001              MOVS     r0,#1
 000068  f88d0001          STRB     r0,[sp,#1]
-;;;309        nvic_init_structure.NVIC_IRQChannelSubPriority = 3;
+;;;332        nvic_init_structure.NVIC_IRQChannelSubPriority = 3;
 00006c  2003              MOVS     r0,#3
 00006e  f88d0002          STRB     r0,[sp,#2]
-;;;310        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
+;;;333        nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
 000072  2001              MOVS     r0,#1
 000074  f88d0003          STRB     r0,[sp,#3]
-;;;311    	NVIC_Init(&nvic_init_structure);	
+;;;334    	NVIC_Init(&nvic_init_structure);	
 000078  4668              MOV      r0,sp
 00007a  f7fffffe          BL       NVIC_Init
-;;;312    }
+;;;335    }
 00007e  bd08              POP      {r3,pc}
-;;;313    
+;;;336    
                           ENDP
 
 
@@ -494,25 +494,80 @@
                   |L7.20|
                           DCD      0x40011000
 
-                          AREA ||i.lock_get_off||, CODE, READONLY, ALIGN=1
+                          AREA ||i.lock_off_status_get||, CODE, READONLY, ALIGN=2
 
-                  lock_get_off PROC
+                  lock_off_status_get PROC
 ;;;268    
-;;;269    u8 lock_get_off(void)
-000000  4770              BX       lr
+;;;269    u8 lock_off_status_get(void)
+000000  b570              PUSH     {r4-r6,lr}
 ;;;270    {
-;;;271    	
-;;;272    	
-;;;273    }
-;;;274    
+;;;271    	u8 i = 0;
+000002  2400              MOVS     r4,#0
+;;;272    	u8 ret = 0;
+000004  2600              MOVS     r6,#0
+;;;273    	u8 cnt = 0;
+000006  2500              MOVS     r5,#0
+;;;274    	
+;;;275    	for(i=0; i<30; i++)
+000008  bf00              NOP      
+00000a  e00a              B        |L8.34|
+                  |L8.12|
+;;;276    	{
+;;;277    		if(LOCK_OFF_READ() == 0)
+00000c  2120              MOVS     r1,#0x20
+00000e  4809              LDR      r0,|L8.52|
+000010  f7fffffe          BL       GPIO_ReadInputDataBit
+000014  b910              CBNZ     r0,|L8.28|
+;;;278    		{
+;;;279    			cnt++;
+000016  1c68              ADDS     r0,r5,#1
+000018  b2c5              UXTB     r5,r0
+00001a  e000              B        |L8.30|
+                  |L8.28|
+;;;280    		}
+;;;281    		else
+;;;282    		{
+;;;283    			cnt = 0;
+00001c  2500              MOVS     r5,#0
+                  |L8.30|
+00001e  1c60              ADDS     r0,r4,#1              ;275
+000020  b2c4              UXTB     r4,r0                 ;275
+                  |L8.34|
+000022  2c1e              CMP      r4,#0x1e              ;275
+000024  dbf2              BLT      |L8.12|
+;;;284    		}
+;;;285    	}
+;;;286    	if(cnt >= 10)
+000026  2d0a              CMP      r5,#0xa
+000028  db01              BLT      |L8.46|
+;;;287    	{
+;;;288    		ret = 0;
+00002a  2600              MOVS     r6,#0
+00002c  e000              B        |L8.48|
+                  |L8.46|
+;;;289    	}
+;;;290    	else
+;;;291    	{
+;;;292    		ret = 1;
+00002e  2601              MOVS     r6,#1
+                  |L8.48|
+;;;293    	}
+;;;294    	
+;;;295    	return ret;
+000030  4630              MOV      r0,r6
+;;;296    }
+000032  bd70              POP      {r4-r6,pc}
+;;;297    
                           ENDP
 
+                  |L8.52|
+                          DCD      0x40010800
 
-                          AREA ||i.lock_get_on||, CODE, READONLY, ALIGN=2
+                          AREA ||i.lock_on_status_get||, CODE, READONLY, ALIGN=2
 
-                  lock_get_on PROC
+                  lock_on_status_get PROC
 ;;;238    
-;;;239    u8 lock_get_on(void)
+;;;239    u8 lock_on_status_get(void)
 000000  b570              PUSH     {r4-r6,lr}
 ;;;240    {
 ;;;241    	u8 i = 0;
@@ -521,7 +576,7 @@
 000004  2600              MOVS     r6,#0
 ;;;243    	u8 cnt = 0;
 000006  2500              MOVS     r5,#0
-;;;244    	for(i=0;i<10;i++)
+;;;244    	for(i=0; i<30; i++)
 000008  bf00              NOP      
 00000a  e00a              B        |L9.34|
                   |L9.12|
@@ -546,7 +601,7 @@
 00001e  1c60              ADDS     r0,r4,#1              ;244
 000020  b2c4              UXTB     r4,r0                 ;244
                   |L9.34|
-000022  2c0a              CMP      r4,#0xa               ;244
+000022  2c1e              CMP      r4,#0x1e              ;244
 000024  dbf2              BLT      |L9.12|
 ;;;253    		}
 ;;;254    	}

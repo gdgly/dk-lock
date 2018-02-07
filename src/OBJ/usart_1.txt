@@ -103,7 +103,7 @@
 ;;;233    		
 ;;;234    		timer_is_timeout_1ms(timer_uart1, 0);
 000022  2100              MOVS     r1,#0
-000024  2008              MOVS     r0,#8
+000024  200a              MOVS     r0,#0xa
 000026  f7fffffe          BL       timer_is_timeout_1ms
 ;;;235    		
 ;;;236    //		if(usart1_rx_status == 0)
@@ -237,7 +237,7 @@
 ;;;300    		
 ;;;301    		timer_is_timeout_1ms(timer_uart2, 0);		//定时器清零
 00001a  2100              MOVS     r1,#0
-00001c  2009              MOVS     r0,#9
+00001c  200b              MOVS     r0,#0xb
 00001e  f7fffffe          BL       timer_is_timeout_1ms
 ;;;302    		
 ;;;303    		if(usart2_rx_status == 0)
@@ -381,7 +381,7 @@
 000016  f7fffffe          BL       USART_ClearITPendingBit
 ;;;368    		timer_is_timeout_1ms(timer_uart3, 0);
 00001a  2100              MOVS     r1,#0
-00001c  200a              MOVS     r0,#0xa
+00001c  200c              MOVS     r0,#0xc
 00001e  f7fffffe          BL       timer_is_timeout_1ms
 ;;;369    		
 ;;;370    //		if(usart3_rx_status == 0)
@@ -740,7 +740,7 @@
 ;;;265    
 ;;;266    	if(timer_is_timeout_1ms(timer_uart1, 40) == 0)	//40ms没接收到数据认为接收数据完成		
 000002  2128              MOVS     r1,#0x28
-000004  2008              MOVS     r0,#8
+000004  200a              MOVS     r0,#0xa
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b978              CBNZ     r0,|L9.44|
 ;;;267    	{
@@ -837,7 +837,7 @@
 ;;;331    {		
 ;;;332    	if(timer_is_timeout_1ms(timer_uart2, 40) == 0)	//40ms没接收到数据认为接收数据完成		
 000002  2128              MOVS     r1,#0x28
-000004  2009              MOVS     r0,#9
+000004  200b              MOVS     r0,#0xb
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b988              CBNZ     r0,|L11.48|
 ;;;333    	{
@@ -938,7 +938,7 @@
 ;;;411    	
 ;;;412    	if(timer_is_timeout_1ms(timer_uart3, 50)==0)	//40ms没接收到数据认为接收数据完成		
 000002  2132              MOVS     r1,#0x32
-000004  200a              MOVS     r0,#0xa
+000004  200c              MOVS     r0,#0xc
 000006  f7fffffe          BL       timer_is_timeout_1ms
 00000a  b988              CBNZ     r0,|L13.48|
 ;;;413    	{

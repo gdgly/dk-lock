@@ -23737,6 +23737,10 @@ Nvoid lock_on(void);
 Nvoid lock_off(void);
 Nvoid lock_close(void);
 N
+N
+Nu8 lock_on_status_get(void);
+Nu8 lock_off_status_get(void);
+N
 N#endif
 N
 N
@@ -26204,7 +26208,7 @@ N
 N
 N
 N
-N//extern u8 PARK_LOCK_Buffer[16];
+N
 N
 N//u8 batt_state = 0;
 N//extern u8 aesKey[16];

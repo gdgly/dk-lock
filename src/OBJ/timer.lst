@@ -23598,6 +23598,8 @@ N	timer_close_lock,
 N	timer_open_lock,
 N	timer_heartbeat,
 N	timer_lock,
+N	timer_bell_1,
+N	timer_bell_2,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
@@ -23877,6 +23879,10 @@ N
 Nvoid lock_on(void);
 Nvoid lock_off(void);
 Nvoid lock_close(void);
+N
+N
+Nu8 lock_on_status_get(void);
+Nu8 lock_off_status_get(void);
 N
 N#endif
 N

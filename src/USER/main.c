@@ -1,11 +1,9 @@
 #include "sys.h"  
-#include "delay.h"
-#include "rtc.h"    
+#include "delay.h" 
 #include "gps.h"
 #include "string.h"		
 #include "stdlib.h"
 #include "usart3.h"
-#include "usart2.h"
 #include "24cxx.h"
 #include "myiic.h"
 #include "adc.h"
@@ -14,32 +12,36 @@
 #include "gprs.h"
 #include "usart.h"
 #include "aes.h"
+#include "aes128.h"
 #include "led.h"
 #include "app_md5.h"
 
 
 
 //gps
-char Gps_Longi_At24C[8];
-char Gps_Lati_At24C[7];
-char Gps_Longi_At24C_Read[8];
-char Gps_Lati_At24C_Read[7];
-u32 Gps_longi;
-u32 Gps_Lati;
-u8 USART1_TX_BUF[512]; 					//串口1,发送缓存区
+//char Gps_Longi_At24C[8];
+//char Gps_Lati_At24C[7];
+//char Gps_Longi_At24C_Read[8];
+//char Gps_Lati_At24C_Read[7];
+//u32 Gps_longi;
+//u32 Gps_Lati;
+//u8 USART1_TX_BUF[512]; 					//串口1,发送缓存区
 
 
 
-char receiveText[24];
-char expressText[512];  
-char cipherText[512];
-char aesKey[16];
+u8 receiveText[24];
+u8 expressText[512];  
+u8 cipherText[512];
+u8 aesKey[16];
 
 
-u8 PublishLockBackbuf[35];
-u8 PublishDataBatbuf[50];
-u8 PublishDataGpsbuf[45];
-u8 PublishDataSelfCheckbuf[35];
+//u8 PublishLockBackbuf[35];
+//u8 PublishDataBatbuf[100];
+//u8 PublishDataGpsbuf[45];
+//u8 PublishDataSelfCheckbuf[35];
+
+
+
 
 nmea_msg gpsx; 											//GPS信息
 
@@ -62,8 +64,8 @@ u8 Bat_Pre_Flag=0;
 u8 *p1;
 u8 *p2;
 //topic:bell
-u8 *p3;
-u8 *p4;
+//u8 *p3;
+//u8 *p4;
 
 
 u8 lock_open_err_flag = 0;
@@ -79,8 +81,11 @@ u8 Lock_Close_Tim5s=0;//障碍物报警关
 
 
 
+u8 lock_open_success_flag = 0;
+
+
 u8 flag=4;
-__self_calendar_obj self_calendar;	//自检日历结构体
+//__self_calendar_obj self_calendar;	//自检日历结构体
 
 ////////////////////////////////////
  u8 second_flag=0;
@@ -92,11 +97,12 @@ u8 lockbuff[16];
 
 u8 gps_flag = 0;
 
+u8 send_buff[100] = {0};
 
 u8 protocol_buff[512] = {0};
 u8 gps_buff[512] = {0};
 
-extern u8 PARK_LOCK_Buffer[16];
+extern u8 PARK_LOCK_Buffer[17];
 
 extern uint8_t gprs_status;
 
@@ -111,9 +117,10 @@ extern uint8_t gprs_status;
 
 u8 gps_err_cnt = 0;
 
-u8 lock_id[16] = {0};
+
 
 u8 tmp[20];
+u8 heartbeat_buff[2] = {0};
 
 void Gps_Msg_Show(void)
 {
@@ -129,7 +136,43 @@ void Gps_Msg_Show(void)
  	sprintf((char *)dtbuf,"Altitude:%.1fm     ",tp/=10);	    			
 }
 
+static void test_encrypt_ecb(void)
+{
 
+    uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
+    uint8_t out[] = { 0x3a, 0xd7, 0x7b, 0xb4, 0x0d, 0x7a, 0x36, 0x60, 0xa8, 0x9e, 0xca, 0xf3, 0x24, 0x66, 0xef, 0x97 };
+
+
+    uint8_t in[]  = { 0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11, 0x73, 0x93, 0x17, 0x2a };
+   	struct AES_ctx ctx;
+	
+	
+	sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"20");
+//	expressText[0] = 0x31;
+	USART_OUT(USART1, "expressText66=%s\r\n", expressText);
+	
+
+	
+//	USART_OUT(USART1, "in=%s\r\n", in);
+//	USART_OUT(USART1, "out=%s\r\n", out);
+//	AES_init_ctx(&ctx, key);
+//	AES_ECB_encrypt(&ctx, in);
+//	USART_OUT(USART1, "in=%s\r\n", in);
+//	USART_OUT(USART1, "out=%s\r\n", out);
+    AES_init_ctx(&ctx, aesKey);
+    AES_ECB_encrypt(&ctx, expressText);
+
+	USART_OUT(USART1, expressText);
+
+    if (0 == memcmp((char*) out, (char*) in, 16))
+    {
+        USART_OUT(USART1, "SUCCESS!\n");
+    }
+    else
+    {
+        USART_OUT(USART1, "FAILURE!\n");
+    }
+}
 
 int main(void)
 { 
@@ -137,17 +180,17 @@ int main(void)
 	u16 k=0;
 	u8 upload=0; 
 	u8 *ret;
-//	u8 *ret1, ret2;
 	uint8_t status = 0;
 	u8 tt = 0;
 	static u8 gps_send_flag = 0;
+//	struct AES_ctx ctx;
+	
 	
 	bsp_init();
 
                                        
 	USART_OUT(USART1, "uart1 is ok\r\n");
 	
-
 	
 	GPS_POW_HIGH();
 
@@ -161,10 +204,13 @@ int main(void)
 			if(gprs_status == 255)
 			{
 				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);
+				
 				break;
 			}
 		}
-		if(gps_send_flag ==0)
+	
+	
+		if(gps_send_flag == 1)
 		{
 		while(1)
 		{
@@ -175,18 +221,17 @@ int main(void)
 			{
 				memset(gps_buff, 0, 512);
 				
-				USART_OUT(USART1,"%s\r\n",latitudedtbuf);
-				USART_OUT(USART1,"%s\r\n",longitudedtbuf);	
+				USART_OUT(USART1,"%s\r\n", latitudedtbuf);
+				USART_OUT(USART1,"%s\r\n", longitudedtbuf);	
 						
-				memcpy(lock_id, PARK_LOCK_Buffer, 16);
-				memset(PublishDataGpsbuf, 0, 45);
-				sprintf((char *)PublishDataGpsbuf,"%s%s%s","AT+PUBLISH=lockdata/",lock_id,",64,2\r\n");
-				ret = gprs_send_at(PublishDataGpsbuf, ">", 300, 0);
+				memset(send_buff, 0, 100);
+				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",64,2\r\n");
+				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
 					memset(cipherText, 0 ,512);
-					sprintf((char *)expressText,"%c%s,%s%c",'{',(char *)longitudedtbuf,(char *)latitudedtbuf,'}',48);
+					sprintf((char *)expressText,"%c%s,%s%c",'{',longitudedtbuf,latitudedtbuf,'}',48);
 					USART_OUT(USART1, "expressText=%s\r\n", expressText);
 					AES_Encrypt((char *)expressText, cipherText, aesKey);
 					USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
@@ -204,12 +249,12 @@ int main(void)
 			}
 			else
 			{
-//				gps_err_cnt++;
-//				if(gps_err_cnt > 30)
-//				{
-//					gps_send_flag = 1;
-//					break;
-//				}
+				if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
+				{
+					gps_send_flag = 1;
+					break;
+				}
+
 			}				
 		}
 	}
@@ -225,116 +270,109 @@ int main(void)
 		Bat_Pre=(Bat_V-5000)*100/2400;
 		
 //		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
-//		if(timer_is_timeout_1ms(timer_open_lock, 50000) == 0)
-//		{	
-//			memcpy(lock_id, PARK_LOCK_Buffer, 16);
-//			USART_OUT(USART1, "MakeFile_MD5_Checksum =%s\r\n", lock_id);
-//			memset(PublishDataBatbuf, 0, 50);	
-//			USART_OUT(USART1, "aaa=%s\r\n", PublishDataBatbuf);			
-//			sprintf((char *)PublishDataBatbuf,"%s%s%s","AT+PUBLISH=lockdata/",lock_id,",24,2\r\n");
-//			USART_OUT(USART1, "ddd =%s\r\n", lock_id);
-//			USART_OUT(USART1, "ccc=%s\r\n", PublishDataBatbuf);
-//			
-//			USART_OUT(USART1, "bbbb\r\n");
-//			ret = gprs_send_at(PublishDataBatbuf, ">", 300, 0);
-//			if(ret != NULL)
-//			{
-//				memset(expressText, 0 ,512);
-//				memset(cipherText, 0 ,512);
-//				sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"20");
-//				USART_OUT(USART1, "expressText=%s\r\n", expressText);
-//				AES_Encrypt((char *)expressText, cipherText, aesKey);
-//				USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-//				USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+		if(timer_is_timeout_1ms(timer_open_lock, 20000) == 0)
+		{	
 
-//				ret = gprs_send_at(cipherText, "OK", 300, 0);
-//				if(ret != NULL)
-//				{
-//					
-//				}
-//				
-//			}
+			memset(send_buff, 0, 100);	
+			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
+
+			USART_OUT(USART1, "ccc=%s\r\n", send_buff);
+
+			ret = gprs_send_at(send_buff, ">", 300, 0);
+			if(ret != NULL)
+			{
+				memset(expressText, 0 ,512);
+				memset(cipherText, 0 ,512);
+				sprintf((char *)expressText, "{%c%s%c:%s}",'"',"battery",'"',"20");
+				USART_OUT(USART1, "expressText=%s\r\n", expressText);
+				AES_Encrypt((char *)expressText, cipherText, aesKey);
+				
+				USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
+				USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+				ret = gprs_send_at(cipherText, "OK", 300, 0);
+				if(ret != NULL)
+				{
+					
+				}			
+			}
 ////			
-//			if(Bat_Pre<10&&Bat_Pre_Flag==1)
-//			{
-//				Bat_Pre_Flag=0;
-//				memcpy(lock_id, PARK_LOCK_Buffer, 16);
-//				
-//				memset(PublishDataBatbuf, 0, 50);
-//				sprintf((char *)PublishDataBatbuf,"%s%s%","AT+PUBLISH=lockdata/",lock_id,",24,2\r\n");
-//				USART_OUT(USART1, "wangzhongya=%s\r\n", PublishDataBatbuf);
-//				ret = gprs_send_at(PublishDataBatbuf, ">", 300, 0);
-//				if(ret != NULL)
-//				{
-//					memset(expressText, 0 ,512);
-//					memset(cipherText, 0 ,512);
-//					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
-//					AES_Encrypt((char *)expressText, cipherText, aesKey);
-//					memset(tmp, 0, 20);
-//					tmp[0] = 0x31;
-//					ret = gprs_send_at(tmp, "OK", 300, 0);
-//					if(ret == NULL)
-//					{
-//						
-//					}
-//				}
-//			}
-//		}
+			if(Bat_Pre<10&&Bat_Pre_Flag==1)
+			{
+				Bat_Pre_Flag=0;
+
+				memset(send_buff, 0, 100);
+				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
+				USART_OUT(USART1, "wangzhongya=%s\r\n", send_buff);
+				ret = gprs_send_at(send_buff, ">", 300, 0);
+				if(ret != NULL)
+				{
+					memset(expressText, 0 ,512);
+					memset(cipherText, 0 ,512);
+					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
+					AES_Encrypt((char *)expressText, cipherText, aesKey);
+					memset(tmp, 0, 20);
+					tmp[0] = 0x31;
+					ret = gprs_send_at(tmp, "OK", 300, 0);
+					if(ret == NULL)
+					{
+						
+					}
+				}
+			}
+		}
 //		//开锁
 		p1 = strstr((u8*)protocol_buff, "topic: lock/");
 		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
 		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
 		{
-			USART_OUT(USART1, "lock data\r\n");
+	
 			timer_is_timeout_1ms(timer_open_lock, 0);
 			timer_is_timeout_1ms(timer_close_lock, 0);
- 			if((LOCK_ON_READ() == 0) || (LOCK_OFF_READ() == 0))
+			
+			USART_OUT(USART1, "lock data\r\n");
+			memset(receiveText ,0 , 512);
+			memset(expressText ,0 , 512);
+			
+			strcpy((char*)receiveText ,(char *)(p1+33));
+			USART_OUT(USART1, "receiveText=%s\r\n", receiveText);
+			AES_Decrypt(expressText, receiveText, aesKey);
+	
+			USART_OUT(USART1, "expressText=%s\r\n", expressText);
+			if(*expressText==0x31)
 			{
-				USART_OUT(USART1, "lock data22222\r\n");
-				memset(receiveText ,0 , 512);
-				memset(expressText ,0 , 512);
-				
-				strcpy((char*)receiveText ,(char *)(p1+33));
-				USART_OUT(USART1, "receiveText=%s\r\n", receiveText);
-				AES_Decrypt(expressText, receiveText, aesKey);
-				USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-				USART_OUT(USART1, "expressText=%s\r\n", expressText);
-				if(*expressText==0x31)
+				if(LOCK_ON_READ() == 0)
 				{
-					if(LOCK_ON_READ() == 0)
-					{
-						Shaking=1;
-						Lock_Open=1;
-						USART_OUT(USART1, "Lock_Open\r\n");
-					}
-					else
-					{
-						Lock_Open=0;
-					}
+					Shaking=1;
+					Lock_Open=1;
+					USART_OUT(USART1, "Lock_Open\r\n");
 				}
-				else if(*expressText==0x32)
+				else
 				{
-					if(LOCK_OFF_READ() == 0)
-					{
-						Shaking=1;
-						Lock_Close=1;
-						USART_OUT(USART1, "Lock_Close11111\r\n");
-					}
-					else
-					{
-						Lock_Close=0;
-					}
-				
+					Lock_Open=0;
 				}
-				else if(*expressText == 0x30)
-				{
-					lock_stop();	//停止运行;
-				}
-				
-				memset(protocol_buff, 0, 512);	
-				
 			}
+			else if(*expressText==0x32)
+			{
+				if(LOCK_OFF_READ() == 0)
+				{
+					Shaking=1;
+					Lock_Close=1;
+					USART_OUT(USART1, "Lock_Close11111\r\n");
+				}
+				else
+				{
+					Lock_Close=0;
+				}
+			
+			}
+			else if(*expressText == 0x30)
+			{
+				lock_stop();	//停止运行;
+			}
+			
+			memset(protocol_buff, 0, 512);					
 		}
+		
 
 		//开锁逻辑		
 		if(Lock_Open == 1)
@@ -352,23 +390,24 @@ int main(void)
 				
 				USART_OUT(USART1, "AAA lock_open\r\n");
 			}
-			timer_delay_1ms(1);
-			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0) //正常开锁
+
+//			if(LOCK_OFF_READ()==0) //正常开锁
+			if(lock_off_status_get() == 0)
 			{
 				USART_OUT(USART1, "AAA lock_stop\r\n");
+				
 				Lock_Open = 0;
 				lock_stop();	//停止运行
 				Shaking = 0;
 				
-				memcpy(lock_id, PARK_LOCK_Buffer, 16);
-				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)lock_id,",44,2\r\n");
-				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
-				ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
 					memset(cipherText, 0 ,512);
-					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"0");
+					sprintf(expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"0");
 					USART_OUT(USART1, "expressText=%s\r\n", expressText);
 					AES_Encrypt((char *)expressText, cipherText, aesKey);
 					USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
@@ -387,10 +426,10 @@ int main(void)
 				Lock_Open = 0;
 				lock_stop();
 				Shaking = 0;
-				memcpy(lock_id, PARK_LOCK_Buffer, 16);
-				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)lock_id,",44,2\r\n");
-				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
-				ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+		
+				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
@@ -403,8 +442,7 @@ int main(void)
 					{
 						
 					}
-				}
-				
+				}	
 			}
 		}
 		//关锁逻辑
@@ -423,17 +461,17 @@ int main(void)
 				USART_OUT(USART1, "BBB lock_close\r\n");
 			}
 			
-			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)	//正常关锁
+//			if(LOCK_ON_READ() == 0)	//正常关锁
+			if(lock_on_status_get() == 0)
 			{
 				Lock_Close = 0;
 				lock_stop();	//停止运行
 				Shaking = 0;
 				USART_OUT(USART1, "BBB lock_stop\r\n");
 				
-				memcpy(lock_id, PARK_LOCK_Buffer, 16);
-				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)lock_id,",44,2\r\n");
-				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
-				ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
@@ -455,10 +493,10 @@ int main(void)
 				Lock_Close = 0;
 				lock_stop();	//停止运行
 				Shaking = 0;
-				memcpy(lock_id, PARK_LOCK_Buffer, 16);
-				sprintf((char *)PublishLockBackbuf,"%s%s%s","AT+PUBLISH=lockback/",(char *)lock_id,",44,2\r\n");
-				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", PublishLockBackbuf);
-				ret = gprs_send_at(PublishLockBackbuf, ">", 300, 0);
+		
+				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
@@ -480,12 +518,13 @@ int main(void)
 		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
 		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
 		{
+			
 			USART_OUT(USART1, "bell\r\n");
-	
+			memset(protocol_buff, 0, 512);	
 			bell_flag=1;
   	
 			BEEP_ON();
-			timer_delay_1ms(500);
+			timer_delay_1ms(100);
 			BEEP_OFF();
 		}
 				
@@ -493,14 +532,23 @@ int main(void)
 		{
 			bell_flag = 0;
 		}
-		
+		//晃动报警
 		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1 && Shaking==0)
 		{
-			Shaking_Alarm_Flag=1;
-			BEEP_ON();
-			timer_delay_1ms(100);
-			BEEP_OFF();
-			timer_delay_1ms(400);
+			
+			if(timer_is_timeout_1ms(timer_bell_1, 400) == 0)
+			{
+				BEEP_ON();
+			}
+			if(timer_is_timeout_1ms(timer_bell_2, 300) == 0)
+			{
+				BEEP_OFF();
+			}
+
+			
+//			timer_delay_1ms(100);
+			
+//			timer_delay_1ms(300);
 		}
 		else
 		{
@@ -511,6 +559,7 @@ int main(void)
 		p1 = strstr((char*)protocol_buff, "MQTT CLOSE");
 		if(p1 !=NULL)
 		{
+			memset(protocol_buff, 0, 512);	
 			gprs_status = 0;
 		}
 		
@@ -519,64 +568,31 @@ int main(void)
 			USART_OUT(USART1, "button_get_value");
 			timer_is_timeout_1ms(timer_close_lock, 0);
 			Lock_Close = 1;
-			Shaking=1;
-			
+			Shaking=1;	
 		}
 			
-		
-		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*60*24) == 0)
+		//心跳
+		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
 		{
-			
-			sprintf((char *)PublishDataBatbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
-			USART_OUT(USART1, "ssss=%s\r\n", PublishDataBatbuf);
-			ret = gprs_send_at(PublishDataBatbuf, ">", 300, 0);
+			memset(send_buff, 0, 100);
+			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
+	
+			USART_OUT(USART1, "ssss=%s\r\n", send_buff);
+			ret = gprs_send_at(send_buff, ">", 300, 0);
 			if(ret != NULL)
 			{
-
-				tmp[0] = 0x30;
-				ret = gprs_send_at(tmp, "OK", 300, 0);
+				memset(heartbeat_buff, 0, 2);
+				heartbeat_buff[0] = 0x30;
+				ret = gprs_send_at(heartbeat_buff, "OK", 300, 0);
 				if(ret != NULL)
 				{
 					
-				}
-				memset(PublishDataBatbuf, 0, 50);
+				}	
 			}
 		}	
 		
-//		if(gps_flag == 1)
-//		{
-//			GPS_POW_HIGH();
-//			if(usart3_rx_status == 1)
-//			{
-//				usart3_rx_status = 0;
-//				GPS_Analysis(&gpsx,(u8*)usart3_buff);
-//				Gps_Msg_Show();
-//				if(gpsx.latitude>0&&gpsx.longitude>0)
-//				{
-//					memset(expressText, 0 ,512);
-//					sprintf((char *)expressText,"%c%s,%s%c",'{',(char *)longitudedtbuf,(char *)latitudedtbuf,'}',48);
-//					sprintf((char *)PublishDataGpsbuf,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",64,2\r\n");
-//					ret = gprs_send_at(PublishDataBatbuf, ">", 300, 0);
-//					if(ret != NULL)
-//					{
-//						memset(cipherText, 0 ,512);
-//						AES_Encrypt((char *)expressText, cipherText, aesKey);
-//						
-//						tmp[0] = 0x38;
-//						ret = gprs_send_at(tmp, "OK", 300, 0);
-//						if(ret != NULL)
-//						{
-//							
-//						}
-//						memset(PublishDataBatbuf, 0, 50);
-//					}	
-//					GPS_POW_LOW();
-//					gps_flag = 0;
-//				}
-//			}
-//		}
 		
-		if(timer_is_timeout_1ms(timer_gps_cycle, 1000*60*1) == 0)
+		if(timer_is_timeout_1ms(timer_gps_cycle, 1000*60*60*24) == 0)
 		{
 			
 			gps_flag = 1;
@@ -592,13 +608,6 @@ int main(void)
 
 
 
-
-
-
-void hand_lock(void)
-{
-	
-}
 
 
 

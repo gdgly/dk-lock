@@ -52,8 +52,8 @@ uint8_t gprs_rx_flag = 0;
 
 
 
-u8 PARK_LOCK_Buffer[16] = {0};
-
+u8 PARK_LOCK_Buffer[17] = {0};
+extern u8 lock_id[16];
 u8 topic_id = 0;
 
 /*
@@ -226,7 +226,10 @@ void gprs_config(void)
 					gprs_status = 4;
 					gprs_err_cnt = 0;
 				}
-		
+				else if(strstr((char*)ret, "MQTT CLOSE") != NULL)
+				{
+					gprs_status = 0;
+				}
 			}
 			else
 			{

@@ -236,12 +236,12 @@ void lock_stop(void)
 	MOTOB_LOW();
 }
 
-u8 lock_get_on(void)
+u8 lock_on_status_get(void)
 {
 	u8 i = 0;
 	u8 ret = 0;
 	u8 cnt = 0;
-	for(i=0;i<10;i++)
+	for(i=0; i<30; i++)
 	{
 		if(LOCK_ON_READ() == 0)
 		{
@@ -266,10 +266,33 @@ u8 lock_get_on(void)
 }
 
 
-u8 lock_get_off(void)
+u8 lock_off_status_get(void)
 {
+	u8 i = 0;
+	u8 ret = 0;
+	u8 cnt = 0;
 	
+	for(i=0; i<30; i++)
+	{
+		if(LOCK_OFF_READ() == 0)
+		{
+			cnt++;
+		}
+		else
+		{
+			cnt = 0;
+		}
+	}
+	if(cnt >= 10)
+	{
+		ret = 0;
+	}
+	else
+	{
+		ret = 1;
+	}
 	
+	return ret;
 }
 
 

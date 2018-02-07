@@ -37,9 +37,7 @@
 "..\obj\adc_1.o"
 "..\obj\gps_1.o"
 "..\obj\myiic_1.o"
-"..\obj\rtc_1.o"
 "..\obj\timer_1.o"
-"..\obj\usart2_1.o"
 "..\obj\usart3_1.o"
 "..\obj\usart_1.o"
 "..\obj\button.o"
@@ -48,6 +46,7 @@
 "..\obj\led.o"
 "..\obj\aes.o"
 "..\obj\app_md5.o"
+"..\obj\aes128.o"
 --strict --scatter "..\OBJ\test.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

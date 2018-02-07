@@ -601,19 +601,9 @@
               <FilePath>..\driver\myiic.c</FilePath>
             </File>
             <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\driver\rtc.c</FilePath>
-            </File>
-            <File>
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\driver\timer.c</FilePath>
-            </File>
-            <File>
-              <FileName>usart2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\driver\usart2.c</FilePath>
             </File>
             <File>
               <FileName>usart3.c</FileName>
@@ -659,6 +649,11 @@
               <FileName>App_md5.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\tplib\App_md5.c</FilePath>
+            </File>
+            <File>
+              <FileName>aes128.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\tplib\aes128.c</FilePath>
             </File>
           </Files>
         </Group>

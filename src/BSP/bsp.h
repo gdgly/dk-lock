@@ -78,6 +78,10 @@ void lock_on(void);
 void lock_off(void);
 void lock_close(void);
 
+
+u8 lock_on_status_get(void);
+u8 lock_off_status_get(void);
+
 #endif
 
 

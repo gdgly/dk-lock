@@ -606,17 +606,10 @@ void AES_Encrypt(char* pExpressText , char* pCipherText  , char* pAeskey)
 	aesDataLen = strlen(pExpressText);
 	//pExpressText:待加密的明文数据，pkey：加密密钥  str：加密后的数据
 	str = encrypt(pExpressText, pAeskey);  //aesTempBuff[AES_TEMP_BUFF_LEN]
-	
-//	printf ("encrypt result:  ");
-//	printf (str);
-//  printf ("\r\n");
 
 	//str:待编码的数据  pCipherText：编码后的数据  aesDataLen：待编码的长度
 	Base64Encode(str, pCipherText,aesDataLen);
 	free(str);
-//  printf("Base64 encoded result:  ");
-//	printf(pCipherText);
-//  printf("\r\n");
 
 }
 
@@ -637,10 +630,7 @@ void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
 	newstr = (char *)malloc(aesDataLen);	
 	memset(newstr , 0 , aesDataLen);
 	aesDataLen = Base64Decode(newstr , pCipherText, aesDataLen, true);
-	
-//  printf("decoded result:  ");
-//  printf(newstr);
-//  printf("\r\n");
+
 	
 	
 	//send_buff：待解密的数据  ，pkey：密钥   str2：解密后的数据
@@ -653,7 +643,6 @@ void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
 	{
 		if(str2[aesDataLen-i-1] != buIndex)
 		{
-//			printf("\nit is a wrong data. \n");
 			free(str2);
 			return;
 		}
@@ -663,7 +652,5 @@ void AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey)
 	strcpy(pExpressText , str2);
 	free(str2);
 	
-//  printf ("AES decrypt result:  ");
-//  printf (pExpressText);
-//  printf ("\r\n");
+
 }
