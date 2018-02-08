@@ -66,6 +66,12 @@ Section Cross References
     system_stm32f10x.o(i.SetSysClock) refers to system_stm32f10x.o(i.SetSysClockTo72) for SetSysClockTo72
     system_stm32f10x.o(i.SystemCoreClockUpdate) refers to system_stm32f10x.o(.data) for SystemCoreClock
     system_stm32f10x.o(i.SystemInit) refers to system_stm32f10x.o(i.SetSysClock) for SetSysClock
+    protocol.o(i.protocol_analyze) refers to rt_memclr_w.o(.text) for __aeabi_memclr4
+    protocol.o(i.protocol_analyze) refers to usart_1.o(i.usart2_recv_data) for usart2_recv_data
+    protocol.o(i.protocol_analyze) refers to strstr.o(.text) for strstr
+    protocol.o(i.protocol_analyze) refers to stm32f10x_gpio.o(i.GPIO_ReadInputDataBit) for GPIO_ReadInputDataBit
+    protocol.o(i.protocol_analyze) refers to main.o(.bss) for protocol_buff
+    protocol.o(i.protocol_analyze) refers to usart_1.o(.bss) for usart2_buff
     bsp.o(i.bsp_init) refers to bsp.o(i.bsp_rcc_init) for bsp_rcc_init
     bsp.o(i.bsp_init) refers to bsp.o(i.bsp_nvic_init) for bsp_nvic_init
     bsp.o(i.bsp_init) refers to bsp.o(i.gpio_init) for gpio_init
@@ -986,7 +992,7 @@ Removing Unused input sections from the image.
     Removing system_stm32f10x.o(i.SystemCoreClockUpdate), (172 bytes).
     Removing system_stm32f10x.o(.data), (20 bytes).
     Removing lock.o(i.lock), (2 bytes).
-    Removing protocol.o(i.protocol_analyze), (2 bytes).
+    Removing protocol.o(i.protocol_analyze), (136 bytes).
     Removing bsp.o(i.iwatchdog_clear), (8 bytes).
     Removing bsp.o(i.iwatchdog_config), (34 bytes).
     Removing delay.o(i.delay_init), (68 bytes).
@@ -1497,7 +1503,7 @@ Removing Unused input sections from the image.
     Removing aes128.o(i.xtime), (20 bytes).
     Removing aes128.o(.constdata), (767 bytes).
 
-514 unused section(s) (total 25515 bytes) removed from the image.
+514 unused section(s) (total 25649 bytes) removed from the image.
 
 ==============================================================================
 

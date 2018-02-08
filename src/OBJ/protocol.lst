@@ -25516,32 +25516,37 @@ N
 N
 Nvoid protocol_analyze(void)
 N{
-N//	u8 topic[100] = {0};
-N//	u8 *par = NULL;
-N//	usart2_recv_data();
-N//		
-N//	//topic: lock/0018131408143929,1
-N//	par = strstr((char *)protocol_buff, "topic:");
-N//	
-N//	if(par != NULL)
-N//	{
-N////		memcpy(topic, "topic: lock/", 12);
-N//	}
-N//	
-N////	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);
-N//	
-N//	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
-N//	{
-N//		
-N//	}
-N//	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
-N//	{
-N//		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
-N//		{
-N//			
-N//			
-N//		}
-N//	}
+N	u8 topic[100] = {0};
+N	u8 *par = NULL;
+X	u8 *par = 0;
+N	usart2_recv_data();
+N		
+N	//topic: lock/0018131408143929,1
+N	par = strstr((char *)protocol_buff, "topic:");
+N	
+N	if(par != NULL)
+X	if(par != 0)
+N	{
+N		memcpy(topic, "topic: lock/", 12);
+N	}
+N	
+N//	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);
+N	
+N	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
+X	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != 0)
+N	{
+N		
+N	}
+N	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
+X	else if(strstr((char *)usart2_buff, (char*)topic) != 0)
+N	{
+N		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
+X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==0 || GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020)) == 0)
+N		{
+N			
+N			
+N		}
+N	}
 N
 N
 N}

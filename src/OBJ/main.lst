@@ -26836,8 +26836,7 @@ N		{
 N			gprs_config();
 N			if(gprs_status == 255)
 N			{
-N				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);
-N				
+N				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);			
 N				break;
 N			}
 N		}
@@ -26845,58 +26844,58 @@ N
 N	
 N		if(gps_send_flag == 1)
 N		{
-N		while(1)
-N		{
-N			usart3_recv_data();
-N			GPS_Analysis(&gpsx, gps_buff);
-N			Gps_Msg_Show();
-N			if(gpsx.latitude>0 && gpsx.longitude>0)
+N			while(1)
 N			{
-N				memset(gps_buff, 0, 512);
-N				
-N				USART_OUT(USART1,"%s\r\n", latitudedtbuf);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),"%s\r\n", latitudedtbuf);
-N				USART_OUT(USART1,"%s\r\n", longitudedtbuf);	
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),"%s\r\n", longitudedtbuf);	
-N						
-N				memset(send_buff, 0, 100);
-N				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",64,2\r\n");
-N				ret = gprs_send_at(send_buff, ">", 300, 0);
-N				if(ret != NULL)
-X				if(ret != 0)
+N				usart3_recv_data();
+N				GPS_Analysis(&gpsx, gps_buff);
+N				Gps_Msg_Show();
+N				if(gpsx.latitude>0 && gpsx.longitude>0)
 N				{
-N					memset(expressText, 0 ,512);
-N					memset(cipherText, 0 ,512);
-N					sprintf((char *)expressText,"%c%s,%s%c",'{',longitudedtbuf,latitudedtbuf,'}',48);
-N					USART_OUT(USART1, "expressText=%s\r\n", expressText);
-X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "expressText=%s\r\n", expressText);
-N					AES_Encrypt((char *)expressText, cipherText, aesKey);
-N					USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "aesKey=%s\r\n", aesKey);
-N					USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "cipherText=%s\r\n", cipherText);
-N					ret = gprs_send_at(cipherText, "OK", 400, 0);
+N					memset(gps_buff, 0, 512);
+N					
+N					USART_OUT(USART1,"%s\r\n", latitudedtbuf);
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),"%s\r\n", latitudedtbuf);
+N					USART_OUT(USART1,"%s\r\n", longitudedtbuf);	
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),"%s\r\n", longitudedtbuf);	
+N							
+N					memset(send_buff, 0, 100);
+N					sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/", PARK_LOCK_Buffer,",64,2\r\n");
+N					ret = gprs_send_at(send_buff, ">", 300, 0);
 N					if(ret != NULL)
 X					if(ret != 0)
 N					{
-N						
+N						memset(expressText, 0 ,512);
+N						memset(cipherText, 0 ,512);
+N						sprintf((char *)expressText,"%c%s,%s%c",'{',longitudedtbuf,latitudedtbuf,'}',48);
+N						USART_OUT(USART1, "expressText=%s\r\n", expressText);
+X						USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "expressText=%s\r\n", expressText);
+N						AES_Encrypt((char *)expressText, cipherText, aesKey);
+N						USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
+X						USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "aesKey=%s\r\n", aesKey);
+N						USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+X						USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "cipherText=%s\r\n", cipherText);
+N						ret = gprs_send_at(cipherText, "OK", 400, 0);
+N						if(ret != NULL)
+X						if(ret != 0)
+N						{
+N							
+N						}	
 N					}	
-N				}	
 N
-N				GPS_POW_LOW();
-X				GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0010));
-N				gps_send_flag = 1;
-N				break;
-N			}
-N			else
-N			{
-N				if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
-N				{
+N					GPS_POW_LOW();
+X					GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0010));
 N					gps_send_flag = 1;
 N					break;
 N				}
+N				else
+N				{
+N					if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
+N					{
+N						gps_send_flag = 1;
+N						break;
+N					}
 N
-N			}				
+N				}				
 N		}
 N	}
 N		

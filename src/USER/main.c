@@ -203,8 +203,7 @@ int main(void)
 			gprs_config();
 			if(gprs_status == 255)
 			{
-				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);
-				
+				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);			
 				break;
 			}
 		}
@@ -212,50 +211,50 @@ int main(void)
 	
 		if(gps_send_flag == 1)
 		{
-		while(1)
-		{
-			usart3_recv_data();
-			GPS_Analysis(&gpsx, gps_buff);
-			Gps_Msg_Show();
-			if(gpsx.latitude>0 && gpsx.longitude>0)
+			while(1)
 			{
-				memset(gps_buff, 0, 512);
-				
-				USART_OUT(USART1,"%s\r\n", latitudedtbuf);
-				USART_OUT(USART1,"%s\r\n", longitudedtbuf);	
-						
-				memset(send_buff, 0, 100);
-				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",64,2\r\n");
-				ret = gprs_send_at(send_buff, ">", 300, 0);
-				if(ret != NULL)
+				usart3_recv_data();
+				GPS_Analysis(&gpsx, gps_buff);
+				Gps_Msg_Show();
+				if(gpsx.latitude>0 && gpsx.longitude>0)
 				{
-					memset(expressText, 0 ,512);
-					memset(cipherText, 0 ,512);
-					sprintf((char *)expressText,"%c%s,%s%c",'{',longitudedtbuf,latitudedtbuf,'}',48);
-					USART_OUT(USART1, "expressText=%s\r\n", expressText);
-					AES_Encrypt((char *)expressText, cipherText, aesKey);
-					USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-					USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-					ret = gprs_send_at(cipherText, "OK", 400, 0);
+					memset(gps_buff, 0, 512);
+					
+					USART_OUT(USART1,"%s\r\n", latitudedtbuf);
+					USART_OUT(USART1,"%s\r\n", longitudedtbuf);	
+							
+					memset(send_buff, 0, 100);
+					sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/", PARK_LOCK_Buffer,",64,2\r\n");
+					ret = gprs_send_at(send_buff, ">", 300, 0);
 					if(ret != NULL)
 					{
-						
+						memset(expressText, 0 ,512);
+						memset(cipherText, 0 ,512);
+						sprintf((char *)expressText,"%c%s,%s%c",'{',longitudedtbuf,latitudedtbuf,'}',48);
+						USART_OUT(USART1, "expressText=%s\r\n", expressText);
+						AES_Encrypt((char *)expressText, cipherText, aesKey);
+						USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
+						USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+						ret = gprs_send_at(cipherText, "OK", 400, 0);
+						if(ret != NULL)
+						{
+							
+						}	
 					}	
-				}	
 
-				GPS_POW_LOW();
-				gps_send_flag = 1;
-				break;
-			}
-			else
-			{
-				if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
-				{
+					GPS_POW_LOW();
 					gps_send_flag = 1;
 					break;
 				}
+				else
+				{
+					if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
+					{
+						gps_send_flag = 1;
+						break;
+					}
 
-			}				
+				}				
 		}
 	}
 		
