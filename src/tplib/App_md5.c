@@ -7,7 +7,7 @@
   ***************************************************************************/
 #define GLOBALS_APP_MD5
 //#include "stm32f4xx.h"
-#include "sys.h"
+//#include "sys.h"
 #include <stdio.h>
 #include <string.h>
 #include "App_md5.h"

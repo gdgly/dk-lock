@@ -1,5 +1,6 @@
 #ifndef _APP_MD5_H
 #define _APP_MD5_H
+#include "bsp.h"
 
 typedef unsigned long UINT4;   
 typedef unsigned char *POINTER;   

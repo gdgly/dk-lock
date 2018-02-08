@@ -52,6 +52,53 @@ u8 usart4_rx_status = 0;
 u8 usart5_rx_status = 0;
 
 
+
+
+
+
+void usart_gpio_init(void)
+{
+	GPIO_InitTypeDef gpio_init_structure;
+	
+		// UART1
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_9;				// UART1 TX				    
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
+  	GPIO_Init(GPIOA, &gpio_init_structure);
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
+  	GPIO_Init(GPIOA, &gpio_init_structure);
+	
+	// UART2
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_2;				// UART2 TX				    
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
+  	GPIO_Init(GPIOA, &gpio_init_structure);
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_3;				
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
+  	GPIO_Init(GPIOA, &gpio_init_structure);
+
+
+	// UART3
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART3 TX				    
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
+  	GPIO_Init(GPIOB, &gpio_init_structure);
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
+  	GPIO_Init(GPIOB, &gpio_init_structure);
+	
+
+}
+
+
+
+
+
+
 /*
 *********************************************************************************************************
 *                                          usart1_init()

@@ -1,7 +1,7 @@
 #ifndef __GPS_H
 #define __GPS_H	 
-#include "sys.h"  
-	
+//#include "sys.h"  
+	#include "bsp.h"
 
 //GPS NMEA-0183协议重要参数结构体定义 
 //卫星信息

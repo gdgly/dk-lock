@@ -17,7 +17,7 @@
 #include "common.h"
 #include "timer.h"
 #include "usart.h"
-#include "usart3.h"
+//#include "usart3.h"
 #include "adc.h"
 
 /*
@@ -76,7 +76,6 @@ void bsp_rcc_init(void)
 	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 	
-	
 }
 
 
@@ -95,7 +94,7 @@ void bsp_rcc_init(void)
 void iwatchdog_config(void)
 {
 	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-	IWDG_SetPrescaler(IWDG_Prescaler_256);
+	IWDG_SetPrescaler(IWDG_Prescaler_64);
 	IWDG_SetReload(0xFFE);
 	IWDG_ReloadCounter();
 	IWDG_Enable();		
@@ -218,84 +217,6 @@ void gpio_init(void)
 }
 
 
-void lock_open(void)
-{
-	MOTOA_LOW();
-	MOTOB_HIGH();
-}
-
-void lock_close(void)
-{
-	MOTOA_HIGH();
-	MOTOB_LOW();
-}
-
-void lock_stop(void)
-{
-	MOTOA_LOW();
-	MOTOB_LOW();
-}
-
-u8 lock_on_status_get(void)
-{
-	u8 i = 0;
-	u8 ret = 0;
-	u8 cnt = 0;
-	for(i=0; i<30; i++)
-	{
-		if(LOCK_ON_READ() == 0)
-		{
-			cnt++;
-		}
-		else
-		{
-			cnt = 0;
-		}
-	}
-	
-	if(cnt >= 10)
-	{
-		ret = 0;
-	}
-	else
-	{
-		ret = 1;
-	}
-	
-	return ret;
-}
-
-
-u8 lock_off_status_get(void)
-{
-	u8 i = 0;
-	u8 ret = 0;
-	u8 cnt = 0;
-	
-	for(i=0; i<30; i++)
-	{
-		if(LOCK_OFF_READ() == 0)
-		{
-			cnt++;
-		}
-		else
-		{
-			cnt = 0;
-		}
-	}
-	if(cnt >= 10)
-	{
-		ret = 0;
-	}
-	else
-	{
-		ret = 1;
-	}
-	
-	return ret;
-}
-
-
 
 void bsp_nvic_init(void)
 {
@@ -354,8 +275,8 @@ void bsp_init(void)
 //	iwatchdog_config();
 	usart1_init(115200, 8, 0, 1);
 	usart2_init(115200);
-//	usart3_init(9600);
-	USART3_Init(9600); 
+	usart3_init(9600);
+
 	timer2_init(200, 41);
 //	RTC_Init();
 //	AT24CXX_Init();   

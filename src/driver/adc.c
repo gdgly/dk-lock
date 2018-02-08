@@ -1,5 +1,5 @@
  #include "adc.h"
- #include "delay.h"
+
 #include "stm32f10x_adc.h"
 #include "timer.h"
 

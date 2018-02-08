@@ -1,5 +1,5 @@
 #include "gps.h" 
-#include "delay.h"								   
+//#include "delay.h"								   
 #include "stdio.h"	 
 #include "stdarg.h"	 
 #include "string.h"	 

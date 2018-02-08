@@ -11,9 +11,13 @@ button_info_s button_info[BUTTON_SUM];
 
 void button_gpio_init(void)
 {
-
+	GPIO_InitTypeDef gpio_init_structure;
 	
-
+	//button
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_6;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
+	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
+  	GPIO_Init(GPIOC, &gpio_init_structure);
 }
 
 
@@ -124,8 +128,6 @@ button_state_e button_get_state(u8 button_name, u32 long_time)
 		
 		}
 	}
-	
-	
 	
 	
 	return button_info[button_name].butt_state;

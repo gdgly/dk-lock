@@ -1,7 +1,7 @@
 #ifndef __TIMER_H
 #define __TIMER_H
-#include "sys.h"
-  
+//#include "sys.h"
+#include "bsp.h"  
 extern  u8 Lock_Open_Tim5s;
 extern u8 Lock_Close_Tim5s;
 
