@@ -63,9 +63,7 @@ u8 Bat_Pre_Flag=0;
 
 u8 *p1;
 u8 *p2;
-//topic:bell
-//u8 *p3;
-//u8 *p4;
+
 
 
 u8 lock_open_err_flag = 0;
@@ -73,11 +71,11 @@ u8 lock_close_err_flag = 0;
 u8 Lock_Open=0;
 u8 Lock_Open_On=0;
 u8 Lock_Open_Off=0;
-u8 Lock_Open_Tim5s;
+
 u8 Lock_Close=0;
 u8 Lock_Close_On=0;
 u8 Lock_Close_Off=0;
-u8 Lock_Close_Tim5s=0;//ÕÏ°­Îï±¨¾¯¹Ø
+
 
 
 
@@ -108,7 +106,6 @@ extern uint8_t gprs_status;
 
 extern u8 usart2_buff[512];
 extern u16 usart2_cnt; 
-
 
 extern u8 usart3_buff[512];
 extern u16 usart3_cnt;  
@@ -181,15 +178,13 @@ int main(void)
 	u8 upload=0; 
 	u8 *ret;
 	uint8_t status = 0;
-	u8 tt = 0;
+//	u8 tt = 0;
 	static u8 gps_send_flag = 0;
 //	struct AES_ctx ctx;
 	
 	bsp_init();
                                   
 	USART_OUT(USART1, "uart1 is ok\r\n");
-
-	GPS_POW_HIGH();
 
 	while(1)
 	{	 
@@ -205,8 +200,9 @@ int main(void)
 		}
 	
 	
-		if(gps_send_flag == 1)
+		if(gps_send_flag == 0)
 		{
+			GPS_POW_HIGH();
 			while(1)
 			{
 				usart3_recv_data();
@@ -251,8 +247,8 @@ int main(void)
 					}
 
 				}				
+			}
 		}
-	}
 		
 		usart1_recv_data();
 		usart2_recv_data();
@@ -264,10 +260,10 @@ int main(void)
 		Bat_V=Bat_V*88/20;
 		Bat_Pre=(Bat_V-5000)*100/2400;
 		
-//		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
-		if(timer_is_timeout_1ms(timer_open_lock, 200000) == 0)
+		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
+//		if(timer_is_timeout_1ms(timer_open_lock, 200000) == 0)
 		{	
-
+			Bat_Pre_Flag =  1;
 			memset(send_buff, 0, 100);	
 			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
 
@@ -535,7 +531,7 @@ int main(void)
 			{
 				BEEP_ON();
 			}
-			if(timer_is_timeout_1ms(timer_bell_2, 300) == 0)
+			if(timer_is_timeout_1ms(timer_bell_2, 800) == 0)
 			{
 				BEEP_OFF();
 			}

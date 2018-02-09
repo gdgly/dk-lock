@@ -25730,10 +25730,11 @@ N*******************************************************************************
 N*/
 Nu8 *gprs_check_cmd(u8 *p_str)
 N{
-N	char *str = 0;
-N
-N	str = strstr((const char*)usart2_buff, (const char*)p_str);
+N	char *str = NULL;
+X	char *str = 0;
 N	
+N	str = strstr((const char*)usart2_buff, (const char*)p_str);
+N
 N	return (u8*)str;
 N}
 N
@@ -25756,12 +25757,11 @@ N*/
 Nu8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 N{
 N	u8 res = 1;
-N	u8 *buff;
+N	u8 buff[512] = {0};
 N	
 N	timer_is_timeout_1ms(timer_at, 0);	//开始定时器timer_at
 N	while (res)
-N	{
-N		
+N	{	
 N		memset(usart2_buff, 0, 512);
 N		usart2_cnt = 0;
 N		
@@ -25769,17 +25769,21 @@ N		usart2_rx_status = 0;
 N		USART_OUT(USART2, cmd);							
 X		USART_OUT(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), cmd);							
 N		timer_delay_1ms(waittime);				//AT指令延时
-N
-N		USART_OUT(USART1, usart2_buff);
-X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), usart2_buff);
+N	
 N		usart2_rx_status = 1;	//数据未处理 不在接收数据
-N		
+N		USART_OUT(USART1, "usart2_buff=%s", usart2_buff);
+X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "usart2_buff=%s", usart2_buff);
+N
 N		if (gprs_check_cmd(ack))	
 N		{
 N			res = 0;				//监测到正确的应答数据
 N			usart2_rx_status = 0;	//数据处理完 开始接收数据
+N//			USART_OUT(USART1, "usart2_buff222=%s", usart2_buff);
+N//			strncpy((char*)buff, (const char*)usart2_buff, 512);
 N			memcpy(buff, usart2_buff, 512);
-N			memset(usart2_buff, 0, 512);
+N			USART_OUT(USART1,  buff);
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),  buff);
+N			memset(usart2_buff, 0, 512); 	//清理usart接收缓冲区
 N			usart2_cnt = 0;		
 N			return buff;
 N		}
@@ -25793,9 +25797,6 @@ X			return 0;
 N		}
 N	}	
 N}
-N
-N
-N
 N
 N
 N
@@ -25838,11 +25839,15 @@ N			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,10000);
 N			if (ret != NULL)
 X			if (ret != 0)
 N			{
+N				USART_OUT(USART1, "MQTT=%s\r\n", ret);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "MQTT=%s\r\n", ret);
 N				if(strstr((char*)ret, "MQTT READY") != NULL)
 X				if(strstr((char*)ret, "MQTT READY") != 0)
 N				{
 N					gprs_status++;
 N					gprs_err_cnt = 0;
+N					USART_OUT(USART1, "STATUS=%d\r\n", gprs_status);
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "STATUS=%d\r\n", gprs_status);
 N				}
 N				else if(strstr((char*)ret, "MQTT CONNECT OK") != NULL)
 X				else if(strstr((char*)ret, "MQTT CONNECT OK") != 0)
@@ -26311,35 +26316,7 @@ N
 N
 N
 N
-N/*
-N*********************************************************************************************************
-N*                                          gprs_recv_task_fun()
-N*
-N* Description : Create application tasks.
-N*
-N* Argument(s) : none
-N*
-N* Return(s)   : none
-N*
-N* Caller(s)   : AppTaskStart()
-N*
-N* Note(s)     : none.
-N*********************************************************************************************************
-N*/
-Nstatic void gprs_recv_task_fun(void *p_arg)
-N{
-N//	OS_ERR err;
 N
-N
-N
-N	while(1)
-N	{	
-N
-N		usart2_recv_data();
-N		
-N	}
-N		
-N}
 N
 N
 N

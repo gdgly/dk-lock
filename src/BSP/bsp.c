@@ -17,7 +17,7 @@
 #include "common.h"
 #include "timer.h"
 #include "usart.h"
-//#include "usart3.h"
+#include "pwm.h"
 #include "adc.h"
 
 /*
@@ -68,6 +68,7 @@ void bsp_rcc_init(void)
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);	
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);	
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);	
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB , ENABLE);
@@ -231,6 +232,13 @@ void bsp_nvic_init(void)
     nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
     nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic_init_structure);
+	
+		// TIM3
+	nvic_init_structure.NVIC_IRQChannel = TIM3_IRQn;
+    nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 0;    //
+    nvic_init_structure.NVIC_IRQChannelSubPriority = 3;
+    nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&nvic_init_structure);
 
 	
 	// USART1
@@ -272,12 +280,15 @@ void bsp_init(void)
 	bsp_rcc_init();
 	bsp_nvic_init();
 	gpio_init();
+//	pwm_gpio_init();
 //	iwatchdog_config();
 	usart1_init(115200, 8, 0, 1);
 	usart2_init(115200);
 	usart3_init(9600);
 
 	timer2_init(200, 41);
+//	pwm_timer3_init(9999, 143);
+//	pwm3_init(30);
 //	RTC_Init();
 //	AT24CXX_Init();   
 	Adc_Init();

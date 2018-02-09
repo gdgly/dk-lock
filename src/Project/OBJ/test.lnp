@@ -12,6 +12,7 @@
 ".\obj\button.o"
 ".\obj\gprs.o"
 ".\obj\motor.o"
+".\obj\pwm.o"
 ".\obj\aes.o"
 ".\obj\app_md5.o"
 ".\obj\aes128.o"

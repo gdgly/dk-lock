@@ -17,5 +17,6 @@
 .\obj\bsp.o: ..\system\common.h
 .\obj\bsp.o: ..\driver\timer.h
 .\obj\bsp.o: ..\driver\usart.h
+.\obj\bsp.o: ..\driver\pwm.h
 .\obj\bsp.o: ..\driver\adc.h
 .\obj\bsp.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h

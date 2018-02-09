@@ -113,10 +113,10 @@ void gprs_power_on(void)
 */
 u8 *gprs_check_cmd(u8 *p_str)
 {
-	char *str = 0;
-
-	str = strstr((const char*)usart2_buff, (const char*)p_str);
+	char *str = NULL;
 	
+	str = strstr((const char*)usart2_buff, (const char*)p_str);
+
 	return (u8*)str;
 }
 
@@ -139,28 +139,30 @@ u8 *gprs_check_cmd(u8 *p_str)
 u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 {
 	u8 res = 1;
-	u8 *buff;
+	u8 buff[512] = {0};
 	
 	timer_is_timeout_1ms(timer_at, 0);	//开始定时器timer_at
 	while (res)
-	{
-		
+	{	
 		memset(usart2_buff, 0, 512);
 		usart2_cnt = 0;
 		
 		usart2_rx_status = 0;
 		USART_OUT(USART2, cmd);							
 		timer_delay_1ms(waittime);				//AT指令延时
-
-		USART_OUT(USART1, usart2_buff);
+	
 		usart2_rx_status = 1;	//数据未处理 不在接收数据
-		
+		USART_OUT(USART1, "usart2_buff=%s", usart2_buff);
+
 		if (gprs_check_cmd(ack))	
 		{
 			res = 0;				//监测到正确的应答数据
 			usart2_rx_status = 0;	//数据处理完 开始接收数据
+//			USART_OUT(USART1, "usart2_buff222=%s", usart2_buff);
+//			strncpy((char*)buff, (const char*)usart2_buff, 512);
 			memcpy(buff, usart2_buff, 512);
-			memset(usart2_buff, 0, 512);
+			USART_OUT(USART1,  buff);
+			memset(usart2_buff, 0, 512); 	//清理usart接收缓冲区
 			usart2_cnt = 0;		
 			return buff;
 		}
@@ -173,9 +175,6 @@ u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 		}
 	}	
 }
-
-
-
 
 
 
@@ -216,10 +215,12 @@ void gprs_config(void)
 			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,10000);
 			if (ret != NULL)
 			{
+				USART_OUT(USART1, "MQTT=%s\r\n", ret);
 				if(strstr((char*)ret, "MQTT READY") != NULL)
 				{
 					gprs_status++;
 					gprs_err_cnt = 0;
+					USART_OUT(USART1, "STATUS=%d\r\n", gprs_status);
 				}
 				else if(strstr((char*)ret, "MQTT CONNECT OK") != NULL)
 				{
@@ -674,35 +675,7 @@ static void gprs_init_task_fun(void *p_arg)
 
 
 
-/*
-*********************************************************************************************************
-*                                          gprs_recv_task_fun()
-*
-* Description : Create application tasks.
-*
-* Argument(s) : none
-*
-* Return(s)   : none
-*
-* Caller(s)   : AppTaskStart()
-*
-* Note(s)     : none.
-*********************************************************************************************************
-*/
-static void gprs_recv_task_fun(void *p_arg)
-{
-//	OS_ERR err;
 
-
-
-	while(1)
-	{	
-
-		usart2_recv_data();
-		
-	}
-		
-}
 
 
 

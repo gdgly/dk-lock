@@ -23911,7 +23911,29 @@ N
 N
 N
 L 20 "..\BSP\bsp.c" 2
-N//#include "usart3.h"
+N#include "pwm.h"
+L 1 "..\driver\pwm.h" 1
+N
+N
+N#ifndef __PWM_H_
+N#define __PWM_H_
+N#include "bsp.h"
+N
+N
+N
+N
+N
+N
+N
+N
+N
+Nvoid pwm_gpio_init(void); 
+Nvoid pwm_timer3_init(u16 arr, u16 psc);
+Nvoid pwm3_init(float dutyfactor);
+N
+N
+N#endif
+L 21 "..\BSP\bsp.c" 2
 N#include "adc.h"
 L 1 "..\driver\adc.h" 1
 N#ifndef __ADC_H
@@ -24485,6 +24507,8 @@ N	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 X	RCC_APB1PeriphClockCmd(((uint32_t)0x00020000), 1);	
 N	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);	
 X	RCC_APB1PeriphClockCmd(((uint32_t)0x00040000), 1);	
+N	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+X	RCC_APB1PeriphClockCmd(((uint32_t)0x00000002), 1);
 N	
 N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
 X	RCC_APB2PeriphClockCmd(((uint32_t)0x00000004) , 1);
@@ -24683,6 +24707,14 @@ N    nvic_init_structure.NVIC_IRQChannelSubPriority = 2;
 N    nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;
 X    nvic_init_structure.NVIC_IRQChannelCmd = 1;
 N    NVIC_Init(&nvic_init_structure);
+N	
+N		// TIM3
+N	nvic_init_structure.NVIC_IRQChannel = TIM3_IRQn;
+N    nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 0;    //
+N    nvic_init_structure.NVIC_IRQChannelSubPriority = 3;
+N    nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;
+X    nvic_init_structure.NVIC_IRQChannelCmd = 1;
+N    NVIC_Init(&nvic_init_structure);
 N
 N	
 N	// USART1
@@ -24727,12 +24759,15 @@ N{
 N	bsp_rcc_init();
 N	bsp_nvic_init();
 N	gpio_init();
+N//	pwm_gpio_init();
 N//	iwatchdog_config();
 N	usart1_init(115200, 8, 0, 1);
 N	usart2_init(115200);
 N	usart3_init(9600);
 N
 N	timer2_init(200, 41);
+N//	pwm_timer3_init(9999, 143);
+N//	pwm3_init(30);
 N//	RTC_Init();
 N//	AT24CXX_Init();   
 N	Adc_Init();
