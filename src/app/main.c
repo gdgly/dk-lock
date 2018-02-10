@@ -252,7 +252,6 @@ int main(void)
 		
 		usart1_recv_data();
 		usart2_recv_data();
-
 	
 		// µÁ≥ÿ–≈œ¢
 		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
