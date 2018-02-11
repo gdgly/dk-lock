@@ -27,7 +27,7 @@ u8 button_get_value(void)
 	u8 i = 0;
 	u8 button_cnt = 0;
 	
-	for(i=0; i<10; i++)
+	for(i=0; i<30; i++)
 	{
 		if(BUTTON1_READ() == 0)
 		{
@@ -39,7 +39,7 @@ u8 button_get_value(void)
 		}
 	}
 	
-	if(button_cnt >= 10)
+	if(button_cnt >= 30)
 	{
 		return 0;
 	}

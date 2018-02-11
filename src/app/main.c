@@ -1,11 +1,9 @@
 
-//#include "delay.h" 
+
 #include "gps.h"
 #include "string.h"		
 #include "stdlib.h"
-//#include "usart3.h"
-//#include "24cxx.h"
-//#include "myiic.h"
+
 #include "adc.h"
 #include "bsp.h"
 #include "timer.h"
@@ -13,33 +11,13 @@
 #include "usart.h"
 #include "aes.h"
 #include "aes128.h"
-//#include "led.h"
 #include "app_md5.h"
-
-
-
-//gps
-//char Gps_Longi_At24C[8];
-//char Gps_Lati_At24C[7];
-//char Gps_Longi_At24C_Read[8];
-//char Gps_Lati_At24C_Read[7];
-//u32 Gps_longi;
-//u32 Gps_Lati;
-//u8 USART1_TX_BUF[512]; 					//串口1,发送缓存区
-
 
 
 u8 receiveText[24];
 u8 expressText[512];  
 u8 cipherText[512];
 u8 aesKey[16];
-
-
-//u8 PublishLockBackbuf[35];
-//u8 PublishDataBatbuf[100];
-//u8 PublishDataGpsbuf[45];
-//u8 PublishDataSelfCheckbuf[35];
-
 
 
 
@@ -183,7 +161,8 @@ int main(void)
 //	struct AES_ctx ctx;
 	
 	bsp_init();
-                                  
+	
+                         
 	USART_OUT(USART1, "uart1 is ok\r\n");
 
 	while(1)
@@ -198,11 +177,10 @@ int main(void)
 				break;
 			}
 		}
-	
-	
+	//GPS
 		if(gps_send_flag == 0)
 		{
-			GPS_POW_HIGH();
+		    GPS_POW_HIGH();  
 			while(1)
 			{
 				usart3_recv_data();
@@ -238,10 +216,11 @@ int main(void)
 					gps_send_flag = 1;
 					break;
 				}
-				else
+				else 
 				{
 					if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
 					{
+						GPS_POW_LOW();
 						gps_send_flag = 1;
 						break;
 					}
@@ -292,7 +271,7 @@ int main(void)
 
 				memset(send_buff, 0, 100);
 				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-				USART_OUT(USART1, "wangzhongya=%s\r\n", send_buff);
+				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
 				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
@@ -310,15 +289,14 @@ int main(void)
 				}
 			}
 		}
-//		//开锁
+//		//接收锁数据
 		p1 = strstr((u8*)protocol_buff, "topic: lock/");
 		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
 		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
 		{
-	
-			timer_is_timeout_1ms(timer_open_lock, 0);
-			timer_is_timeout_1ms(timer_close_lock, 0);
-			
+		
+			if(LOCK_ON_READ()==0 || LOCK_OFF_READ()==0)
+			{
 			USART_OUT(USART1, "lock data\r\n");
 			memset(receiveText ,0 , 512);
 			memset(expressText ,0 , 512);
@@ -326,15 +304,16 @@ int main(void)
 			strcpy((char*)receiveText ,(char *)(p1+33));
 			USART_OUT(USART1, "receiveText=%s\r\n", receiveText);
 			AES_Decrypt(expressText, receiveText, aesKey);
-	
-			USART_OUT(USART1, "expressText=%s\r\n", expressText);
 			if(*expressText==0x31)
 			{
-				if(LOCK_ON_READ() == 0)
+//				if(LOCK_ON_READ() == 0)
+//				if(lock_on_status_get() == 0)
+				if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
 				{
+					timer_is_timeout_1ms(timer_open_lock, 0);
 					Shaking=1;
 					Lock_Open=1;
-					USART_OUT(USART1, "Lock_Open\r\n");
+					USART_OUT(USART1, "Lock_Open11111\r\n");
 				}
 				else
 				{
@@ -343,8 +322,11 @@ int main(void)
 			}
 			else if(*expressText==0x32)
 			{
-				if(LOCK_OFF_READ() == 0)
+//				if(LOCK_OFF_READ() == 0)
+//				if(lock_off_status_get() == 0)
+				if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	
 				{
+					timer_is_timeout_1ms(timer_close_lock, 0);
 					Shaking=1;
 					Lock_Close=1;
 					USART_OUT(USART1, "Lock_Close11111\r\n");
@@ -362,25 +344,25 @@ int main(void)
 			
 			memset(protocol_buff, 0, 512);					
 		}
-		
+	}
 
 		//开锁逻辑		
 		if(Lock_Open == 1)
 		{
+
 			if(timer_is_timeout_1ms(timer_open_lock, 4000) == 0)
 			{
-				lock_open_err_flag = 1;					
+				lock_open_err_flag = 1;
+				
 				lock_close();
 				USART_OUT(USART1, "Lock_Open timer\r\n");
 			}
 			USART_OUT(USART1, "Lock_Open\r\n");
 			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
 			{
-				lock_open();	//开锁
-				
+				lock_open();	//开锁	
 				USART_OUT(USART1, "AAA lock_open\r\n");
 			}
-
 //			if(LOCK_OFF_READ()==0) //正常开锁
 			if(lock_off_status_get() == 0)
 			{
@@ -391,7 +373,7 @@ int main(void)
 				Shaking = 0;
 				
 				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
 				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
@@ -416,9 +398,9 @@ int main(void)
 				Lock_Open = 0;
 				lock_stop();
 				Shaking = 0;
-		
+				USART_OUT(USART1, "open lock unusual\r\n");
 				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
 				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
@@ -444,11 +426,11 @@ int main(void)
 				lock_close_err_flag = 1;
 				USART_OUT(USART1, "Lock_Close timer\r\n");
 			}
-			USART_OUT(USART1, "BBB Lock_Close\r\n");
+			USART_OUT(USART1, "lock close\r\n");
 			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	//正常关锁
 			{
 				lock_close();
-				USART_OUT(USART1, "BBB lock_close\r\n");
+				USART_OUT(USART1, "BBB lock close\r\n");
 			}
 			
 //			if(LOCK_ON_READ() == 0)	//正常关锁
@@ -483,9 +465,9 @@ int main(void)
 				Lock_Close = 0;
 				lock_stop();	//停止运行
 				Shaking = 0;
-		
+				USART_OUT(USART1, "close lock unusual\r\n");
 				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
 				ret = gprs_send_at(send_buff, ">", 300, 0);
 				if(ret != NULL)
 				{
@@ -502,6 +484,15 @@ int main(void)
 				}
 			}		
 		}
+		//按键
+		if(button_get_value() == 0)
+		{
+			USART_OUT(USART1, "button_get_value\r\n");
+			timer_is_timeout_1ms(timer_close_lock, 0);
+			Lock_Close = 1;
+			Shaking=1;	
+		}
+			
 		
 		//报警器
 		p1 = strstr((char*)protocol_buff, "topic: bell/");
@@ -525,7 +516,7 @@ int main(void)
 		//晃动报警
 		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1 && Shaking==0)
 		{
-			
+			USART_OUT(USART1, "Sharking\r\n");
 			if(timer_is_timeout_1ms(timer_bell_1, 400) == 0)
 			{
 				BEEP_ON();
@@ -534,11 +525,6 @@ int main(void)
 			{
 				BEEP_OFF();
 			}
-
-			
-//			timer_delay_1ms(100);
-			
-//			timer_delay_1ms(300);
 		}
 		else
 		{
@@ -551,16 +537,10 @@ int main(void)
 		{
 			memset(protocol_buff, 0, 512);	
 			gprs_status = 0;
+			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
 		}
 		
-		if(button_get_value() == 0)
-		{
-			USART_OUT(USART1, "button_get_value");
-			timer_is_timeout_1ms(timer_close_lock, 0);
-			Lock_Close = 1;
-			Shaking=1;	
-		}
-			
+
 		//心跳
 		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
 		{

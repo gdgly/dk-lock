@@ -215,7 +215,6 @@ void gprs_config(void)
 			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,10000);
 			if (ret != NULL)
 			{
-				USART_OUT(USART1, "MQTT=%s\r\n", ret);
 				if(strstr((char*)ret, "MQTT READY") != NULL)
 				{
 					gprs_status++;
@@ -357,13 +356,6 @@ void gprs_config(void)
 			gprs_status = 255;
 		break;
 			
-//		case 254:
-
-//		break;			
-//		
-//		case 255:
-
-//		break;	
 		
 		default:
 		break;				

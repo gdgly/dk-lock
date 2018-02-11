@@ -25401,7 +25401,7 @@ N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N//#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
 N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
 N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
@@ -25839,8 +25839,6 @@ N			ret = gprs_send_at("AT+STATUS\r\n", "OK", 800,10000);
 N			if (ret != NULL)
 X			if (ret != 0)
 N			{
-N				USART_OUT(USART1, "MQTT=%s\r\n", ret);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "MQTT=%s\r\n", ret);
 N				if(strstr((char*)ret, "MQTT READY") != NULL)
 X				if(strstr((char*)ret, "MQTT READY") != 0)
 N				{
@@ -25996,13 +25994,6 @@ N		case 9:
 N			gprs_status = 255;
 N		break;
 N			
-N//		case 254:
-N
-N//		break;			
-N//		
-N//		case 255:
-N
-N//		break;	
 N		
 N		default:
 N		break;				

@@ -23739,7 +23739,7 @@ N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N//#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
 N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
 N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
@@ -23804,7 +23804,7 @@ N	u8 val = 0;
 N	u8 i = 0;
 N	u8 button_cnt = 0;
 N	
-N	for(i=0; i<10; i++)
+N	for(i=0; i<30; i++)
 N	{
 N		if(BUTTON1_READ() == 0)
 X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0040)) == 0)
@@ -23817,7 +23817,7 @@ N			button_cnt = 0;
 N		}
 N	}
 N	
-N	if(button_cnt >= 10)
+N	if(button_cnt >= 30)
 N	{
 N		return 0;
 N	}

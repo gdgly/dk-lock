@@ -25366,7 +25366,7 @@ N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N//#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
 N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
 N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
@@ -25405,8 +25405,13 @@ L 9 "..\app\protocol.h" 2
 N#include <stm32f10x.h>
 N
 N
+Ntypedef struct
+N{
+N	u16 pdata_len;
+N	u8 *topic;
+N	u8 *pdata;
 N
-N
+N} mqtt_telegram_t;
 N
 N
 N
@@ -25498,6 +25503,47 @@ N
 N
 N
 L 7 "..\app\protocol.c" 2
+N#include "common.h"
+L 1 "..\system\common.h" 1
+N/*************************************************
+N  Copyright (C), 1988-1999,  Tech. Co., Ltd.
+N  File name:      
+N  Author:       Version:        Date:
+N  Description:   
+N  Others:         
+N  Function List:  
+N    1. ....
+N  History:         
+N                   
+N    1. Date:
+N       Author:
+N       Modification:
+N    2. ...
+N*************************************************/
+N#ifndef _COMMON_H
+N#define _COMMON_H
+N#include <stm32f10x.h>
+N
+N
+N#define F(x, y, z)	(((x) & (y)) | ((~x) & (z)))
+N#define	G(x, y, z)	(((x) & (z)) | ((y) & (~z)))
+N#define H(x, y, z)	((x) ^ (y) ^ (z))
+N#define I(x, y, z)	((y) ^ ((x) | (~z)))
+N
+N
+N
+Nvoid delay(uint32_t conut);
+Nvoid system_reset(void);
+Nuint8_t *str_picked(uint8_t *src_str, uint8_t *sub_str1, uint8_t *sub_str2, uint8_t *dst_str);
+Nuint8_t *mem_picked(uint8_t *src_str, uint8_t *sub_str, uint16_t len, uint8_t *dst_str);
+Nchar *itoa(int value, char *string, int radix);
+Nchar *mem_str(char *mem, int mem_len, char *sub_str);
+N
+N#endif
+N
+N
+L 8 "..\app\protocol.c" 2
+N
 N
 N
 Nextern u8 usart2_buff[512];
@@ -25509,7 +25555,12 @@ N
 N
 Nvoid protocol_analyze(void)
 N{
+N	mqtt_telegram_t mt;
+N	
+N	u8 topic_tmp[100] = {0};
 N	u8 topic[100] = {0};
+N	u8 buff[100] = {0};
+N	u16 data_len = 0;
 N	u8 *par = NULL;
 X	u8 *par = 0;
 N	usart2_recv_data();
@@ -25520,11 +25571,20 @@ N
 N	if(par != NULL)
 X	if(par != 0)
 N	{
-N		memcpy(topic, "topic: lock/", 12);
+N		par = str_picked(protocol_buff, "topic:", ",", mt.topic);
+N		if(par != NULL)
+X		if(par != 0)
+N		{
+N			
+N		}
 N	}
 N	
-N//	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);
+N	sprintf((char*)topic, "%s%s", "lock/", PARK_LOCK_Buffer);
 N	
+N	if(strcmp(topic_tmp, topic) == 0)
+N	{
+N		
+N	}
 N	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
 X	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != 0)
 N	{

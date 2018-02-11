@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\OBJ\test.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\OBJ\test.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060061: Last Updated: Fri Feb 09 18:18:38 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060061: Last Updated: Sat Feb 10 17:44:16 2018
 <BR><P>
 <H3>Maximum Stack Usage =       1288 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -639,6 +639,10 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_memclr
 </UL>
 
+<P><STRONG><a name="[116]"></a>strcmp</STRONG> (Thumb, 128 bytes, Stack size 0 bytes, strcmpv7m.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_get_lc_numeric
+</UL>
+
 <P><STRONG><a name="[155]"></a>__use_two_region_memory</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
 
 <P><STRONG><a name="[1]"></a>__rt_heap_escrow</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
@@ -854,10 +858,6 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__default_signal_display
 </UL>
 <BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_SIGRTMEM
-</UL>
-
-<P><STRONG><a name="[116]"></a>strcmp</STRONG> (Thumb, 128 bytes, Stack size 0 bytes, strcmpv7m.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_get_lc_numeric
 </UL>
 
 <P><STRONG><a name="[70]"></a>_sys_exit</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, sys_exit.o(.text))
@@ -1587,7 +1587,7 @@ Global Symbols
 <LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;KeyExpansion
 </UL>
 
-<P><STRONG><a name="[f1]"></a>gpio_init</STRONG> (Thumb, 348 bytes, Stack size 8 bytes, bsp.o(i.gpio_init))
+<P><STRONG><a name="[f1]"></a>gpio_init</STRONG> (Thumb, 342 bytes, Stack size 8 bytes, bsp.o(i.gpio_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = gpio_init &rArr; GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Init
@@ -1603,7 +1603,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gprs_send_at
 </UL>
 
-<P><STRONG><a name="[102]"></a>gprs_config</STRONG> (Thumb, 770 bytes, Stack size 528 bytes, gprs.o(i.gprs_config))
+<P><STRONG><a name="[102]"></a>gprs_config</STRONG> (Thumb, 758 bytes, Stack size 528 bytes, gprs.o(i.gprs_config))
 <BR><BR>[Stack]<UL><LI>Max Depth = 1264 + Unknown Stack Size
 <LI>Call Chain = gprs_config &rArr; gprs_send_at &rArr; USART_OUT &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>
@@ -1681,7 +1681,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[6b]"></a>main</STRONG> (Thumb, 2990 bytes, Stack size 24 bytes, main.o(i.main))
+<P><STRONG><a name="[6b]"></a>main</STRONG> (Thumb, 3116 bytes, Stack size 24 bytes, main.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 1288 + Unknown Stack Size
 <LI>Call Chain = main &rArr; gprs_config &rArr; gprs_send_at &rArr; USART_OUT &rArr; __2sprintf &rArr; _printf_char_common &rArr; __printf
 </UL>

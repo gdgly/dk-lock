@@ -18,3 +18,4 @@
 .\obj\protocol.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\misc.h
 .\obj\protocol.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_iwdg.h
 .\obj\protocol.o: ..\driver\usart.h
+.\obj\protocol.o: ..\system\common.h

@@ -23706,7 +23706,7 @@ N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N//#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
 N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
 N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
@@ -24650,7 +24650,6 @@ N
 N	//button
 N	gpio_init_structure.GPIO_Pin = GPIO_Pin_6;
 X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0040);
-N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
 N	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
 N  	GPIO_Init(GPIOC, &gpio_init_structure);
 X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), &gpio_init_structure);

@@ -4,98 +4,142 @@
 
                           AREA ||i.protocol_analyze||, CODE, READONLY, ALIGN=2
 
+                          REQUIRE _printf_percent
+                          REQUIRE _printf_s
+                          REQUIRE _printf_str
                   protocol_analyze PROC
-;;;15     
-;;;16     void protocol_analyze(void)
-000000  b510              PUSH     {r4,lr}
-;;;17     {
-000002  b09a              SUB      sp,sp,#0x68
-;;;18     	u8 topic[100] = {0};
+;;;17     
+;;;18     void protocol_analyze(void)
+000000  b530              PUSH     {r4,r5,lr}
+;;;19     {
+000002  b0cf              SUB      sp,sp,#0x13c
+;;;20     	mqtt_telegram_t mt;
+;;;21     	
+;;;22     	u8 topic_tmp[100] = {0};
 000004  2164              MOVS     r1,#0x64
-000006  a801              ADD      r0,sp,#4
+000006  a833              ADD      r0,sp,#0xcc
 000008  f7fffffe          BL       __aeabi_memclr4
-;;;19     	u8 *par = NULL;
-00000c  2400              MOVS     r4,#0
-;;;20     	usart2_recv_data();
-00000e  f7fffffe          BL       usart2_recv_data
-;;;21     		
-;;;22     	//topic: lock/0018131408143929,1
-;;;23     	par = strstr((char *)protocol_buff, "topic:");
-000012  a10f              ADR      r1,|L1.80|
-000014  4810              LDR      r0,|L1.88|
-000016  f7fffffe          BL       strstr
-00001a  4604              MOV      r4,r0
-;;;24     	
-;;;25     	if(par != NULL)
-00001c  b11c              CBZ      r4,|L1.38|
-;;;26     	{
-;;;27     		memcpy(topic, "topic: lock/", 12);
-00001e  a20f              ADR      r2,|L1.92|
-000020  ca07              LDM      r2,{r0-r2}
-000022  ab01              ADD      r3,sp,#4
-000024  c307              STM      r3!,{r0-r2}
-                  |L1.38|
-;;;28     	}
-;;;29     	
-;;;30     //	sprintf((char*)topic, "%s%s", "topic: lock/", PARK_LOCK_Buffer);
+;;;23     	u8 topic[100] = {0};
+00000c  2164              MOVS     r1,#0x64
+00000e  a81a              ADD      r0,sp,#0x68
+000010  f7fffffe          BL       __aeabi_memclr4
+;;;24     	u8 buff[100] = {0};
+000014  2164              MOVS     r1,#0x64
+000016  a801              ADD      r0,sp,#4
+000018  f7fffffe          BL       __aeabi_memclr4
+;;;25     	u16 data_len = 0;
+00001c  2500              MOVS     r5,#0
+;;;26     	u8 *par = NULL;
+00001e  2400              MOVS     r4,#0
+;;;27     	usart2_recv_data();
+000020  f7fffffe          BL       usart2_recv_data
+;;;28     		
+;;;29     	//topic: lock/0018131408143929,1
+;;;30     	par = strstr((char *)protocol_buff, "topic:");
+000024  a116              ADR      r1,|L1.128|
+000026  4818              LDR      r0,|L1.136|
+000028  f7fffffe          BL       strstr
+00002c  4604              MOV      r4,r0
 ;;;31     	
-;;;32     	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
-000026  a111              ADR      r1,|L1.108|
-000028  4815              LDR      r0,|L1.128|
-00002a  f7fffffe          BL       strstr
-00002e  b968              CBNZ     r0,|L1.76|
+;;;32     	if(par != NULL)
+00002e  b13c              CBZ      r4,|L1.64|
 ;;;33     	{
-;;;34     		
-;;;35     	}
-;;;36     	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
-000030  a901              ADD      r1,sp,#4
-000032  4813              LDR      r0,|L1.128|
-000034  f7fffffe          BL       strstr
-000038  b140              CBZ      r0,|L1.76|
-;;;37     	{
-;;;38     		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
-00003a  2110              MOVS     r1,#0x10
-00003c  4811              LDR      r0,|L1.132|
-00003e  f7fffffe          BL       GPIO_ReadInputDataBit
-000042  b118              CBZ      r0,|L1.76|
-000044  2120              MOVS     r1,#0x20
-000046  480f              LDR      r0,|L1.132|
-000048  f7fffffe          BL       GPIO_ReadInputDataBit
-                  |L1.76|
-;;;39     		{
-;;;40     			
-;;;41     			
-;;;42     		}
-;;;43     	}
-;;;44     
-;;;45     
-;;;46     }
-00004c  b01a              ADD      sp,sp,#0x68
-00004e  bd10              POP      {r4,pc}
-;;;47     
+;;;34     		par = str_picked(protocol_buff, "topic:", ",", mt.topic);
+000030  a216              ADR      r2,|L1.140|
+000032  a113              ADR      r1,|L1.128|
+000034  4814              LDR      r0,|L1.136|
+000036  9b4d              LDR      r3,[sp,#0x134]
+000038  f7fffffe          BL       str_picked
+00003c  4604              MOV      r4,r0
+;;;35     		if(par != NULL)
+00003e  bf00              NOP      
+                  |L1.64|
+;;;36     		{
+;;;37     			
+;;;38     		}
+;;;39     	}
+;;;40     	
+;;;41     	sprintf((char*)topic, "%s%s", "lock/", PARK_LOCK_Buffer);
+000040  4b13              LDR      r3,|L1.144|
+000042  a214              ADR      r2,|L1.148|
+000044  a115              ADR      r1,|L1.156|
+000046  a81a              ADD      r0,sp,#0x68
+000048  f7fffffe          BL       __2sprintf
+;;;42     	
+;;;43     	if(strcmp(topic_tmp, topic) == 0)
+00004c  a91a              ADD      r1,sp,#0x68
+00004e  a833              ADD      r0,sp,#0xcc
+000050  f7fffffe          BL       strcmp
+;;;44     	{
+;;;45     		
+;;;46     	}
+;;;47     	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
+000054  a113              ADR      r1,|L1.164|
+000056  4818              LDR      r0,|L1.184|
+000058  f7fffffe          BL       strstr
+00005c  b968              CBNZ     r0,|L1.122|
+;;;48     	{
+;;;49     		
+;;;50     	}
+;;;51     	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
+00005e  a91a              ADD      r1,sp,#0x68
+000060  4815              LDR      r0,|L1.184|
+000062  f7fffffe          BL       strstr
+000066  b140              CBZ      r0,|L1.122|
+;;;52     	{
+;;;53     		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
+000068  2110              MOVS     r1,#0x10
+00006a  4814              LDR      r0,|L1.188|
+00006c  f7fffffe          BL       GPIO_ReadInputDataBit
+000070  b118              CBZ      r0,|L1.122|
+000072  2120              MOVS     r1,#0x20
+000074  4811              LDR      r0,|L1.188|
+000076  f7fffffe          BL       GPIO_ReadInputDataBit
+                  |L1.122|
+;;;54     		{
+;;;55     			
+;;;56     			
+;;;57     		}
+;;;58     	}
+;;;59     
+;;;60     
+;;;61     }
+00007a  b04f              ADD      sp,sp,#0x13c
+00007c  bd30              POP      {r4,r5,pc}
+;;;62     
                           ENDP
 
-                  |L1.80|
-000050  746f7069          DCB      "topic:",0
-000054  633a00  
-000057  00                DCB      0
-                  |L1.88|
-                          DCD      protocol_buff
-                  |L1.92|
-00005c  746f7069          DCB      "topic: lock/",0
-000060  633a206c
-000064  6f636b2f
-000068  00      
-000069  00                DCB      0
-00006a  00                DCB      0
-00006b  00                DCB      0
-                  |L1.108|
-00006c  2b535441          DCB      "+STATUS: MQTT CLOSE",0
-000070  5455533a
-000074  204d5154
-000078  5420434c
-00007c  4f534500
+00007e  0000              DCW      0x0000
                   |L1.128|
+000080  746f7069          DCB      "topic:",0
+000084  633a00  
+000087  00                DCB      0
+                  |L1.136|
+                          DCD      protocol_buff
+                  |L1.140|
+00008c  2c00              DCB      ",",0
+00008e  00                DCB      0
+00008f  00                DCB      0
+                  |L1.144|
+                          DCD      PARK_LOCK_Buffer
+                  |L1.148|
+000094  6c6f636b          DCB      "lock/",0
+000098  2f00    
+00009a  00                DCB      0
+00009b  00                DCB      0
+                  |L1.156|
+00009c  25732573          DCB      "%s%s",0
+0000a0  00      
+0000a1  00                DCB      0
+0000a2  00                DCB      0
+0000a3  00                DCB      0
+                  |L1.164|
+0000a4  2b535441          DCB      "+STATUS: MQTT CLOSE",0
+0000a8  5455533a
+0000ac  204d5154
+0000b0  5420434c
+0000b4  4f534500
+                  |L1.184|
                           DCD      usart2_buff
-                  |L1.132|
+                  |L1.188|
                           DCD      0x40010800

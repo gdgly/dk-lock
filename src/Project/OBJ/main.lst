@@ -1,6 +1,6 @@
 L 1 "..\app\main.c"
 N
-N//#include "delay.h" 
+N
 N#include "gps.h"
 L 1 "..\driver\gps.h" 1
 N#ifndef __GPS_H
@@ -23698,7 +23698,7 @@ N#define LOCK_OFF_READ()			GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5)
 N
 N
 N
-N#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
+N//#define HAND()  				GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_6)//手动输入
 N//#define ALARM_LOCK_ON()  		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_4)//关锁报警
 N//#define ALARM_LOCK_OFF()   		GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_5)//开锁报警
 N
@@ -25414,9 +25414,7 @@ N#endif /* __stdlib_h */
 N
 N/* end of stdlib.h */
 L 6 "..\app\main.c" 2
-N//#include "usart3.h"
-N//#include "24cxx.h"
-N//#include "myiic.h"
+N
 N#include "adc.h"
 L 1 "..\driver\adc.h" 1
 N#ifndef __ADC_H
@@ -25937,7 +25935,7 @@ Nu16  Get_Adc(u8 ch);
 Nu16 Get_Adc_Average(u8 ch,u8 times); 
 N 
 N#endif 
-L 10 "..\app\main.c" 2
+L 8 "..\app\main.c" 2
 N#include "bsp.h"
 N#include "timer.h"
 L 1 "..\driver\timer.h" 1
@@ -25991,7 +25989,7 @@ N
 N
 N 
 N#endif
-L 12 "..\app\main.c" 2
+L 10 "..\app\main.c" 2
 N#include "gprs.h"
 L 1 "..\driver\gprs.h" 1
 N/*************************************************
@@ -26092,7 +26090,7 @@ Nstatic void gprs_recv_task_fun(void *p_arg);
 N
 N#endif
 N
-L 13 "..\app\main.c" 2
+L 11 "..\app\main.c" 2
 N#include "usart.h"
 L 1 "..\driver\usart.h" 1
 N/*************************************************
@@ -26168,7 +26166,7 @@ N
 N
 N
 N
-L 14 "..\app\main.c" 2
+L 12 "..\app\main.c" 2
 N#include "aes.h"
 L 1 "..\tplib\aes.h" 1
 N#ifndef _AES_H_
@@ -26178,7 +26176,7 @@ N#define RoundKeyLEN  300
 Nvoid AES_Encrypt(char* pExpressText , char* pCipherText , char* pAeskey);
 Nvoid AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey);
 N#endif
-L 15 "..\app\main.c" 2
+L 13 "..\app\main.c" 2
 N#include "aes128.h"
 L 1 "..\tplib\aes128.h" 1
 N#ifndef _AES128_H_
@@ -26280,8 +26278,7 @@ N#endif // #if defined(CTR) && (CTR == 1)
 N
 N
 N#endif //_AES_H_
-L 16 "..\app\main.c" 2
-N//#include "led.h"
+L 14 "..\app\main.c" 2
 N#include "app_md5.h"
 L 1 "..\tplib\app_md5.h" 1
 N#ifndef _APP_MD5_H
@@ -26321,32 +26318,13 @@ Nvoid MD5Update(MD5_CTX *, unsigned char *, unsigned int);
 Nvoid MD5Final(unsigned char [16], MD5_CTX *);   
 NMD5_CHECK MakeFile_MD5_Checksum(u8 *pPacket, u32 pPacket_len);
 N#endif//_APP_MD5_H
-L 18 "..\app\main.c" 2
-N
-N
-N
-N//gps
-N//char Gps_Longi_At24C[8];
-N//char Gps_Lati_At24C[7];
-N//char Gps_Longi_At24C_Read[8];
-N//char Gps_Lati_At24C_Read[7];
-N//u32 Gps_longi;
-N//u32 Gps_Lati;
-N//u8 USART1_TX_BUF[512]; 					//串口1,发送缓存区
-N
+L 15 "..\app\main.c" 2
 N
 N
 Nu8 receiveText[24];
 Nu8 expressText[512];  
 Nu8 cipherText[512];
 Nu8 aesKey[16];
-N
-N
-N//u8 PublishLockBackbuf[35];
-N//u8 PublishDataBatbuf[100];
-N//u8 PublishDataGpsbuf[45];
-N//u8 PublishDataSelfCheckbuf[35];
-N
 N
 N
 N
@@ -26494,7 +26472,8 @@ N	static u8 gps_send_flag = 0;
 N//	struct AES_ctx ctx;
 N	
 N	bsp_init();
-N                                  
+N	
+N                         
 N	USART_OUT(USART1, "uart1 is ok\r\n");
 X	USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "uart1 is ok\r\n");
 N
@@ -26510,12 +26489,11 @@ N				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);
 N				break;
 N			}
 N		}
-N	
-N	
+N	//GPS
 N		if(gps_send_flag == 0)
 N		{
-N			GPS_POW_HIGH();
-X			GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0010));
+N		    GPS_POW_HIGH();  
+X		    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0010));  
 N			while(1)
 N			{
 N				usart3_recv_data();
@@ -26559,10 +26537,12 @@ X					GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1
 N					gps_send_flag = 1;
 N					break;
 N				}
-N				else
+N				else 
 N				{
 N					if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
 N					{
+N						GPS_POW_LOW();
+X						GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0010));
 N						gps_send_flag = 1;
 N						break;
 N					}
@@ -26573,7 +26553,6 @@ N		}
 N		
 N		usart1_recv_data();
 N		usart2_recv_data();
-N
 N	
 N		// 电池信息
 N		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
@@ -26621,8 +26600,8 @@ N				Bat_Pre_Flag=0;
 N
 N				memset(send_buff, 0, 100);
 N				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-N				USART_OUT(USART1, "wangzhongya=%s\r\n", send_buff);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "wangzhongya=%s\r\n", send_buff);
+N				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "send_buff=%s\r\n", send_buff);
 N				ret = gprs_send_at(send_buff, ">", 300, 0);
 N				if(ret != NULL)
 X				if(ret != 0)
@@ -26642,15 +26621,15 @@ N					}
 N				}
 N			}
 N		}
-N//		//开锁
+N//		//接收锁数据
 N		p1 = strstr((u8*)protocol_buff, "topic: lock/");
 N		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
 N		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
 N		{
-N	
-N			timer_is_timeout_1ms(timer_open_lock, 0);
-N			timer_is_timeout_1ms(timer_close_lock, 0);
-N			
+N		
+N			if(LOCK_ON_READ()==0 || LOCK_OFF_READ()==0)
+X			if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==0 || GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==0)
+N			{
 N			USART_OUT(USART1, "lock data\r\n");
 X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "lock data\r\n");
 N			memset(receiveText ,0 , 512);
@@ -26660,18 +26639,18 @@ N			strcpy((char*)receiveText ,(char *)(p1+33));
 N			USART_OUT(USART1, "receiveText=%s\r\n", receiveText);
 X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "receiveText=%s\r\n", receiveText);
 N			AES_Decrypt(expressText, receiveText, aesKey);
-N	
-N			USART_OUT(USART1, "expressText=%s\r\n", expressText);
-X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "expressText=%s\r\n", expressText);
 N			if(*expressText==0x31)
 N			{
-N				if(LOCK_ON_READ() == 0)
-X				if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010)) == 0)
+N//				if(LOCK_ON_READ() == 0)
+N//				if(lock_on_status_get() == 0)
+N				if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
+X				if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==0 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==1)
 N				{
+N					timer_is_timeout_1ms(timer_open_lock, 0);
 N					Shaking=1;
 N					Lock_Open=1;
-N					USART_OUT(USART1, "Lock_Open\r\n");
-X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "Lock_Open\r\n");
+N					USART_OUT(USART1, "Lock_Open11111\r\n");
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "Lock_Open11111\r\n");
 N				}
 N				else
 N				{
@@ -26680,9 +26659,12 @@ N				}
 N			}
 N			else if(*expressText==0x32)
 N			{
-N				if(LOCK_OFF_READ() == 0)
-X				if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020)) == 0)
+N//				if(LOCK_OFF_READ() == 0)
+N//				if(lock_off_status_get() == 0)
+N				if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	
+X				if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==1 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==0)	
 N				{
+N					timer_is_timeout_1ms(timer_close_lock, 0);
 N					Shaking=1;
 N					Lock_Close=1;
 N					USART_OUT(USART1, "Lock_Close11111\r\n");
@@ -26701,14 +26683,16 @@ N			}
 N			
 N			memset(protocol_buff, 0, 512);					
 N		}
-N		
+N	}
 N
 N		//开锁逻辑		
 N		if(Lock_Open == 1)
 N		{
+N
 N			if(timer_is_timeout_1ms(timer_open_lock, 4000) == 0)
 N			{
-N				lock_open_err_flag = 1;					
+N				lock_open_err_flag = 1;
+N				
 N				lock_close();
 N				USART_OUT(USART1, "Lock_Open timer\r\n");
 X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "Lock_Open timer\r\n");
@@ -26718,12 +26702,10 @@ X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),
 N			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
 X			if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==0 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==1)
 N			{
-N				lock_open();	//开锁
-N				
+N				lock_open();	//开锁	
 N				USART_OUT(USART1, "AAA lock_open\r\n");
 X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "AAA lock_open\r\n");
 N			}
-N
 N//			if(LOCK_OFF_READ()==0) //正常开锁
 N			if(lock_off_status_get() == 0)
 N			{
@@ -26735,8 +26717,8 @@ N				lock_stop();	//停止运行
 N				Shaking = 0;
 N				
 N				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-N				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "PublishLockBackbuf=%s\r\n", send_buff);
+N				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "send_buff=%s\r\n", send_buff);
 N				ret = gprs_send_at(send_buff, ">", 300, 0);
 N				if(ret != NULL)
 X				if(ret != 0)
@@ -26766,10 +26748,11 @@ N				lock_open_err_flag = 0;
 N				Lock_Open = 0;
 N				lock_stop();
 N				Shaking = 0;
-N		
+N				USART_OUT(USART1, "open lock unusual\r\n");
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "open lock unusual\r\n");
 N				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-N				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "PublishLockBackbuf=%s\r\n", send_buff);
+N				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "send_buff=%s\r\n", send_buff);
 N				ret = gprs_send_at(send_buff, ">", 300, 0);
 N				if(ret != NULL)
 X				if(ret != 0)
@@ -26799,14 +26782,14 @@ N				lock_close_err_flag = 1;
 N				USART_OUT(USART1, "Lock_Close timer\r\n");
 X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "Lock_Close timer\r\n");
 N			}
-N			USART_OUT(USART1, "BBB Lock_Close\r\n");
-X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "BBB Lock_Close\r\n");
+N			USART_OUT(USART1, "lock close\r\n");
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "lock close\r\n");
 N			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	//正常关锁
 X			if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==1 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==0)	
 N			{
 N				lock_close();
-N				USART_OUT(USART1, "BBB lock_close\r\n");
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "BBB lock_close\r\n");
+N				USART_OUT(USART1, "BBB lock close\r\n");
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "BBB lock close\r\n");
 N			}
 N			
 N//			if(LOCK_ON_READ() == 0)	//正常关锁
@@ -26847,10 +26830,11 @@ N				lock_close_err_flag = 0;
 N				Lock_Close = 0;
 N				lock_stop();	//停止运行
 N				Shaking = 0;
-N		
+N				USART_OUT(USART1, "close lock unusual\r\n");
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "close lock unusual\r\n");
 N				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-N				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "PublishLockBackbuf=%s\r\n", send_buff);
+N				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "send_buff=%s\r\n", send_buff);
 N				ret = gprs_send_at(send_buff, ">", 300, 0);
 N				if(ret != NULL)
 X				if(ret != 0)
@@ -26869,6 +26853,16 @@ N					}
 N				}
 N			}		
 N		}
+N		//按键
+N		if(button_get_value() == 0)
+N		{
+N			USART_OUT(USART1, "button_get_value\r\n");
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "button_get_value\r\n");
+N			timer_is_timeout_1ms(timer_close_lock, 0);
+N			Lock_Close = 1;
+N			Shaking=1;	
+N		}
+N			
 N		
 N		//报警器
 N		p1 = strstr((char*)protocol_buff, "topic: bell/");
@@ -26896,7 +26890,8 @@ N		//晃动报警
 N		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1 && Shaking==0)
 X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==1 && GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020))==1 && Shaking==0)
 N		{
-N			
+N			USART_OUT(USART1, "Sharking\r\n");
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "Sharking\r\n");
 N			if(timer_is_timeout_1ms(timer_bell_1, 400) == 0)
 N			{
 N				BEEP_ON();
@@ -26907,11 +26902,6 @@ N			{
 N				BEEP_OFF();
 X				GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0008));
 N			}
-N
-N			
-N//			timer_delay_1ms(100);
-N			
-N//			timer_delay_1ms(300);
 N		}
 N		else
 N		{
@@ -26926,17 +26916,11 @@ X		if(p1 !=0)
 N		{
 N			memset(protocol_buff, 0, 512);	
 N			gprs_status = 0;
+N			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "MQTT SERVER CLOSE\r\n");
 N		}
 N		
-N		if(button_get_value() == 0)
-N		{
-N			USART_OUT(USART1, "button_get_value");
-X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "button_get_value");
-N			timer_is_timeout_1ms(timer_close_lock, 0);
-N			Lock_Close = 1;
-N			Shaking=1;	
-N		}
-N			
+N
 N		//心跳
 N		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
 N		{

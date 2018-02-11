@@ -186,7 +186,6 @@ void gpio_init(void)
 	
 	//button
 	gpio_init_structure.GPIO_Pin = GPIO_Pin_6;
-  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
 	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
   	GPIO_Init(GPIOC, &gpio_init_structure);
 	
