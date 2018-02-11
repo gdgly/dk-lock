@@ -143,8 +143,6 @@
                           REQUIRE _printf_str
                           REQUIRE _printf_str
                           REQUIRE _printf_str
-                          REQUIRE _printf_str
-                          REQUIRE _printf_str
                   main PROC
 ;;;151    
 ;;;152    int main(void)
@@ -167,12 +165,12 @@
 ;;;164    	
 ;;;165                             
 ;;;166    	USART_OUT(USART1, "uart1 is ok\r\n");
-00000c  a1f7              ADR      r1,|L2.1004|
-00000e  48fb              LDR      r0,|L2.1020|
+00000c  a1f6              ADR      r1,|L2.1000|
+00000e  48fa              LDR      r0,|L2.1016|
 000010  f7fffffe          BL       USART_OUT
 ;;;167    
 ;;;168    	while(1)
-000014  e3fe              B        |L2.2068|
+000014  e3fd              B        |L2.2066|
                   |L2.22|
 ;;;169    	{	 
 ;;;170    
@@ -183,14 +181,14 @@
 ;;;173    			gprs_config();
 000018  f7fffffe          BL       gprs_config
 ;;;174    			if(gprs_status == 255)
-00001c  48f8              LDR      r0,|L2.1024|
+00001c  48f7              LDR      r0,|L2.1020|
 00001e  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000020  28ff              CMP      r0,#0xff
 000022  d104              BNE      |L2.46|
 ;;;175    			{
 ;;;176    				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);			
 000024  2110              MOVS     r1,#0x10
-000026  48f7              LDR      r0,|L2.1028|
+000026  48f6              LDR      r0,|L2.1024|
 000028  f7fffffe          BL       MakeFile_MD5_Checksum
 ;;;177    				break;
 00002c  e000              B        |L2.48|
@@ -202,1759 +200,1723 @@
 ;;;179    		}
 ;;;180    	//GPS
 ;;;181    		if(gps_send_flag == 0)
-000032  48f5              LDR      r0,|L2.1032|
+000032  48f4              LDR      r0,|L2.1028|
 000034  7800              LDRB     r0,[r0,#0]  ; gps_send_flag
 000036  2800              CMP      r0,#0
-000038  d176              BNE      |L2.296|
+000038  d17b              BNE      |L2.306|
 ;;;182    		{
 ;;;183    		    GPS_POW_HIGH();  
 00003a  2110              MOVS     r1,#0x10
-00003c  48f3              LDR      r0,|L2.1036|
+00003c  48f2              LDR      r0,|L2.1032|
 00003e  f7fffffe          BL       GPIO_SetBits
 ;;;184    			while(1)
-000042  e07f              B        |L2.324|
+000042  e085              B        |L2.336|
                   |L2.68|
 ;;;185    			{
 ;;;186    				usart3_recv_data();
 000044  f7fffffe          BL       usart3_recv_data
 ;;;187    				GPS_Analysis(&gpsx, gps_buff);
-000048  49f1              LDR      r1,|L2.1040|
-00004a  48f2              LDR      r0,|L2.1044|
+000048  49f0              LDR      r1,|L2.1036|
+00004a  48f1              LDR      r0,|L2.1040|
 00004c  f7fffffe          BL       GPS_Analysis
 ;;;188    				Gps_Msg_Show();
 000050  f7fffffe          BL       Gps_Msg_Show
 ;;;189    				if(gpsx.latitude>0 && gpsx.longitude>0)
-000054  48ef              LDR      r0,|L2.1044|
+000054  48ee              LDR      r0,|L2.1040|
 000056  f8d00081          LDR      r0,[r0,#0x81]  ; gpsx
 00005a  2800              CMP      r0,#0
-00005c  d065              BEQ      |L2.298|
-00005e  48ed              LDR      r0,|L2.1044|
+00005c  d06b              BEQ      |L2.310|
+00005e  48ec              LDR      r0,|L2.1040|
 000060  f8d00086          LDR      r0,[r0,#0x86]  ; gpsx
 000064  2800              CMP      r0,#0
-000066  d060              BEQ      |L2.298|
+000066  d066              BEQ      |L2.310|
 ;;;190    				{
 ;;;191    					memset(gps_buff, 0, 512);
 000068  f44f7100          MOV      r1,#0x200
-00006c  48e8              LDR      r0,|L2.1040|
+00006c  48e7              LDR      r0,|L2.1036|
 00006e  f7fffffe          BL       __aeabi_memclr
 ;;;192    					
 ;;;193    					USART_OUT(USART1,"%s\r\n", latitudedtbuf);
-000072  4ae9              LDR      r2,|L2.1048|
-000074  a1e9              ADR      r1,|L2.1052|
-000076  48e1              LDR      r0,|L2.1020|
+000072  4ae8              LDR      r2,|L2.1044|
+000074  a1e8              ADR      r1,|L2.1048|
+000076  48e0              LDR      r0,|L2.1016|
 000078  f7fffffe          BL       USART_OUT
 ;;;194    					USART_OUT(USART1,"%s\r\n", longitudedtbuf);	
-00007c  4ae9              LDR      r2,|L2.1060|
-00007e  a1e7              ADR      r1,|L2.1052|
-000080  48de              LDR      r0,|L2.1020|
+00007c  4ae8              LDR      r2,|L2.1056|
+00007e  a1e6              ADR      r1,|L2.1048|
+000080  48dd              LDR      r0,|L2.1016|
 000082  f7fffffe          BL       USART_OUT
 ;;;195    							
 ;;;196    					memset(send_buff, 0, 100);
 000086  2164              MOVS     r1,#0x64
-000088  48e7              LDR      r0,|L2.1064|
+000088  48e6              LDR      r0,|L2.1060|
 00008a  f7fffffe          BL       __aeabi_memclr
 ;;;197    					sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/", PARK_LOCK_Buffer,",64,2\r\n");
-00008e  a0e7              ADR      r0,|L2.1068|
-000090  4bdc              LDR      r3,|L2.1028|
-000092  a2e8              ADR      r2,|L2.1076|
-000094  a1ed              ADR      r1,|L2.1100|
+00008e  a0e6              ADR      r0,|L2.1064|
+000090  4bdb              LDR      r3,|L2.1024|
+000092  a2e7              ADR      r2,|L2.1072|
+000094  a1ec              ADR      r1,|L2.1096|
 000096  9000              STR      r0,[sp,#0]
-000098  48e3              LDR      r0,|L2.1064|
+000098  48e2              LDR      r0,|L2.1060|
 00009a  f7fffffe          BL       __2sprintf
-;;;198    					ret = gprs_send_at(send_buff, ">", 300, 0);
-00009e  2300              MOVS     r3,#0
-0000a0  f44f7296          MOV      r2,#0x12c
-0000a4  a1eb              ADR      r1,|L2.1108|
-0000a6  48e0              LDR      r0,|L2.1064|
-0000a8  f7fffffe          BL       gprs_send_at
-0000ac  4604              MOV      r4,r0
+;;;198    					ret = gprs_send_at(send_buff, ">", 300, 2000);
+00009e  f44f63fa          MOV      r3,#0x7d0
+0000a2  f44f7296          MOV      r2,#0x12c
+0000a6  a1ea              ADR      r1,|L2.1104|
+0000a8  48de              LDR      r0,|L2.1060|
+0000aa  f7fffffe          BL       gprs_send_at
+0000ae  4604              MOV      r4,r0
 ;;;199    					if(ret != NULL)
-0000ae  2c00              CMP      r4,#0
-0000b0  d032              BEQ      |L2.280|
+0000b0  2c00              CMP      r4,#0
+0000b2  d036              BEQ      |L2.290|
 ;;;200    					{
 ;;;201    						memset(expressText, 0 ,512);
-0000b2  f44f7100          MOV      r1,#0x200
-0000b6  48e8              LDR      r0,|L2.1112|
-0000b8  f7fffffe          BL       __aeabi_memclr
+0000b4  f44f7100          MOV      r1,#0x200
+0000b8  48e6              LDR      r0,|L2.1108|
+0000ba  f7fffffe          BL       __aeabi_memclr
 ;;;202    						memset(cipherText, 0 ,512);
-0000bc  f44f7100          MOV      r1,#0x200
-0000c0  48e6              LDR      r0,|L2.1116|
-0000c2  f7fffffe          BL       __aeabi_memclr
+0000be  f44f7100          MOV      r1,#0x200
+0000c2  48e5              LDR      r0,|L2.1112|
+0000c4  f7fffffe          BL       __aeabi_memclr
 ;;;203    						sprintf((char *)expressText,"%c%s,%s%c",'{',longitudedtbuf,latitudedtbuf,'}',48);
-0000c6  2030              MOVS     r0,#0x30
-0000c8  217d              MOVS     r1,#0x7d
-0000ca  4ad3              LDR      r2,|L2.1048|
-0000cc  4bd5              LDR      r3,|L2.1060|
-0000ce  e9cd2100          STRD     r2,r1,[sp,#0]
-0000d2  9002              STR      r0,[sp,#8]
-0000d4  227b              MOVS     r2,#0x7b
-0000d6  a1e2              ADR      r1,|L2.1120|
-0000d8  48df              LDR      r0,|L2.1112|
-0000da  f7fffffe          BL       __2sprintf
+0000c8  2030              MOVS     r0,#0x30
+0000ca  217d              MOVS     r1,#0x7d
+0000cc  4ad1              LDR      r2,|L2.1044|
+0000ce  4bd4              LDR      r3,|L2.1056|
+0000d0  e9cd2100          STRD     r2,r1,[sp,#0]
+0000d4  9002              STR      r0,[sp,#8]
+0000d6  227b              MOVS     r2,#0x7b
+0000d8  a1e0              ADR      r1,|L2.1116|
+0000da  48de              LDR      r0,|L2.1108|
+0000dc  f7fffffe          BL       __2sprintf
 ;;;204    						USART_OUT(USART1, "expressText=%s\r\n", expressText);
-0000de  4ade              LDR      r2,|L2.1112|
-0000e0  a1e2              ADR      r1,|L2.1132|
-0000e2  48c6              LDR      r0,|L2.1020|
-0000e4  f7fffffe          BL       USART_OUT
+0000e0  4adc              LDR      r2,|L2.1108|
+0000e2  a1e1              ADR      r1,|L2.1128|
+0000e4  48c4              LDR      r0,|L2.1016|
+0000e6  f7fffffe          BL       USART_OUT
 ;;;205    						AES_Encrypt((char *)expressText, cipherText, aesKey);
-0000e8  4ae5              LDR      r2,|L2.1152|
-0000ea  49dc              LDR      r1,|L2.1116|
-0000ec  48da              LDR      r0,|L2.1112|
-0000ee  f7fffffe          BL       AES_Encrypt
+0000ea  4ae4              LDR      r2,|L2.1148|
+0000ec  49da              LDR      r1,|L2.1112|
+0000ee  48d9              LDR      r0,|L2.1108|
+0000f0  f7fffffe          BL       AES_Encrypt
 ;;;206    						USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-0000f2  4ae3              LDR      r2,|L2.1152|
-0000f4  a1e3              ADR      r1,|L2.1156|
-0000f6  48c1              LDR      r0,|L2.1020|
-0000f8  f7fffffe          BL       USART_OUT
+0000f4  4ae1              LDR      r2,|L2.1148|
+0000f6  a1e2              ADR      r1,|L2.1152|
+0000f8  48bf              LDR      r0,|L2.1016|
+0000fa  f7fffffe          BL       USART_OUT
 ;;;207    						USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-0000fc  4ad7              LDR      r2,|L2.1116|
-0000fe  a1e4              ADR      r1,|L2.1168|
-000100  48be              LDR      r0,|L2.1020|
-000102  f7fffffe          BL       USART_OUT
+0000fe  4ad6              LDR      r2,|L2.1112|
+000100  a1e2              ADR      r1,|L2.1164|
+000102  48bd              LDR      r0,|L2.1016|
+000104  f7fffffe          BL       USART_OUT
 ;;;208    						ret = gprs_send_at(cipherText, "OK", 400, 0);
-000106  2300              MOVS     r3,#0
-000108  f44f72c8          MOV      r2,#0x190
-00010c  a1e4              ADR      r1,|L2.1184|
-00010e  48d3              LDR      r0,|L2.1116|
-000110  f7fffffe          BL       gprs_send_at
-000114  4604              MOV      r4,r0
+000108  2300              MOVS     r3,#0
+00010a  f44f72c8          MOV      r2,#0x190
+00010e  a1e3              ADR      r1,|L2.1180|
+000110  48d1              LDR      r0,|L2.1112|
+000112  f7fffffe          BL       gprs_send_at
+000116  4604              MOV      r4,r0
 ;;;209    						if(ret != NULL)
-000116  bf00              NOP      
-                  |L2.280|
+000118  b11c              CBZ      r4,|L2.290|
 ;;;210    						{
-;;;211    							
+;;;211    							timer_is_timeout_1ms(timer_heartbeat, 0);
+00011a  2100              MOVS     r1,#0
+00011c  2006              MOVS     r0,#6
+00011e  f7fffffe          BL       timer_is_timeout_1ms
+                  |L2.290|
 ;;;212    						}	
-;;;213    					}	
-;;;214    
-;;;215    					GPS_POW_LOW();
-000118  2110              MOVS     r1,#0x10
-00011a  48bc              LDR      r0,|L2.1036|
-00011c  f7fffffe          BL       GPIO_ResetBits
-;;;216    					gps_send_flag = 1;
-000120  2001              MOVS     r0,#1
-000122  49b9              LDR      r1,|L2.1032|
-000124  7008              STRB     r0,[r1,#0]
-;;;217    					break;
-000126  e00e              B        |L2.326|
-                  |L2.296|
-000128  e00e              B        |L2.328|
-                  |L2.298|
-;;;218    				}
-;;;219    				else 
-;;;220    				{
-;;;221    					if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
-00012a  49de              LDR      r1,|L2.1188|
-00012c  2003              MOVS     r0,#3
-00012e  f7fffffe          BL       timer_is_timeout_1ms
-000132  b938              CBNZ     r0,|L2.324|
-;;;222    					{
-;;;223    						GPS_POW_LOW();
-000134  2110              MOVS     r1,#0x10
-000136  48b5              LDR      r0,|L2.1036|
-000138  f7fffffe          BL       GPIO_ResetBits
-;;;224    						gps_send_flag = 1;
-00013c  2001              MOVS     r0,#1
-00013e  49b2              LDR      r1,|L2.1032|
-000140  7008              STRB     r0,[r1,#0]
-;;;225    						break;
-000142  e000              B        |L2.326|
-                  |L2.324|
-000144  e77e              B        |L2.68|
-                  |L2.326|
-000146  bf00              NOP                            ;217
-                  |L2.328|
-;;;226    					}
-;;;227    
-;;;228    				}				
-;;;229    			}
-;;;230    		}
-;;;231    		
-;;;232    		usart1_recv_data();
-000148  f7fffffe          BL       usart1_recv_data
-;;;233    		usart2_recv_data();
-00014c  f7fffffe          BL       usart2_recv_data
-;;;234    	
-;;;235    		// 电池信息
-;;;236    		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
-000150  210a              MOVS     r1,#0xa
-000152  2000              MOVS     r0,#0
-000154  f7fffffe          BL       Get_Adc_Average
-000158  49d3              LDR      r1,|L2.1192|
-00015a  8008              STRH     r0,[r1,#0]
-;;;237    		Bat_V=Bat_V*3300/4096;
-00015c  8809              LDRH     r1,[r1,#0]  ; Bat_V
-00015e  f64042e4          MOV      r2,#0xce4
-000162  fb01f002          MUL      r0,r1,r2
-000166  17c1              ASRS     r1,r0,#31
-000168  eb005111          ADD      r1,r0,r1,LSR #20
-00016c  f3c1310f          UBFX     r1,r1,#12,#16
-000170  4acd              LDR      r2,|L2.1192|
-000172  8011              STRH     r1,[r2,#0]
-;;;238    		Bat_V=Bat_V*88/20;
-000174  4610              MOV      r0,r2
-000176  8800              LDRH     r0,[r0,#0]  ; Bat_V
-000178  2158              MOVS     r1,#0x58
-00017a  4348              MULS     r0,r1,r0
-00017c  2114              MOVS     r1,#0x14
-00017e  fb90f0f1          SDIV     r0,r0,r1
-000182  4611              MOV      r1,r2
-000184  8008              STRH     r0,[r1,#0]
-;;;239    		Bat_Pre=(Bat_V-5000)*100/2400;
-000186  4608              MOV      r0,r1
-000188  8800              LDRH     r0,[r0,#0]  ; Bat_V
-00018a  f5a05098          SUB      r0,r0,#0x1300
-00018e  3888              SUBS     r0,r0,#0x88
-000190  2164              MOVS     r1,#0x64
-000192  4348              MULS     r0,r1,r0
-000194  f44f6116          MOV      r1,#0x960
-000198  fb90f0f1          SDIV     r0,r0,r1
-00019c  49c3              LDR      r1,|L2.1196|
-00019e  8008              STRH     r0,[r1,#0]
-;;;240    		
-;;;241    		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
-0001a0  4608              MOV      r0,r1
-0001a2  8800              LDRH     r0,[r0,#0]  ; Bat_Pre
-0001a4  2814              CMP      r0,#0x14
-0001a6  da7c              BGE      |L2.674|
-0001a8  4608              MOV      r0,r1
-0001aa  8800              LDRH     r0,[r0,#0]  ; Bat_Pre
-0001ac  280a              CMP      r0,#0xa
-0001ae  dd78              BLE      |L2.674|
-0001b0  48bf              LDR      r0,|L2.1200|
-0001b2  7800              LDRB     r0,[r0,#0]  ; Bat_Pre_Flag
-0001b4  2800              CMP      r0,#0
-0001b6  d174              BNE      |L2.674|
-;;;242    //		if(timer_is_timeout_1ms(timer_open_lock, 200000) == 0)
-;;;243    		{	
-;;;244    			Bat_Pre_Flag =  1;
-0001b8  2001              MOVS     r0,#1
-0001ba  49bd              LDR      r1,|L2.1200|
-0001bc  7008              STRB     r0,[r1,#0]
-;;;245    			memset(send_buff, 0, 100);	
-0001be  2164              MOVS     r1,#0x64
-0001c0  4899              LDR      r0,|L2.1064|
-0001c2  f7fffffe          BL       __aeabi_memclr
-;;;246    			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-0001c6  a0bb              ADR      r0,|L2.1204|
-0001c8  4b8e              LDR      r3,|L2.1028|
-0001ca  a29a              ADR      r2,|L2.1076|
-0001cc  a19f              ADR      r1,|L2.1100|
-0001ce  9000              STR      r0,[sp,#0]
-0001d0  4895              LDR      r0,|L2.1064|
-0001d2  f7fffffe          BL       __2sprintf
-;;;247    
-;;;248    			USART_OUT(USART1, "ccc=%s\r\n", send_buff);
-0001d6  4a94              LDR      r2,|L2.1064|
-0001d8  a1b8              ADR      r1,|L2.1212|
-0001da  4888              LDR      r0,|L2.1020|
-0001dc  f7fffffe          BL       USART_OUT
-;;;249    
-;;;250    			ret = gprs_send_at(send_buff, ">", 300, 0);
-0001e0  2300              MOVS     r3,#0
-0001e2  f44f7296          MOV      r2,#0x12c
-0001e6  a19b              ADR      r1,|L2.1108|
-0001e8  488f              LDR      r0,|L2.1064|
-0001ea  f7fffffe          BL       gprs_send_at
-0001ee  4604              MOV      r4,r0
-;;;251    			if(ret != NULL)
-0001f0  2c00              CMP      r4,#0
-0001f2  d030              BEQ      |L2.598|
-;;;252    			{
-;;;253    				memset(expressText, 0 ,512);
-0001f4  f44f7100          MOV      r1,#0x200
-0001f8  4897              LDR      r0,|L2.1112|
-0001fa  f7fffffe          BL       __aeabi_memclr
-;;;254    				memset(cipherText, 0 ,512);
-0001fe  f44f7100          MOV      r1,#0x200
-000202  4896              LDR      r0,|L2.1116|
-000204  f7fffffe          BL       __aeabi_memclr
-;;;255    				sprintf((char *)expressText, "{%c%s%c:%s}",'"',"battery",'"',"20");
-000208  a0af              ADR      r0,|L2.1224|
-00020a  2122              MOVS     r1,#0x22
-00020c  a3af              ADR      r3,|L2.1228|
-00020e  460a              MOV      r2,r1
-000210  e9cd1000          STRD     r1,r0,[sp,#0]
-000214  a1af              ADR      r1,|L2.1236|
-000216  4890              LDR      r0,|L2.1112|
-000218  f7fffffe          BL       __2sprintf
-;;;256    				USART_OUT(USART1, "expressText=%s\r\n", expressText);
-00021c  4a8e              LDR      r2,|L2.1112|
-00021e  a193              ADR      r1,|L2.1132|
-000220  4876              LDR      r0,|L2.1020|
-000222  f7fffffe          BL       USART_OUT
-;;;257    				AES_Encrypt((char *)expressText, cipherText, aesKey);
-000226  4a96              LDR      r2,|L2.1152|
-000228  498c              LDR      r1,|L2.1116|
-00022a  488b              LDR      r0,|L2.1112|
-00022c  f7fffffe          BL       AES_Encrypt
-;;;258    				
-;;;259    				USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-000230  4a93              LDR      r2,|L2.1152|
-000232  a194              ADR      r1,|L2.1156|
-000234  4871              LDR      r0,|L2.1020|
-000236  f7fffffe          BL       USART_OUT
-;;;260    				USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-00023a  4a88              LDR      r2,|L2.1116|
-00023c  a194              ADR      r1,|L2.1168|
-00023e  486f              LDR      r0,|L2.1020|
-000240  f7fffffe          BL       USART_OUT
-;;;261    				ret = gprs_send_at(cipherText, "OK", 300, 0);
-000244  2300              MOVS     r3,#0
-000246  f44f7296          MOV      r2,#0x12c
-00024a  a195              ADR      r1,|L2.1184|
-00024c  4883              LDR      r0,|L2.1116|
-00024e  f7fffffe          BL       gprs_send_at
-000252  4604              MOV      r4,r0
-;;;262    				if(ret != NULL)
-000254  bf00              NOP      
-                  |L2.598|
-;;;263    				{
-;;;264    					
-;;;265    				}			
-;;;266    			}
-;;;267    ////			
-;;;268    			if(Bat_Pre<10&&Bat_Pre_Flag==1)
-000256  4895              LDR      r0,|L2.1196|
-000258  8800              LDRH     r0,[r0,#0]  ; Bat_Pre
-00025a  280a              CMP      r0,#0xa
-00025c  da4b              BGE      |L2.758|
-00025e  4894              LDR      r0,|L2.1200|
-000260  7800              LDRB     r0,[r0,#0]  ; Bat_Pre_Flag
-000262  2801              CMP      r0,#1
-000264  d147              BNE      |L2.758|
-;;;269    			{
-;;;270    				Bat_Pre_Flag=0;
-000266  2000              MOVS     r0,#0
-000268  4991              LDR      r1,|L2.1200|
-00026a  7008              STRB     r0,[r1,#0]
-;;;271    
-;;;272    				memset(send_buff, 0, 100);
-00026c  2164              MOVS     r1,#0x64
-00026e  486e              LDR      r0,|L2.1064|
-000270  f7fffffe          BL       __aeabi_memclr
-;;;273    				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-000274  a08f              ADR      r0,|L2.1204|
-000276  4b63              LDR      r3,|L2.1028|
-000278  a26e              ADR      r2,|L2.1076|
-00027a  a199              ADR      r1,|L2.1248|
-00027c  9000              STR      r0,[sp,#0]
-00027e  486a              LDR      r0,|L2.1064|
-000280  f7fffffe          BL       __2sprintf
-;;;274    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-000284  4a68              LDR      r2,|L2.1064|
-000286  a198              ADR      r1,|L2.1256|
-000288  485c              LDR      r0,|L2.1020|
-00028a  f7fffffe          BL       USART_OUT
-;;;275    				ret = gprs_send_at(send_buff, ">", 300, 0);
-00028e  2300              MOVS     r3,#0
-000290  f44f7296          MOV      r2,#0x12c
-000294  a16f              ADR      r1,|L2.1108|
-000296  4864              LDR      r0,|L2.1064|
-000298  f7fffffe          BL       gprs_send_at
-00029c  4604              MOV      r4,r0
-;;;276    				if(ret != NULL)
-00029e  b104              CBZ      r4,|L2.674|
-;;;277    				{
-;;;278    					memset(expressText, 0 ,512);
-0002a0  e000              B        |L2.676|
-                  |L2.674|
-0002a2  e028              B        |L2.758|
-                  |L2.676|
-0002a4  f44f7100          MOV      r1,#0x200
-0002a8  486b              LDR      r0,|L2.1112|
-0002aa  f7fffffe          BL       __aeabi_memclr
-;;;279    					memset(cipherText, 0 ,512);
-0002ae  f44f7100          MOV      r1,#0x200
-0002b2  486a              LDR      r0,|L2.1116|
-0002b4  f7fffffe          BL       __aeabi_memclr
-;;;280    					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
-0002b8  a08f              ADR      r0,|L2.1272|
-0002ba  2122              MOVS     r1,#0x22
-0002bc  a383              ADR      r3,|L2.1228|
-0002be  460a              MOV      r2,r1
-0002c0  e9cd1000          STRD     r1,r0,[sp,#0]
-0002c4  a183              ADR      r1,|L2.1236|
-0002c6  4864              LDR      r0,|L2.1112|
-0002c8  f7fffffe          BL       __2sprintf
-;;;281    					AES_Encrypt((char *)expressText, cipherText, aesKey);
-0002cc  4a6c              LDR      r2,|L2.1152|
-0002ce  4963              LDR      r1,|L2.1116|
-0002d0  4861              LDR      r0,|L2.1112|
-0002d2  f7fffffe          BL       AES_Encrypt
-;;;282    					memset(tmp, 0, 20);
-0002d6  2114              MOVS     r1,#0x14
-0002d8  4888              LDR      r0,|L2.1276|
-0002da  f7fffffe          BL       __aeabi_memclr
-;;;283    					tmp[0] = 0x31;
-0002de  2031              MOVS     r0,#0x31
-0002e0  4986              LDR      r1,|L2.1276|
-0002e2  7008              STRB     r0,[r1,#0]
-;;;284    					ret = gprs_send_at(tmp, "OK", 300, 0);
-0002e4  2300              MOVS     r3,#0
-0002e6  f44f7296          MOV      r2,#0x12c
-0002ea  a16d              ADR      r1,|L2.1184|
-0002ec  4883              LDR      r0,|L2.1276|
-0002ee  f7fffffe          BL       gprs_send_at
-0002f2  4604              MOV      r4,r0
-;;;285    					if(ret == NULL)
-0002f4  bf00              NOP      
-                  |L2.758|
-;;;286    					{
-;;;287    						
-;;;288    					}
-;;;289    				}
-;;;290    			}
-;;;291    		}
-;;;292    //		//接收锁数据
-;;;293    		p1 = strstr((u8*)protocol_buff, "topic: lock/");
-0002f6  a182              ADR      r1,|L2.1280|
-0002f8  4885              LDR      r0,|L2.1296|
-0002fa  f7fffffe          BL       strstr
-0002fe  4985              LDR      r1,|L2.1300|
-000300  6008              STR      r0,[r1,#0]  ; p1
-;;;294    		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
-000302  4940              LDR      r1,|L2.1028|
-000304  4883              LDR      r0,|L2.1300|
-000306  6800              LDR      r0,[r0,#0]  ; p1
-000308  f7fffffe          BL       strstr
-00030c  4982              LDR      r1,|L2.1304|
-00030e  6008              STR      r0,[r1,#0]  ; p2
-;;;295    		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
-000310  220c              MOVS     r2,#0xc
-000312  a17b              ADR      r1,|L2.1280|
-000314  487f              LDR      r0,|L2.1300|
-000316  6800              LDR      r0,[r0,#0]  ; p1
-000318  f7fffffe          BL       strncmp
-00031c  2800              CMP      r0,#0
-                  |L2.798|
-00031e  d162              BNE      |L2.998|
-;;;296    		{
-;;;297    		
-;;;298    			if(LOCK_ON_READ()==0 || LOCK_OFF_READ()==0)
-000320  2110              MOVS     r1,#0x10
-000322  487e              LDR      r0,|L2.1308|
-000324  f7fffffe          BL       GPIO_ReadInputDataBit
-000328  b128              CBZ      r0,|L2.822|
-00032a  2120              MOVS     r1,#0x20
-00032c  487b              LDR      r0,|L2.1308|
-00032e  f7fffffe          BL       GPIO_ReadInputDataBit
-000332  2800              CMP      r0,#0
-000334  d1f3              BNE      |L2.798|
-                  |L2.822|
-;;;299    			{
-;;;300    			USART_OUT(USART1, "lock data\r\n");
-000336  a17a              ADR      r1,|L2.1312|
-000338  4830              LDR      r0,|L2.1020|
-00033a  f7fffffe          BL       USART_OUT
-;;;301    			memset(receiveText ,0 , 512);
-00033e  f44f7100          MOV      r1,#0x200
-000342  487a              LDR      r0,|L2.1324|
-000344  f7fffffe          BL       __aeabi_memclr
-;;;302    			memset(expressText ,0 , 512);
-000348  f44f7100          MOV      r1,#0x200
-00034c  4842              LDR      r0,|L2.1112|
-00034e  f7fffffe          BL       __aeabi_memclr
-;;;303    			
-;;;304    			strcpy((char*)receiveText ,(char *)(p1+33));
-000352  4870              LDR      r0,|L2.1300|
-000354  6801              LDR      r1,[r0,#0]  ; p1
-000356  3121              ADDS     r1,r1,#0x21
-000358  4874              LDR      r0,|L2.1324|
-00035a  f7fffffe          BL       strcpy
-;;;305    			USART_OUT(USART1, "receiveText=%s\r\n", receiveText);
-00035e  4a73              LDR      r2,|L2.1324|
-000360  a173              ADR      r1,|L2.1328|
-000362  4826              LDR      r0,|L2.1020|
-000364  f7fffffe          BL       USART_OUT
-;;;306    			AES_Decrypt(expressText, receiveText, aesKey);
-000368  4a45              LDR      r2,|L2.1152|
-00036a  4970              LDR      r1,|L2.1324|
-00036c  483a              LDR      r0,|L2.1112|
-00036e  f7fffffe          BL       AES_Decrypt
-;;;307    			if(*expressText==0x31)
-000372  4839              LDR      r0,|L2.1112|
-000374  7800              LDRB     r0,[r0,#0]  ; expressText
-000376  2831              CMP      r0,#0x31
-000378  d11c              BNE      |L2.948|
-;;;308    			{
-;;;309    //				if(LOCK_ON_READ() == 0)
-;;;310    //				if(lock_on_status_get() == 0)
-;;;311    				if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
-00037a  2110              MOVS     r1,#0x10
-00037c  4867              LDR      r0,|L2.1308|
-00037e  f7fffffe          BL       GPIO_ReadInputDataBit
-000382  b998              CBNZ     r0,|L2.940|
-000384  2120              MOVS     r1,#0x20
-000386  4865              LDR      r0,|L2.1308|
-000388  f7fffffe          BL       GPIO_ReadInputDataBit
-00038c  2801              CMP      r0,#1
-00038e  d10d              BNE      |L2.940|
-;;;312    				{
-;;;313    					timer_is_timeout_1ms(timer_open_lock, 0);
-000390  2100              MOVS     r1,#0
-000392  2005              MOVS     r0,#5
-000394  f7fffffe          BL       timer_is_timeout_1ms
-;;;314    					Shaking=1;
-000398  2001              MOVS     r0,#1
-00039a  496a              LDR      r1,|L2.1348|
-00039c  7008              STRB     r0,[r1,#0]
-;;;315    					Lock_Open=1;
-00039e  496a              LDR      r1,|L2.1352|
-0003a0  7008              STRB     r0,[r1,#0]
-;;;316    					USART_OUT(USART1, "Lock_Open11111\r\n");
-0003a2  a16a              ADR      r1,|L2.1356|
-0003a4  4815              LDR      r0,|L2.1020|
-0003a6  f7fffffe          BL       USART_OUT
-0003aa  e0ea              B        |L2.1410|
-                  |L2.940|
-;;;317    				}
-;;;318    				else
-;;;319    				{
-;;;320    					Lock_Open=0;
-0003ac  2000              MOVS     r0,#0
-0003ae  4966              LDR      r1,|L2.1352|
-0003b0  7008              STRB     r0,[r1,#0]
-0003b2  e0e6              B        |L2.1410|
-                  |L2.948|
-;;;321    				}
-;;;322    			}
-;;;323    			else if(*expressText==0x32)
-0003b4  4828              LDR      r0,|L2.1112|
-0003b6  7800              LDRB     r0,[r0,#0]  ; expressText
-0003b8  2832              CMP      r0,#0x32
-0003ba  d116              BNE      |L2.1002|
-;;;324    			{
-;;;325    //				if(LOCK_OFF_READ() == 0)
-;;;326    //				if(lock_off_status_get() == 0)
-;;;327    				if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	
-0003bc  2110              MOVS     r1,#0x10
-0003be  4857              LDR      r0,|L2.1308|
-0003c0  f7fffffe          BL       GPIO_ReadInputDataBit
-0003c4  2801              CMP      r0,#1
-0003c6  d10f              BNE      |L2.1000|
-0003c8  2120              MOVS     r1,#0x20
-0003ca  4854              LDR      r0,|L2.1308|
-0003cc  f7fffffe          BL       GPIO_ReadInputDataBit
-0003d0  b950              CBNZ     r0,|L2.1000|
-;;;328    				{
-;;;329    					timer_is_timeout_1ms(timer_close_lock, 0);
-0003d2  2100              MOVS     r1,#0
-0003d4  2004              MOVS     r0,#4
-0003d6  f7fffffe          BL       timer_is_timeout_1ms
-;;;330    					Shaking=1;
-0003da  2001              MOVS     r0,#1
-0003dc  4959              LDR      r1,|L2.1348|
-0003de  7008              STRB     r0,[r1,#0]
-;;;331    					Lock_Close=1;
-0003e0  495f              LDR      r1,|L2.1376|
-0003e2  7008              STRB     r0,[r1,#0]
-;;;332    					USART_OUT(USART1, "Lock_Close11111\r\n");
-0003e4  e0be              B        |L2.1380|
+;;;213    					}
+;;;214    					else
+;;;215    					{
+;;;216    						
+;;;217    					}
+;;;218    
+;;;219    					GPS_POW_LOW();
+000122  2110              MOVS     r1,#0x10
+000124  48b8              LDR      r0,|L2.1032|
+000126  f7fffffe          BL       GPIO_ResetBits
+;;;220    					gps_send_flag = 1;
+00012a  2001              MOVS     r0,#1
+00012c  49b5              LDR      r1,|L2.1028|
+00012e  7008              STRB     r0,[r1,#0]
+;;;221    					break;
+000130  e00f              B        |L2.338|
+                  |L2.306|
+000132  e00f              B        |L2.340|
+000134  e7ff              B        |L2.310|
+                  |L2.310|
+;;;222    				}
+;;;223    				else 
+;;;224    				{
+;;;225    					if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
+000136  49da              LDR      r1,|L2.1184|
+000138  2003              MOVS     r0,#3
+00013a  f7fffffe          BL       timer_is_timeout_1ms
+00013e  b938              CBNZ     r0,|L2.336|
+;;;226    					{
+;;;227    						GPS_POW_LOW();
+000140  2110              MOVS     r1,#0x10
+000142  48b1              LDR      r0,|L2.1032|
+000144  f7fffffe          BL       GPIO_ResetBits
+;;;228    						gps_send_flag = 1;
+000148  2001              MOVS     r0,#1
+00014a  49ae              LDR      r1,|L2.1028|
+00014c  7008              STRB     r0,[r1,#0]
+;;;229    						break;
+00014e  e000              B        |L2.338|
+                  |L2.336|
+000150  e778              B        |L2.68|
+                  |L2.338|
+000152  bf00              NOP                            ;221
+                  |L2.340|
+;;;230    					}
+;;;231    
+;;;232    				}				
+;;;233    			}
+;;;234    		}
+;;;235    		
+;;;236    		usart1_recv_data();
+000154  f7fffffe          BL       usart1_recv_data
+;;;237    		usart2_recv_data();
+000158  f7fffffe          BL       usart2_recv_data
+;;;238    	
+;;;239    		// 电池信息
+;;;240    		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
+00015c  210a              MOVS     r1,#0xa
+00015e  2000              MOVS     r0,#0
+000160  f7fffffe          BL       Get_Adc_Average
+000164  49cf              LDR      r1,|L2.1188|
+000166  8008              STRH     r0,[r1,#0]
+;;;241    		Bat_V=Bat_V*3300/4096;
+000168  8809              LDRH     r1,[r1,#0]  ; Bat_V
+00016a  f64042e4          MOV      r2,#0xce4
+00016e  fb01f002          MUL      r0,r1,r2
+000172  17c1              ASRS     r1,r0,#31
+000174  eb005111          ADD      r1,r0,r1,LSR #20
+000178  f3c1310f          UBFX     r1,r1,#12,#16
+00017c  4ac9              LDR      r2,|L2.1188|
+00017e  8011              STRH     r1,[r2,#0]
+;;;242    		Bat_V=Bat_V*88/20;
+000180  4610              MOV      r0,r2
+000182  8800              LDRH     r0,[r0,#0]  ; Bat_V
+000184  2158              MOVS     r1,#0x58
+000186  4348              MULS     r0,r1,r0
+000188  2114              MOVS     r1,#0x14
+00018a  fb90f0f1          SDIV     r0,r0,r1
+00018e  4611              MOV      r1,r2
+000190  8008              STRH     r0,[r1,#0]
+;;;243    		Bat_Pre=(Bat_V-5000)*100/2400;
+000192  4608              MOV      r0,r1
+000194  8800              LDRH     r0,[r0,#0]  ; Bat_V
+000196  f5a05098          SUB      r0,r0,#0x1300
+00019a  3888              SUBS     r0,r0,#0x88
+00019c  2164              MOVS     r1,#0x64
+00019e  4348              MULS     r0,r1,r0
+0001a0  f44f6116          MOV      r1,#0x960
+0001a4  fb90f0f1          SDIV     r0,r0,r1
+0001a8  49bf              LDR      r1,|L2.1192|
+0001aa  8008              STRH     r0,[r1,#0]
+;;;244    		
+;;;245    		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
+0001ac  4608              MOV      r0,r1
+0001ae  8800              LDRH     r0,[r0,#0]  ; Bat_Pre
+0001b0  2814              CMP      r0,#0x14
+0001b2  da5b              BGE      |L2.620|
+0001b4  4608              MOV      r0,r1
+0001b6  8800              LDRH     r0,[r0,#0]  ; Bat_Pre
+0001b8  280a              CMP      r0,#0xa
+0001ba  dd57              BLE      |L2.620|
+0001bc  48bb              LDR      r0,|L2.1196|
+0001be  7800              LDRB     r0,[r0,#0]  ; Bat_Pre_Flag
+0001c0  2800              CMP      r0,#0
+0001c2  d153              BNE      |L2.620|
+;;;246    		{	
+;;;247    			Bat_Pre_Flag =  1;
+0001c4  2001              MOVS     r0,#1
+0001c6  49b9              LDR      r1,|L2.1196|
+0001c8  7008              STRB     r0,[r1,#0]
+;;;248    			memset(send_buff, 0, 100);	
+0001ca  2164              MOVS     r1,#0x64
+0001cc  4895              LDR      r0,|L2.1060|
+0001ce  f7fffffe          BL       __aeabi_memclr
+;;;249    			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
+0001d2  a0b7              ADR      r0,|L2.1200|
+0001d4  4b8a              LDR      r3,|L2.1024|
+0001d6  a296              ADR      r2,|L2.1072|
+0001d8  a19b              ADR      r1,|L2.1096|
+0001da  9000              STR      r0,[sp,#0]
+0001dc  4891              LDR      r0,|L2.1060|
+0001de  f7fffffe          BL       __2sprintf
+;;;250    
+;;;251    			USART_OUT(USART1, "ccc=%s\r\n", send_buff);
+0001e2  4a90              LDR      r2,|L2.1060|
+0001e4  a1b4              ADR      r1,|L2.1208|
+0001e6  4884              LDR      r0,|L2.1016|
+0001e8  f7fffffe          BL       USART_OUT
+;;;252    
+;;;253    			ret = gprs_send_at(send_buff, ">", 300, 2000);
+0001ec  f44f63fa          MOV      r3,#0x7d0
+0001f0  f44f7296          MOV      r2,#0x12c
+0001f4  a196              ADR      r1,|L2.1104|
+0001f6  488b              LDR      r0,|L2.1060|
+0001f8  f7fffffe          BL       gprs_send_at
+0001fc  4604              MOV      r4,r0
+;;;254    			if(ret != NULL)
+0001fe  2c00              CMP      r4,#0
+000200  d034              BEQ      |L2.620|
+;;;255    			{
+;;;256    				memset(expressText, 0 ,512);
+000202  f44f7100          MOV      r1,#0x200
+000206  4893              LDR      r0,|L2.1108|
+000208  f7fffffe          BL       __aeabi_memclr
+;;;257    				memset(cipherText, 0 ,512);
+00020c  f44f7100          MOV      r1,#0x200
+000210  4891              LDR      r0,|L2.1112|
+000212  f7fffffe          BL       __aeabi_memclr
+;;;258    				sprintf((char *)expressText, "{%c%s%c:%s}",'"',"battery",'"',"20");
+000216  a0ab              ADR      r0,|L2.1220|
+000218  2122              MOVS     r1,#0x22
+00021a  a3ab              ADR      r3,|L2.1224|
+00021c  460a              MOV      r2,r1
+00021e  e9cd1000          STRD     r1,r0,[sp,#0]
+000222  a1ab              ADR      r1,|L2.1232|
+000224  488b              LDR      r0,|L2.1108|
+000226  f7fffffe          BL       __2sprintf
+;;;259    				USART_OUT(USART1, "expressText=%s\r\n", expressText);
+00022a  4a8a              LDR      r2,|L2.1108|
+00022c  a18e              ADR      r1,|L2.1128|
+00022e  4872              LDR      r0,|L2.1016|
+000230  f7fffffe          BL       USART_OUT
+;;;260    				AES_Encrypt((char *)expressText, cipherText, aesKey);
+000234  4a91              LDR      r2,|L2.1148|
+000236  4988              LDR      r1,|L2.1112|
+000238  4886              LDR      r0,|L2.1108|
+00023a  f7fffffe          BL       AES_Encrypt
+;;;261    				
+;;;262    				USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
+00023e  4a8f              LDR      r2,|L2.1148|
+000240  a18f              ADR      r1,|L2.1152|
+000242  486d              LDR      r0,|L2.1016|
+000244  f7fffffe          BL       USART_OUT
+;;;263    				USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+000248  4a83              LDR      r2,|L2.1112|
+00024a  a190              ADR      r1,|L2.1164|
+00024c  486a              LDR      r0,|L2.1016|
+00024e  f7fffffe          BL       USART_OUT
+;;;264    				ret = gprs_send_at(cipherText, "OK", 300, 0);
+000252  2300              MOVS     r3,#0
+000254  f44f7296          MOV      r2,#0x12c
+000258  a190              ADR      r1,|L2.1180|
+00025a  487f              LDR      r0,|L2.1112|
+00025c  f7fffffe          BL       gprs_send_at
+000260  4604              MOV      r4,r0
+;;;265    				if(ret != NULL)
+000262  b11c              CBZ      r4,|L2.620|
+;;;266    				{
+;;;267    					timer_is_timeout_1ms(timer_heartbeat, 0);
+000264  2100              MOVS     r1,#0
+000266  2006              MOVS     r0,#6
+000268  f7fffffe          BL       timer_is_timeout_1ms
+                  |L2.620|
+;;;268    				}			
+;;;269    			}
+;;;270    			else
+;;;271    			{
+;;;272    				
+;;;273    			}
+;;;274    ////			
+;;;275    //			if(Bat_Pre<10&&Bat_Pre_Flag==1)
+;;;276    //			{
+;;;277    //				Bat_Pre_Flag=0;
+;;;278    
+;;;279    //				memset(send_buff, 0, 100);
+;;;280    //				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
+;;;281    //				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+;;;282    //				ret = gprs_send_at(send_buff, ">", 300, 2000);
+;;;283    //				if(ret != NULL)
+;;;284    //				{
+;;;285    //					memset(expressText, 0 ,512);
+;;;286    //					memset(cipherText, 0 ,512);
+;;;287    //					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
+;;;288    //					AES_Encrypt((char *)expressText, cipherText, aesKey);
+;;;289    
+;;;290    //					ret = gprs_send_at(cipherText, "OK", 300, 0);
+;;;291    //					if(ret != NULL)
+;;;292    //					{
+;;;293    //						timer_is_timeout_1ms(timer_heartbeat, 0);
+;;;294    //					}
+;;;295    //				}
+;;;296    //				else
+;;;297    //				{
+;;;298    //					
+;;;299    //				}
+;;;300    //			}
+;;;301    		}
+;;;302    //		//接收锁数据
+;;;303    		p1 = strstr((u8*)protocol_buff, "topic: lock/");
+00026c  a19b              ADR      r1,|L2.1244|
+00026e  489f              LDR      r0,|L2.1260|
+000270  f7fffffe          BL       strstr
+000274  499e              LDR      r1,|L2.1264|
+000276  6008              STR      r0,[r1,#0]  ; p1
+;;;304    		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
+000278  4961              LDR      r1,|L2.1024|
+00027a  489d              LDR      r0,|L2.1264|
+00027c  6800              LDR      r0,[r0,#0]  ; p1
+00027e  f7fffffe          BL       strstr
+000282  499c              LDR      r1,|L2.1268|
+000284  6008              STR      r0,[r1,#0]  ; p2
+;;;305    		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
+000286  220c              MOVS     r2,#0xc
+000288  a194              ADR      r1,|L2.1244|
+00028a  4899              LDR      r0,|L2.1264|
+00028c  6800              LDR      r0,[r0,#0]  ; p1
+00028e  f7fffffe          BL       strncmp
+000292  2800              CMP      r0,#0
+000294  d179              BNE      |L2.906|
+;;;306    		{
+;;;307    			
+;;;308    			if(LOCK_ON_READ()==0 || LOCK_OFF_READ()==0)
+000296  2110              MOVS     r1,#0x10
+000298  4897              LDR      r0,|L2.1272|
+00029a  f7fffffe          BL       GPIO_ReadInputDataBit
+00029e  b128              CBZ      r0,|L2.684|
+0002a0  2120              MOVS     r1,#0x20
+0002a2  4895              LDR      r0,|L2.1272|
+0002a4  f7fffffe          BL       GPIO_ReadInputDataBit
+0002a8  2800              CMP      r0,#0
+0002aa  d16e              BNE      |L2.906|
+                  |L2.684|
+;;;309    			{
+;;;310    			timer_is_timeout_1ms(timer_heartbeat, 0);
+0002ac  2100              MOVS     r1,#0
+0002ae  2006              MOVS     r0,#6
+0002b0  f7fffffe          BL       timer_is_timeout_1ms
+;;;311    			USART_OUT(USART1, "lock data\r\n");
+0002b4  a191              ADR      r1,|L2.1276|
+0002b6  4850              LDR      r0,|L2.1016|
+0002b8  f7fffffe          BL       USART_OUT
+;;;312    			memset(receiveText ,0 , 512);
+0002bc  f44f7100          MOV      r1,#0x200
+0002c0  4891              LDR      r0,|L2.1288|
+0002c2  f7fffffe          BL       __aeabi_memclr
+;;;313    			memset(expressText ,0 , 512);
+0002c6  f44f7100          MOV      r1,#0x200
+0002ca  4862              LDR      r0,|L2.1108|
+0002cc  f7fffffe          BL       __aeabi_memclr
+;;;314    			
+;;;315    			strcpy((char*)receiveText ,(char *)(p1+33));
+0002d0  4887              LDR      r0,|L2.1264|
+0002d2  6801              LDR      r1,[r0,#0]  ; p1
+0002d4  3121              ADDS     r1,r1,#0x21
+0002d6  488c              LDR      r0,|L2.1288|
+0002d8  f7fffffe          BL       strcpy
+;;;316    			USART_OUT(USART1, "receiveText=%s\r\n", receiveText);
+0002dc  4a8a              LDR      r2,|L2.1288|
+0002de  a18b              ADR      r1,|L2.1292|
+0002e0  4845              LDR      r0,|L2.1016|
+0002e2  f7fffffe          BL       USART_OUT
+;;;317    			AES_Decrypt(expressText, receiveText, aesKey);
+0002e6  4a65              LDR      r2,|L2.1148|
+0002e8  4987              LDR      r1,|L2.1288|
+0002ea  485a              LDR      r0,|L2.1108|
+0002ec  f7fffffe          BL       AES_Decrypt
+;;;318    			if(*expressText==0x31)
+0002f0  4858              LDR      r0,|L2.1108|
+0002f2  7800              LDRB     r0,[r0,#0]  ; expressText
+0002f4  2831              CMP      r0,#0x31
+0002f6  d11c              BNE      |L2.818|
+;;;319    			{
+;;;320    //				if(LOCK_ON_READ() == 0)
+;;;321    //				if(lock_on_status_get() == 0)
+;;;322    				if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
+0002f8  2110              MOVS     r1,#0x10
+0002fa  487f              LDR      r0,|L2.1272|
+0002fc  f7fffffe          BL       GPIO_ReadInputDataBit
+000300  b998              CBNZ     r0,|L2.810|
+000302  2120              MOVS     r1,#0x20
+000304  487c              LDR      r0,|L2.1272|
+000306  f7fffffe          BL       GPIO_ReadInputDataBit
+00030a  2801              CMP      r0,#1
+00030c  d10d              BNE      |L2.810|
+;;;323    				{
+;;;324    					timer_is_timeout_1ms(timer_open_lock, 0);
+00030e  2100              MOVS     r1,#0
+000310  2005              MOVS     r0,#5
+000312  f7fffffe          BL       timer_is_timeout_1ms
+;;;325    					Shaking=1;
+000316  2001              MOVS     r0,#1
+000318  4981              LDR      r1,|L2.1312|
+00031a  7008              STRB     r0,[r1,#0]
+;;;326    					Lock_Open=1;
+00031c  4981              LDR      r1,|L2.1316|
+00031e  7008              STRB     r0,[r1,#0]
+;;;327    					USART_OUT(USART1, "Lock_Open11111\r\n");
+000320  a181              ADR      r1,|L2.1320|
+000322  4835              LDR      r0,|L2.1016|
+000324  f7fffffe          BL       USART_OUT
+000328  e02a              B        |L2.896|
+                  |L2.810|
+;;;328    				}
+;;;329    				else
+;;;330    				{
+;;;331    					Lock_Open=0;
+00032a  2000              MOVS     r0,#0
+00032c  497d              LDR      r1,|L2.1316|
+00032e  7008              STRB     r0,[r1,#0]
+000330  e026              B        |L2.896|
+                  |L2.818|
+;;;332    				}
+;;;333    			}
+;;;334    			else if(*expressText==0x32)
+000332  4848              LDR      r0,|L2.1108|
+000334  7800              LDRB     r0,[r0,#0]  ; expressText
+000336  2832              CMP      r0,#0x32
+000338  d11c              BNE      |L2.884|
+;;;335    			{
+;;;336    //				if(LOCK_OFF_READ() == 0)
+;;;337    //				if(lock_off_status_get() == 0)
+;;;338    				if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	
+00033a  2110              MOVS     r1,#0x10
+00033c  486e              LDR      r0,|L2.1272|
+00033e  f7fffffe          BL       GPIO_ReadInputDataBit
+000342  2801              CMP      r0,#1
+000344  d112              BNE      |L2.876|
+000346  2120              MOVS     r1,#0x20
+000348  486b              LDR      r0,|L2.1272|
+00034a  f7fffffe          BL       GPIO_ReadInputDataBit
+00034e  b968              CBNZ     r0,|L2.876|
+;;;339    				{
+;;;340    					timer_is_timeout_1ms(timer_close_lock, 0);
+000350  2100              MOVS     r1,#0
+000352  2004              MOVS     r0,#4
+000354  f7fffffe          BL       timer_is_timeout_1ms
+;;;341    					Shaking=1;
+000358  2001              MOVS     r0,#1
+00035a  4971              LDR      r1,|L2.1312|
+00035c  7008              STRB     r0,[r1,#0]
+;;;342    					Lock_Close=1;
+00035e  4977              LDR      r1,|L2.1340|
+000360  7008              STRB     r0,[r1,#0]
+;;;343    					USART_OUT(USART1, "Lock_Close11111\r\n");
+000362  a177              ADR      r1,|L2.1344|
+000364  4824              LDR      r0,|L2.1016|
+000366  f7fffffe          BL       USART_OUT
+00036a  e009              B        |L2.896|
+                  |L2.876|
+;;;344    				}
+;;;345    				else
+;;;346    				{
+;;;347    					Lock_Close=0;
+00036c  2000              MOVS     r0,#0
+00036e  4973              LDR      r1,|L2.1340|
+000370  7008              STRB     r0,[r1,#0]
+000372  e005              B        |L2.896|
+                  |L2.884|
+;;;348    				}
+;;;349    			
+;;;350    			}
+;;;351    			else if(*expressText == 0x30)
+000374  4837              LDR      r0,|L2.1108|
+000376  7800              LDRB     r0,[r0,#0]  ; expressText
+000378  2830              CMP      r0,#0x30
+00037a  d101              BNE      |L2.896|
+;;;352    			{
+;;;353    				lock_stop();	//停止运行;
+00037c  f7fffffe          BL       lock_stop
+                  |L2.896|
+;;;354    			}
+;;;355    			
+;;;356    			memset(protocol_buff, 0, 512);					
+000380  f44f7100          MOV      r1,#0x200
+000384  4859              LDR      r0,|L2.1260|
+000386  f7fffffe          BL       __aeabi_memclr
+                  |L2.906|
+;;;357    		}
+;;;358    	}
+;;;359    
+;;;360    		//开锁逻辑		
+;;;361    		if(Lock_Open == 1)
+00038a  4866              LDR      r0,|L2.1316|
+00038c  7800              LDRB     r0,[r0,#0]  ; Lock_Open
+00038e  2801              CMP      r0,#1
+000390  d128              BNE      |L2.996|
+;;;362    		{
+;;;363    
+;;;364    			if(timer_is_timeout_1ms(timer_open_lock, 4000) == 0)
+000392  f44f617a          MOV      r1,#0xfa0
+000396  2005              MOVS     r0,#5
+000398  f7fffffe          BL       timer_is_timeout_1ms
+00039c  b940              CBNZ     r0,|L2.944|
+;;;365    			{
+;;;366    				lock_open_err_flag = 1;
+00039e  2001              MOVS     r0,#1
+0003a0  496c              LDR      r1,|L2.1364|
+0003a2  7008              STRB     r0,[r1,#0]
+;;;367    				
+;;;368    				lock_close();
+0003a4  f7fffffe          BL       lock_close
+;;;369    				USART_OUT(USART1, "Lock_Open timer\r\n");
+0003a8  a16b              ADR      r1,|L2.1368|
+0003aa  4813              LDR      r0,|L2.1016|
+0003ac  f7fffffe          BL       USART_OUT
+                  |L2.944|
+;;;370    			}
+;;;371    			USART_OUT(USART1, "Lock_Open\r\n");
+0003b0  a16e              ADR      r1,|L2.1388|
+0003b2  4811              LDR      r0,|L2.1016|
+0003b4  f7fffffe          BL       USART_OUT
+;;;372    			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
+0003b8  2110              MOVS     r1,#0x10
+0003ba  484f              LDR      r0,|L2.1272|
+0003bc  f7fffffe          BL       GPIO_ReadInputDataBit
+0003c0  b958              CBNZ     r0,|L2.986|
+0003c2  2120              MOVS     r1,#0x20
+0003c4  484c              LDR      r0,|L2.1272|
+0003c6  f7fffffe          BL       GPIO_ReadInputDataBit
+0003ca  2801              CMP      r0,#1
+0003cc  d105              BNE      |L2.986|
+;;;373    			{
+;;;374    				lock_open();	//开锁	
+0003ce  f7fffffe          BL       lock_open
+;;;375    				USART_OUT(USART1, "AAA lock_open\r\n");
+0003d2  a169              ADR      r1,|L2.1400|
+0003d4  4808              LDR      r0,|L2.1016|
+0003d6  f7fffffe          BL       USART_OUT
+                  |L2.986|
+;;;376    			}
+;;;377    //			if(LOCK_OFF_READ()==0) //正常开锁
+;;;378    			if(lock_off_status_get() == 0)
+0003da  f7fffffe          BL       lock_off_status_get
+0003de  2800              CMP      r0,#0
+0003e0  d101              BNE      |L2.998|
+;;;379    			{
+;;;380    				USART_OUT(USART1, "AAA lock_stop\r\n");
+0003e2  e0d1              B        |L2.1416|
+                  |L2.996|
+0003e4  e199              B        |L2.1818|
                   |L2.998|
-0003e6  e0d1              B        |L2.1420|
+0003e6  e12e              B        |L2.1606|
                   |L2.1000|
-0003e8  e0c1              B        |L2.1390|
-                  |L2.1002|
-0003ea  e0c4              B        |L2.1398|
-                  |L2.1004|
-0003ec  75617274          DCB      "uart1 is ok\r\n",0
-0003f0  31206973
-0003f4  206f6b0d
-0003f8  0a00    
-0003fa  00                DCB      0
-0003fb  00                DCB      0
-                  |L2.1020|
+0003e8  75617274          DCB      "uart1 is ok\r\n",0
+0003ec  31206973
+0003f0  206f6b0d
+0003f4  0a00    
+0003f6  00                DCB      0
+0003f7  00                DCB      0
+                  |L2.1016|
                           DCD      0x40013800
-                  |L2.1024|
+                  |L2.1020|
                           DCD      gprs_status
-                  |L2.1028|
+                  |L2.1024|
                           DCD      PARK_LOCK_Buffer
-                  |L2.1032|
+                  |L2.1028|
                           DCD      gps_send_flag
-                  |L2.1036|
+                  |L2.1032|
                           DCD      0x40011000
-                  |L2.1040|
+                  |L2.1036|
                           DCD      gps_buff
-                  |L2.1044|
+                  |L2.1040|
                           DCD      gpsx
-                  |L2.1048|
+                  |L2.1044|
                           DCD      latitudedtbuf
-                  |L2.1052|
-00041c  25730d0a          DCB      "%s\r\n",0
-000420  00      
-000421  00                DCB      0
-000422  00                DCB      0
-000423  00                DCB      0
-                  |L2.1060|
+                  |L2.1048|
+000418  25730d0a          DCB      "%s\r\n",0
+00041c  00      
+00041d  00                DCB      0
+00041e  00                DCB      0
+00041f  00                DCB      0
+                  |L2.1056|
                           DCD      longitudedtbuf
-                  |L2.1064|
+                  |L2.1060|
                           DCD      send_buff
-                  |L2.1068|
-00042c  2c36342c          DCB      ",64,2\r\n",0
-000430  320d0a00
-                  |L2.1076|
-000434  41542b50          DCB      "AT+PUBLISH=lockdata/",0
-000438  55424c49
-00043c  53483d6c
-000440  6f636b64
-000444  6174612f
-000448  00      
-000449  00                DCB      0
-00044a  00                DCB      0
-00044b  00                DCB      0
-                  |L2.1100|
-00044c  25732573          DCB      "%s%s%s",0
-000450  257300  
+                  |L2.1064|
+000428  2c36342c          DCB      ",64,2\r\n",0
+00042c  320d0a00
+                  |L2.1072|
+000430  41542b50          DCB      "AT+PUBLISH=lockdata/",0
+000434  55424c49
+000438  53483d6c
+00043c  6f636b64
+000440  6174612f
+000444  00      
+000445  00                DCB      0
+000446  00                DCB      0
+000447  00                DCB      0
+                  |L2.1096|
+000448  25732573          DCB      "%s%s%s",0
+00044c  257300  
+00044f  00                DCB      0
+                  |L2.1104|
+000450  3e00              DCB      ">",0
+000452  00                DCB      0
 000453  00                DCB      0
                   |L2.1108|
-000454  3e00              DCB      ">",0
-000456  00                DCB      0
-000457  00                DCB      0
-                  |L2.1112|
                           DCD      expressText
-                  |L2.1116|
+                  |L2.1112|
                           DCD      cipherText
-                  |L2.1120|
-000460  25632573          DCB      "%c%s,%s%c",0
-000464  2c257325
-000468  6300    
-00046a  00                DCB      0
-00046b  00                DCB      0
-                  |L2.1132|
-00046c  65787072          DCB      "expressText=%s\r\n",0
-000470  65737354
-000474  6578743d
-000478  25730d0a
-00047c  00      
-00047d  00                DCB      0
-00047e  00                DCB      0
-00047f  00                DCB      0
-                  |L2.1152|
+                  |L2.1116|
+00045c  25632573          DCB      "%c%s,%s%c",0
+000460  2c257325
+000464  6300    
+000466  00                DCB      0
+000467  00                DCB      0
+                  |L2.1128|
+000468  65787072          DCB      "expressText=%s\r\n",0
+00046c  65737354
+000470  6578743d
+000474  25730d0a
+000478  00      
+000479  00                DCB      0
+00047a  00                DCB      0
+00047b  00                DCB      0
+                  |L2.1148|
                           DCD      aesKey
-                  |L2.1156|
-000484  6165734b          DCB      "aesKey=%s\r\n",0
-000488  65793d25
-00048c  730d0a00
-                  |L2.1168|
-000490  63697068          DCB      "cipherText=%s\r\n",0
-000494  65725465
-000498  78743d25
-00049c  730d0a00
+                  |L2.1152|
+000480  6165734b          DCB      "aesKey=%s\r\n",0
+000484  65793d25
+000488  730d0a00
+                  |L2.1164|
+00048c  63697068          DCB      "cipherText=%s\r\n",0
+000490  65725465
+000494  78743d25
+000498  730d0a00
+                  |L2.1180|
+00049c  4f4b00            DCB      "OK",0
+00049f  00                DCB      0
                   |L2.1184|
-0004a0  4f4b00            DCB      "OK",0
-0004a3  00                DCB      0
-                  |L2.1188|
                           DCD      0x000493e0
-                  |L2.1192|
+                  |L2.1188|
                           DCD      Bat_V
-                  |L2.1196|
+                  |L2.1192|
                           DCD      Bat_Pre
-                  |L2.1200|
+                  |L2.1196|
                           DCD      Bat_Pre_Flag
-                  |L2.1204|
-0004b4  2c32342c          DCB      ",24,2\r\n",0
-0004b8  320d0a00
-                  |L2.1212|
-0004bc  6363633d          DCB      "ccc=%s\r\n",0
-0004c0  25730d0a
-0004c4  00      
-0004c5  00                DCB      0
-0004c6  00                DCB      0
+                  |L2.1200|
+0004b0  2c32342c          DCB      ",24,2\r\n",0
+0004b4  320d0a00
+                  |L2.1208|
+0004b8  6363633d          DCB      "ccc=%s\r\n",0
+0004bc  25730d0a
+0004c0  00      
+0004c1  00                DCB      0
+0004c2  00                DCB      0
+0004c3  00                DCB      0
+                  |L2.1220|
+0004c4  323000            DCB      "20",0
 0004c7  00                DCB      0
                   |L2.1224|
-0004c8  323000            DCB      "20",0
-0004cb  00                DCB      0
-                  |L2.1228|
-0004cc  62617474          DCB      "battery",0
-0004d0  65727900
-                  |L2.1236|
-0004d4  7b256325          DCB      "{%c%s%c:%s}",0
-0004d8  7325633a
-0004dc  25737d00
-                  |L2.1248|
-0004e0  25732573          DCB      "%s%s%",0
-0004e4  2500    
-0004e6  00                DCB      0
-0004e7  00                DCB      0
-                  |L2.1256|
-0004e8  73656e64          DCB      "send_buff=%s\r\n",0
-0004ec  5f627566
-0004f0  663d2573
-0004f4  0d0a00  
-0004f7  00                DCB      0
-                  |L2.1272|
-0004f8  313000            DCB      "10",0
-0004fb  00                DCB      0
-                  |L2.1276|
-                          DCD      tmp
-                  |L2.1280|
-000500  746f7069          DCB      "topic: lock/",0
-000504  633a206c
-000508  6f636b2f
-00050c  00      
-00050d  00                DCB      0
-00050e  00                DCB      0
-00050f  00                DCB      0
-                  |L2.1296|
+0004c8  62617474          DCB      "battery",0
+0004cc  65727900
+                  |L2.1232|
+0004d0  7b256325          DCB      "{%c%s%c:%s}",0
+0004d4  7325633a
+0004d8  25737d00
+                  |L2.1244|
+0004dc  746f7069          DCB      "topic: lock/",0
+0004e0  633a206c
+0004e4  6f636b2f
+0004e8  00      
+0004e9  00                DCB      0
+0004ea  00                DCB      0
+0004eb  00                DCB      0
+                  |L2.1260|
                           DCD      protocol_buff
-                  |L2.1300|
+                  |L2.1264|
                           DCD      ||p1||
-                  |L2.1304|
+                  |L2.1268|
                           DCD      ||p2||
-                  |L2.1308|
+                  |L2.1272|
                           DCD      0x40010800
-                  |L2.1312|
-000520  6c6f636b          DCB      "lock data\r\n",0
-000524  20646174
-000528  610d0a00
-                  |L2.1324|
+                  |L2.1276|
+0004fc  6c6f636b          DCB      "lock data\r\n",0
+000500  20646174
+000504  610d0a00
+                  |L2.1288|
                           DCD      receiveText
-                  |L2.1328|
-000530  72656365          DCB      "receiveText=%s\r\n",0
-000534  69766554
-000538  6578743d
-00053c  25730d0a
-000540  00      
-000541  00                DCB      0
-000542  00                DCB      0
-000543  00                DCB      0
-                  |L2.1348|
+                  |L2.1292|
+00050c  72656365          DCB      "receiveText=%s\r\n",0
+000510  69766554
+000514  6578743d
+000518  25730d0a
+00051c  00      
+00051d  00                DCB      0
+00051e  00                DCB      0
+00051f  00                DCB      0
+                  |L2.1312|
                           DCD      Shaking
-                  |L2.1352|
+                  |L2.1316|
                           DCD      Lock_Open
-                  |L2.1356|
-00054c  4c6f636b          DCB      "Lock_Open11111\r\n",0
-000550  5f4f7065
-000554  6e313131
-000558  31310d0a
-00055c  00      
-00055d  00                DCB      0
-00055e  00                DCB      0
-00055f  00                DCB      0
-                  |L2.1376|
+                  |L2.1320|
+000528  4c6f636b          DCB      "Lock_Open11111\r\n",0
+00052c  5f4f7065
+000530  6e313131
+000534  31310d0a
+000538  00      
+000539  00                DCB      0
+00053a  00                DCB      0
+00053b  00                DCB      0
+                  |L2.1340|
                           DCD      Lock_Close
-                  |L2.1380|
-000564  a1f9              ADR      r1,|L2.2380|
-000566  48fe              LDR      r0,|L2.2400|
-000568  f7fffffe          BL       USART_OUT
-00056c  e009              B        |L2.1410|
-                  |L2.1390|
-;;;333    				}
-;;;334    				else
-;;;335    				{
-;;;336    					Lock_Close=0;
-00056e  2000              MOVS     r0,#0
-000570  49fc              LDR      r1,|L2.2404|
-000572  7008              STRB     r0,[r1,#0]
-000574  e005              B        |L2.1410|
-                  |L2.1398|
-;;;337    				}
-;;;338    			
-;;;339    			}
-;;;340    			else if(*expressText == 0x30)
-000576  48fc              LDR      r0,|L2.2408|
-000578  7800              LDRB     r0,[r0,#0]  ; expressText
-00057a  2830              CMP      r0,#0x30
-00057c  d101              BNE      |L2.1410|
-;;;341    			{
-;;;342    				lock_stop();	//停止运行;
-00057e  f7fffffe          BL       lock_stop
-                  |L2.1410|
-;;;343    			}
-;;;344    			
-;;;345    			memset(protocol_buff, 0, 512);					
-000582  f44f7100          MOV      r1,#0x200
-000586  48f9              LDR      r0,|L2.2412|
-000588  f7fffffe          BL       __aeabi_memclr
-                  |L2.1420|
-;;;346    		}
-;;;347    	}
-;;;348    
-;;;349    		//开锁逻辑		
-;;;350    		if(Lock_Open == 1)
-00058c  48f8              LDR      r0,|L2.2416|
-00058e  7800              LDRB     r0,[r0,#0]  ; Lock_Open
-000590  2801              CMP      r0,#1
-000592  d17d              BNE      |L2.1680|
-;;;351    		{
-;;;352    
-;;;353    			if(timer_is_timeout_1ms(timer_open_lock, 4000) == 0)
-000594  f44f617a          MOV      r1,#0xfa0
-000598  2005              MOVS     r0,#5
-00059a  f7fffffe          BL       timer_is_timeout_1ms
-00059e  b940              CBNZ     r0,|L2.1458|
-;;;354    			{
-;;;355    				lock_open_err_flag = 1;
-0005a0  2001              MOVS     r0,#1
-0005a2  49f4              LDR      r1,|L2.2420|
-0005a4  7008              STRB     r0,[r1,#0]
-;;;356    				
-;;;357    				lock_close();
-0005a6  f7fffffe          BL       lock_close
-;;;358    				USART_OUT(USART1, "Lock_Open timer\r\n");
-0005aa  a1f3              ADR      r1,|L2.2424|
-0005ac  48ec              LDR      r0,|L2.2400|
-0005ae  f7fffffe          BL       USART_OUT
-                  |L2.1458|
-;;;359    			}
-;;;360    			USART_OUT(USART1, "Lock_Open\r\n");
-0005b2  a1f6              ADR      r1,|L2.2444|
-0005b4  48ea              LDR      r0,|L2.2400|
-0005b6  f7fffffe          BL       USART_OUT
-;;;361    			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
-0005ba  2110              MOVS     r1,#0x10
-0005bc  48f6              LDR      r0,|L2.2456|
-0005be  f7fffffe          BL       GPIO_ReadInputDataBit
-0005c2  b958              CBNZ     r0,|L2.1500|
-0005c4  2120              MOVS     r1,#0x20
-0005c6  48f4              LDR      r0,|L2.2456|
-0005c8  f7fffffe          BL       GPIO_ReadInputDataBit
-0005cc  2801              CMP      r0,#1
-0005ce  d105              BNE      |L2.1500|
-;;;362    			{
-;;;363    				lock_open();	//开锁	
-0005d0  f7fffffe          BL       lock_open
-;;;364    				USART_OUT(USART1, "AAA lock_open\r\n");
-0005d4  a1f1              ADR      r1,|L2.2460|
-0005d6  48e2              LDR      r0,|L2.2400|
-0005d8  f7fffffe          BL       USART_OUT
-                  |L2.1500|
-;;;365    			}
-;;;366    //			if(LOCK_OFF_READ()==0) //正常开锁
-;;;367    			if(lock_off_status_get() == 0)
-0005dc  f7fffffe          BL       lock_off_status_get
-0005e0  2800              CMP      r0,#0
-0005e2  d15c              BNE      |L2.1694|
-;;;368    			{
-;;;369    				USART_OUT(USART1, "AAA lock_stop\r\n");
-0005e4  a1f1              ADR      r1,|L2.2476|
-0005e6  48de              LDR      r0,|L2.2400|
-0005e8  f7fffffe          BL       USART_OUT
-;;;370    				
-;;;371    				Lock_Open = 0;
-0005ec  2000              MOVS     r0,#0
-0005ee  49e0              LDR      r1,|L2.2416|
-0005f0  7008              STRB     r0,[r1,#0]
-;;;372    				lock_stop();	//停止运行
-0005f2  f7fffffe          BL       lock_stop
-;;;373    				Shaking = 0;
-0005f6  2000              MOVS     r0,#0
-0005f8  49f0              LDR      r1,|L2.2492|
-0005fa  7008              STRB     r0,[r1,#0]
-;;;374    				
-;;;375    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-0005fc  a0f0              ADR      r0,|L2.2496|
-0005fe  4bf2              LDR      r3,|L2.2504|
-000600  a2f2              ADR      r2,|L2.2508|
-000602  f2af11b8          ADR      r1,|L2.1100|
-000606  9000              STR      r0,[sp,#0]
-000608  48f6              LDR      r0,|L2.2532|
-00060a  f7fffffe          BL       __2sprintf
-;;;376    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-00060e  4af5              LDR      r2,|L2.2532|
-000610  f2af112c          ADR      r1,|L2.1256|
-000614  48d2              LDR      r0,|L2.2400|
-000616  f7fffffe          BL       USART_OUT
-;;;377    				ret = gprs_send_at(send_buff, ">", 300, 0);
-00061a  2300              MOVS     r3,#0
-00061c  f44f7296          MOV      r2,#0x12c
-000620  f2af11d0          ADR      r1,|L2.1108|
-000624  48ef              LDR      r0,|L2.2532|
-000626  f7fffffe          BL       gprs_send_at
-00062a  4604              MOV      r4,r0
-;;;378    				if(ret != NULL)
-00062c  b38c              CBZ      r4,|L2.1682|
-;;;379    				{
-;;;380    					memset(expressText, 0 ,512);
-00062e  f44f7100          MOV      r1,#0x200
-000632  48cd              LDR      r0,|L2.2408|
-000634  f7fffffe          BL       __aeabi_memclr
-;;;381    					memset(cipherText, 0 ,512);
-000638  f44f7100          MOV      r1,#0x200
-00063c  48ea              LDR      r0,|L2.2536|
-00063e  f7fffffe          BL       __aeabi_memclr
-;;;382    					sprintf(expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"0");
-000642  a0ea              ADR      r0,|L2.2540|
-000644  2122              MOVS     r1,#0x22
-000646  a2ea              ADR      r2,|L2.2544|
-000648  e9cd1202          STRD     r1,r2,[sp,#8]
-00064c  e9cd1004          STRD     r1,r0,[sp,#0x10]
-000650  a0e8              ADR      r0,|L2.2548|
-000652  a3e9              ADR      r3,|L2.2552|
-000654  460a              MOV      r2,r1
-000656  e9cd1000          STRD     r1,r0,[sp,#0]
-00065a  a1e8              ADR      r1,|L2.2556|
-00065c  48c2              LDR      r0,|L2.2408|
-00065e  f7fffffe          BL       __2sprintf
-;;;383    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
-000662  4ac1              LDR      r2,|L2.2408|
-000664  f2af11fc          ADR      r1,|L2.1132|
-000668  48bd              LDR      r0,|L2.2400|
-00066a  f7fffffe          BL       USART_OUT
-;;;384    					AES_Encrypt((char *)expressText, cipherText, aesKey);
-00066e  4ae9              LDR      r2,|L2.2580|
-000670  49dd              LDR      r1,|L2.2536|
-000672  48bd              LDR      r0,|L2.2408|
-000674  f7fffffe          BL       AES_Encrypt
-;;;385    					USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-000678  4adb              LDR      r2,|L2.2536|
-00067a  f2af11ec          ADR      r1,|L2.1168|
-00067e  48b8              LDR      r0,|L2.2400|
-000680  f7fffffe          BL       USART_OUT
-;;;386    					
-;;;387    					ret = gprs_send_at(cipherText, "OK", 300, 0);
-000684  2300              MOVS     r3,#0
-000686  f44f7296          MOV      r2,#0x12c
-00068a  f2af11ec          ADR      r1,|L2.1184|
-00068e  e001              B        |L2.1684|
-                  |L2.1680|
-000690  e06b              B        |L2.1898|
-                  |L2.1682|
-000692  e004              B        |L2.1694|
-                  |L2.1684|
-000694  48d4              LDR      r0,|L2.2536|
-000696  f7fffffe          BL       gprs_send_at
-00069a  4604              MOV      r4,r0
-;;;388    					if(ret == NULL)
-00069c  bf00              NOP      
-                  |L2.1694|
-;;;389    					{
-;;;390    						
-;;;391    					}
-;;;392    				}			
-;;;393    			}
-;;;394    			
-;;;395    			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1 && lock_open_err_flag == 1)//开锁超时异常处理
-00069e  2110              MOVS     r1,#0x10
-0006a0  48bd              LDR      r0,|L2.2456|
-0006a2  f7fffffe          BL       GPIO_ReadInputDataBit
-0006a6  2800              CMP      r0,#0
-0006a8  d15f              BNE      |L2.1898|
-0006aa  2120              MOVS     r1,#0x20
-0006ac  48ba              LDR      r0,|L2.2456|
-0006ae  f7fffffe          BL       GPIO_ReadInputDataBit
-0006b2  2801              CMP      r0,#1
-0006b4  d159              BNE      |L2.1898|
-0006b6  48af              LDR      r0,|L2.2420|
-0006b8  7800              LDRB     r0,[r0,#0]  ; lock_open_err_flag
-0006ba  2801              CMP      r0,#1
-0006bc  d155              BNE      |L2.1898|
-;;;396    			{
-;;;397    				lock_open_err_flag = 0;
-0006be  2000              MOVS     r0,#0
-0006c0  49ac              LDR      r1,|L2.2420|
-0006c2  7008              STRB     r0,[r1,#0]
-;;;398    				Lock_Open = 0;
-0006c4  49aa              LDR      r1,|L2.2416|
-0006c6  7008              STRB     r0,[r1,#0]
-;;;399    				lock_stop();
-0006c8  f7fffffe          BL       lock_stop
-;;;400    				Shaking = 0;
-0006cc  2000              MOVS     r0,#0
-0006ce  49bb              LDR      r1,|L2.2492|
-0006d0  7008              STRB     r0,[r1,#0]
-;;;401    				USART_OUT(USART1, "open lock unusual\r\n");
-0006d2  a1d1              ADR      r1,|L2.2584|
-0006d4  48a2              LDR      r0,|L2.2400|
-0006d6  f7fffffe          BL       USART_OUT
-;;;402    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-0006da  a0b9              ADR      r0,|L2.2496|
-0006dc  4bba              LDR      r3,|L2.2504|
-0006de  a2bb              ADR      r2,|L2.2508|
-0006e0  f2af2198          ADR      r1,|L2.1100|
-0006e4  9000              STR      r0,[sp,#0]
-0006e6  48bf              LDR      r0,|L2.2532|
-0006e8  f7fffffe          BL       __2sprintf
-;;;403    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-0006ec  4abd              LDR      r2,|L2.2532|
-0006ee  f2af2108          ADR      r1,|L2.1256|
-0006f2  489b              LDR      r0,|L2.2400|
-0006f4  f7fffffe          BL       USART_OUT
-;;;404    				ret = gprs_send_at(send_buff, ">", 300, 0);
-0006f8  2300              MOVS     r3,#0
-0006fa  f44f7296          MOV      r2,#0x12c
-0006fe  f2af21ac          ADR      r1,|L2.1108|
-000702  48b8              LDR      r0,|L2.2532|
-000704  f7fffffe          BL       gprs_send_at
-000708  4604              MOV      r4,r0
-;;;405    				if(ret != NULL)
-00070a  b374              CBZ      r4,|L2.1898|
-;;;406    				{
-;;;407    					memset(expressText, 0 ,512);
-00070c  f44f7100          MOV      r1,#0x200
-000710  4895              LDR      r0,|L2.2408|
-000712  f7fffffe          BL       __aeabi_memclr
-;;;408    					memset(cipherText, 0 ,512);
-000716  f44f7100          MOV      r1,#0x200
-00071a  48b3              LDR      r0,|L2.2536|
-00071c  f7fffffe          BL       __aeabi_memclr
-;;;409    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"1");
-000720  a0b4              ADR      r0,|L2.2548|
-000722  2122              MOVS     r1,#0x22
-000724  a2b2              ADR      r2,|L2.2544|
-000726  e9cd1202          STRD     r1,r2,[sp,#8]
-00072a  e9cd1004          STRD     r1,r0,[sp,#0x10]
-00072e  a0b1              ADR      r0,|L2.2548|
-000730  a3b1              ADR      r3,|L2.2552|
-000732  460a              MOV      r2,r1
-000734  e9cd1000          STRD     r1,r0,[sp,#0]
-000738  a1b0              ADR      r1,|L2.2556|
-00073a  488b              LDR      r0,|L2.2408|
-00073c  f7fffffe          BL       __2sprintf
-;;;410    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
-000740  4a89              LDR      r2,|L2.2408|
-000742  f2af21d8          ADR      r1,|L2.1132|
-000746  4886              LDR      r0,|L2.2400|
-000748  f7fffffe          BL       USART_OUT
-;;;411    					AES_Encrypt((char *)expressText, cipherText, aesKey);
-00074c  4ab1              LDR      r2,|L2.2580|
-00074e  49a6              LDR      r1,|L2.2536|
-000750  4885              LDR      r0,|L2.2408|
-000752  f7fffffe          BL       AES_Encrypt
-;;;412    					ret = gprs_send_at(cipherText, "OK", 300, 0);
-000756  2300              MOVS     r3,#0
-000758  f44f7296          MOV      r2,#0x12c
-00075c  f2af21c0          ADR      r1,|L2.1184|
-000760  48a1              LDR      r0,|L2.2536|
-000762  f7fffffe          BL       gprs_send_at
-000766  4604              MOV      r4,r0
-;;;413    					if(ret == NULL)
-000768  bf00              NOP      
-                  |L2.1898|
-;;;414    					{
-;;;415    						
-;;;416    					}
-;;;417    				}	
-;;;418    			}
-;;;419    		}
-;;;420    		//关锁逻辑
-;;;421    		if(Lock_Close == 1)
-00076a  487e              LDR      r0,|L2.2404|
-00076c  7800              LDRB     r0,[r0,#0]  ; Lock_Close
-00076e  2801              CMP      r0,#1
-000770  d17e              BNE      |L2.2160|
-;;;422    		{
-;;;423    			if(timer_is_timeout_1ms(timer_close_lock, 4000) == 0)
-000772  f44f617a          MOV      r1,#0xfa0
-000776  2004              MOVS     r0,#4
-000778  f7fffffe          BL       timer_is_timeout_1ms
-00077c  b940              CBNZ     r0,|L2.1936|
-;;;424    			{
-;;;425    				lock_open();
-00077e  f7fffffe          BL       lock_open
-;;;426    				lock_close_err_flag = 1;
-000782  2001              MOVS     r0,#1
-000784  49a9              LDR      r1,|L2.2604|
-000786  7008              STRB     r0,[r1,#0]
-;;;427    				USART_OUT(USART1, "Lock_Close timer\r\n");
-000788  a1a9              ADR      r1,|L2.2608|
-00078a  4875              LDR      r0,|L2.2400|
-00078c  f7fffffe          BL       USART_OUT
-                  |L2.1936|
-;;;428    			}
-;;;429    			USART_OUT(USART1, "lock close\r\n");
-000790  a1ac              ADR      r1,|L2.2628|
-000792  4873              LDR      r0,|L2.2400|
-000794  f7fffffe          BL       USART_OUT
-;;;430    			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	//正常关锁
-000798  2110              MOVS     r1,#0x10
-00079a  487f              LDR      r0,|L2.2456|
-00079c  f7fffffe          BL       GPIO_ReadInputDataBit
-0007a0  2801              CMP      r0,#1
-0007a2  d10a              BNE      |L2.1978|
-0007a4  2120              MOVS     r1,#0x20
-0007a6  487c              LDR      r0,|L2.2456|
-0007a8  f7fffffe          BL       GPIO_ReadInputDataBit
-0007ac  b928              CBNZ     r0,|L2.1978|
-;;;431    			{
-;;;432    				lock_close();
-0007ae  f7fffffe          BL       lock_close
-;;;433    				USART_OUT(USART1, "BBB lock close\r\n");
-0007b2  a1a8              ADR      r1,|L2.2644|
-0007b4  486a              LDR      r0,|L2.2400|
-0007b6  f7fffffe          BL       USART_OUT
-                  |L2.1978|
-;;;434    			}
-;;;435    			
-;;;436    //			if(LOCK_ON_READ() == 0)	//正常关锁
-;;;437    			if(lock_on_status_get() == 0)
-0007ba  f7fffffe          BL       lock_on_status_get
-0007be  2800              CMP      r0,#0
-0007c0  d153              BNE      |L2.2154|
-;;;438    			{
-;;;439    				Lock_Close = 0;
-0007c2  4968              LDR      r1,|L2.2404|
-0007c4  7008              STRB     r0,[r1,#0]
-;;;440    				lock_stop();	//停止运行
-0007c6  f7fffffe          BL       lock_stop
-;;;441    				Shaking = 0;
-0007ca  2000              MOVS     r0,#0
-0007cc  497b              LDR      r1,|L2.2492|
-0007ce  7008              STRB     r0,[r1,#0]
-;;;442    				USART_OUT(USART1, "BBB lock_stop\r\n");
-0007d0  a1a5              ADR      r1,|L2.2664|
-0007d2  4863              LDR      r0,|L2.2400|
-0007d4  f7fffffe          BL       USART_OUT
-;;;443    				
-;;;444    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-0007d8  a079              ADR      r0,|L2.2496|
-0007da  4b7b              LDR      r3,|L2.2504|
-0007dc  a27b              ADR      r2,|L2.2508|
-0007de  f2af3194          ADR      r1,|L2.1100|
-0007e2  9000              STR      r0,[sp,#0]
-0007e4  487f              LDR      r0,|L2.2532|
-0007e6  f7fffffe          BL       __2sprintf
-;;;445    				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
-0007ea  4a7e              LDR      r2,|L2.2532|
-0007ec  a1a2              ADR      r1,|L2.2680|
-0007ee  485c              LDR      r0,|L2.2400|
-0007f0  f7fffffe          BL       USART_OUT
-;;;446    				ret = gprs_send_at(send_buff, ">", 300, 0);
-0007f4  2300              MOVS     r3,#0
-0007f6  f44f7296          MOV      r2,#0x12c
-0007fa  f2af31a8          ADR      r1,|L2.1108|
-0007fe  4879              LDR      r0,|L2.2532|
-000800  f7fffffe          BL       gprs_send_at
-000804  4604              MOV      r4,r0
-;;;447    				if(ret != NULL)
-000806  b384              CBZ      r4,|L2.2154|
-;;;448    				{
-;;;449    					memset(expressText, 0 ,512);
-000808  f44f7100          MOV      r1,#0x200
-00080c  4856              LDR      r0,|L2.2408|
-00080e  f7fffffe          BL       __aeabi_memclr
-;;;450    					memset(cipherText, 0 ,512);
-000812  e000              B        |L2.2070|
-                  |L2.2068|
-000814  e208              B        |L2.3112|
-                  |L2.2070|
-000816  f44f7100          MOV      r1,#0x200
-00081a  4873              LDR      r0,|L2.2536|
-00081c  f7fffffe          BL       __aeabi_memclr
-;;;451    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"0");
-000820  a072              ADR      r0,|L2.2540|
-000822  2122              MOVS     r1,#0x22
-000824  a272              ADR      r2,|L2.2544|
-000826  e9cd1202          STRD     r1,r2,[sp,#8]
-00082a  e9cd1004          STRD     r1,r0,[sp,#0x10]
-00082e  a098              ADR      r0,|L2.2704|
-000830  a371              ADR      r3,|L2.2552|
-000832  460a              MOV      r2,r1
-000834  e9cd1000          STRD     r1,r0,[sp,#0]
-000838  a170              ADR      r1,|L2.2556|
-00083a  484b              LDR      r0,|L2.2408|
-00083c  f7fffffe          BL       __2sprintf
-;;;452    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
-000840  4a49              LDR      r2,|L2.2408|
-000842  f2af31d8          ADR      r1,|L2.1132|
-000846  4846              LDR      r0,|L2.2400|
-000848  f7fffffe          BL       USART_OUT
-;;;453    					AES_Encrypt((char *)expressText, cipherText, aesKey);
-00084c  4a71              LDR      r2,|L2.2580|
-00084e  4966              LDR      r1,|L2.2536|
-000850  4845              LDR      r0,|L2.2408|
-000852  f7fffffe          BL       AES_Encrypt
-;;;454    					ret = gprs_send_at(cipherText, "OK", 300, 0);
-000856  2300              MOVS     r3,#0
-000858  f44f7296          MOV      r2,#0x12c
-00085c  f2af31c0          ADR      r1,|L2.1184|
-000860  4861              LDR      r0,|L2.2536|
-000862  f7fffffe          BL       gprs_send_at
-000866  4604              MOV      r4,r0
-;;;455    					if(ret == NULL)
-000868  bf00              NOP      
-                  |L2.2154|
-;;;456    					{
-;;;457    						
-;;;458    					}
-;;;459    				}
-;;;460    			}
-;;;461    			
-;;;462    			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0 && lock_close_err_flag == 1) //关锁超时处理
-00086a  2110              MOVS     r1,#0x10
-00086c  484a              LDR      r0,|L2.2456|
-00086e  e000              B        |L2.2162|
-                  |L2.2160|
-000870  e05d              B        |L2.2350|
-                  |L2.2162|
-000872  f7fffffe          BL       GPIO_ReadInputDataBit
-000876  2801              CMP      r0,#1
-000878  d159              BNE      |L2.2350|
-00087a  2120              MOVS     r1,#0x20
-00087c  4846              LDR      r0,|L2.2456|
-00087e  f7fffffe          BL       GPIO_ReadInputDataBit
-000882  2800              CMP      r0,#0
-000884  d153              BNE      |L2.2350|
-000886  4869              LDR      r0,|L2.2604|
-000888  7800              LDRB     r0,[r0,#0]  ; lock_close_err_flag
-00088a  2801              CMP      r0,#1
-00088c  d14f              BNE      |L2.2350|
-;;;463    			{
-;;;464    				lock_close_err_flag = 0;
-00088e  2000              MOVS     r0,#0
-000890  4966              LDR      r1,|L2.2604|
-000892  7008              STRB     r0,[r1,#0]
-;;;465    				Lock_Close = 0;
-000894  4933              LDR      r1,|L2.2404|
-000896  7008              STRB     r0,[r1,#0]
-;;;466    				lock_stop();	//停止运行
-000898  f7fffffe          BL       lock_stop
-;;;467    				Shaking = 0;
-00089c  2000              MOVS     r0,#0
-00089e  4947              LDR      r1,|L2.2492|
-0008a0  7008              STRB     r0,[r1,#0]
-;;;468    				USART_OUT(USART1, "close lock unusual\r\n");
-0008a2  a17c              ADR      r1,|L2.2708|
-0008a4  482e              LDR      r0,|L2.2400|
-0008a6  f7fffffe          BL       USART_OUT
-;;;469    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-0008aa  a045              ADR      r0,|L2.2496|
-0008ac  4b46              LDR      r3,|L2.2504|
-0008ae  a247              ADR      r2,|L2.2508|
-0008b0  f2af4168          ADR      r1,|L2.1100|
-0008b4  9000              STR      r0,[sp,#0]
-0008b6  484b              LDR      r0,|L2.2532|
-0008b8  f7fffffe          BL       __2sprintf
-;;;470    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-0008bc  4a49              LDR      r2,|L2.2532|
-0008be  f2af31d8          ADR      r1,|L2.1256|
-0008c2  4827              LDR      r0,|L2.2400|
-0008c4  f7fffffe          BL       USART_OUT
-;;;471    				ret = gprs_send_at(send_buff, ">", 300, 0);
-0008c8  2300              MOVS     r3,#0
-0008ca  f44f7296          MOV      r2,#0x12c
-0008ce  f2af417c          ADR      r1,|L2.1108|
-0008d2  4844              LDR      r0,|L2.2532|
-0008d4  f7fffffe          BL       gprs_send_at
-0008d8  4604              MOV      r4,r0
-;;;472    				if(ret != NULL)
-0008da  b344              CBZ      r4,|L2.2350|
-;;;473    				{
-;;;474    					memset(expressText, 0 ,512);
-0008dc  f44f7100          MOV      r1,#0x200
-0008e0  4821              LDR      r0,|L2.2408|
-0008e2  f7fffffe          BL       __aeabi_memclr
-;;;475    					memset(cipherText, 0 ,512);
-0008e6  f44f7100          MOV      r1,#0x200
-0008ea  483f              LDR      r0,|L2.2536|
-0008ec  f7fffffe          BL       __aeabi_memclr
-;;;476    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"1");
-0008f0  a040              ADR      r0,|L2.2548|
-0008f2  2122              MOVS     r1,#0x22
-0008f4  a23e              ADR      r2,|L2.2544|
-0008f6  e9cd1202          STRD     r1,r2,[sp,#8]
-0008fa  e9cd1004          STRD     r1,r0,[sp,#0x10]
-0008fe  a064              ADR      r0,|L2.2704|
-000900  a33d              ADR      r3,|L2.2552|
-000902  460a              MOV      r2,r1
-000904  e9cd1000          STRD     r1,r0,[sp,#0]
-000908  a13c              ADR      r1,|L2.2556|
-00090a  4817              LDR      r0,|L2.2408|
-00090c  f7fffffe          BL       __2sprintf
-;;;477    					AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
-000910  4a40              LDR      r2,|L2.2580|
-000912  4935              LDR      r1,|L2.2536|
-000914  4814              LDR      r0,|L2.2408|
-000916  f7fffffe          BL       AES_Encrypt
-;;;478    				
-;;;479    					ret = gprs_send_at(cipherText, "OK", 300, 0);
-00091a  2300              MOVS     r3,#0
-00091c  f44f7296          MOV      r2,#0x12c
-000920  f2af4184          ADR      r1,|L2.1184|
-000924  4830              LDR      r0,|L2.2536|
-000926  f7fffffe          BL       gprs_send_at
-00092a  4604              MOV      r4,r0
-;;;480    					if(ret == NULL)
-00092c  bf00              NOP      
-                  |L2.2350|
-;;;481    					{
-;;;482    						
-;;;483    					}
-;;;484    				}
-;;;485    			}		
-;;;486    		}
-;;;487    		//按键
-;;;488    		if(button_get_value() == 0)
-00092e  f7fffffe          BL       button_get_value
-000932  b948              CBNZ     r0,|L2.2376|
-;;;489    		{
-;;;490    			USART_OUT(USART1, "button_get_value\r\n");
-000934  a15d              ADR      r1,|L2.2732|
-000936  480a              LDR      r0,|L2.2400|
-000938  f7fffffe          BL       USART_OUT
-;;;491    			timer_is_timeout_1ms(timer_close_lock, 0);
-00093c  2100              MOVS     r1,#0
-00093e  2004              MOVS     r0,#4
-000940  f7fffffe          BL       timer_is_timeout_1ms
-;;;492    			Lock_Close = 1;
-000944  2001              MOVS     r0,#1
-000946  e0bb              B        |L2.2752|
-                  |L2.2376|
-000948  e0be              B        |L2.2760|
-00094a  0000              DCW      0x0000
-                  |L2.2380|
-00094c  4c6f636b          DCB      "Lock_Close11111\r\n",0
-000950  5f436c6f
-000954  73653131
-000958  3131310d
-00095c  0a00    
-00095e  00                DCB      0
-00095f  00                DCB      0
-                  |L2.2400|
-                          DCD      0x40013800
-                  |L2.2404|
-                          DCD      Lock_Close
-                  |L2.2408|
-                          DCD      expressText
-                  |L2.2412|
-                          DCD      protocol_buff
-                  |L2.2416|
-                          DCD      Lock_Open
-                  |L2.2420|
+                  |L2.1344|
+000540  4c6f636b          DCB      "Lock_Close11111\r\n",0
+000544  5f436c6f
+000548  73653131
+00054c  3131310d
+000550  0a00    
+000552  00                DCB      0
+000553  00                DCB      0
+                  |L2.1364|
                           DCD      lock_open_err_flag
+                  |L2.1368|
+000558  4c6f636b          DCB      "Lock_Open timer\r\n",0
+00055c  5f4f7065
+000560  6e207469
+000564  6d65720d
+000568  0a00    
+00056a  00                DCB      0
+00056b  00                DCB      0
+                  |L2.1388|
+00056c  4c6f636b          DCB      "Lock_Open\r\n",0
+000570  5f4f7065
+000574  6e0d0a00
+                  |L2.1400|
+000578  41414120          DCB      "AAA lock_open\r\n",0
+00057c  6c6f636b
+000580  5f6f7065
+000584  6e0d0a00
+                  |L2.1416|
+000588  a1f7              ADR      r1,|L2.2408|
+00058a  48fb              LDR      r0,|L2.2424|
+00058c  f7fffffe          BL       USART_OUT
+;;;381    				
+;;;382    				Lock_Open = 0;
+000590  2000              MOVS     r0,#0
+000592  49fa              LDR      r1,|L2.2428|
+000594  7008              STRB     r0,[r1,#0]
+;;;383    				lock_stop();	//停止运行
+000596  f7fffffe          BL       lock_stop
+;;;384    				Shaking = 0;
+00059a  2000              MOVS     r0,#0
+00059c  49f8              LDR      r1,|L2.2432|
+00059e  7008              STRB     r0,[r1,#0]
+;;;385    				
+;;;386    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+0005a0  a0f8              ADR      r0,|L2.2436|
+0005a2  4bfa              LDR      r3,|L2.2444|
+0005a4  a2fa              ADR      r2,|L2.2448|
+0005a6  f2af1160          ADR      r1,|L2.1096|
+0005aa  9000              STR      r0,[sp,#0]
+0005ac  48fe              LDR      r0,|L2.2472|
+0005ae  f7fffffe          BL       __2sprintf
+;;;387    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+0005b2  4afd              LDR      r2,|L2.2472|
+0005b4  a1fd              ADR      r1,|L2.2476|
+0005b6  48f0              LDR      r0,|L2.2424|
+0005b8  f7fffffe          BL       USART_OUT
+;;;388    				ret = gprs_send_at(send_buff, ">", 300, 2000);
+0005bc  f44f63fa          MOV      r3,#0x7d0
+0005c0  f44f7296          MOV      r2,#0x12c
+0005c4  f2af1178          ADR      r1,|L2.1104|
+0005c8  48f7              LDR      r0,|L2.2472|
+0005ca  f7fffffe          BL       gprs_send_at
+0005ce  4604              MOV      r4,r0
+;;;389    				if(ret != NULL)
+0005d0  2c00              CMP      r4,#0
+0005d2  d038              BEQ      |L2.1606|
+;;;390    				{
+;;;391    					memset(expressText, 0 ,512);
+0005d4  f44f7100          MOV      r1,#0x200
+0005d8  48f8              LDR      r0,|L2.2492|
+0005da  f7fffffe          BL       __aeabi_memclr
+;;;392    					memset(cipherText, 0 ,512);
+0005de  f44f7100          MOV      r1,#0x200
+0005e2  48f7              LDR      r0,|L2.2496|
+0005e4  f7fffffe          BL       __aeabi_memclr
+;;;393    					sprintf(expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"0");
+0005e8  a0f6              ADR      r0,|L2.2500|
+0005ea  2122              MOVS     r1,#0x22
+0005ec  a2f6              ADR      r2,|L2.2504|
+0005ee  e9cd1202          STRD     r1,r2,[sp,#8]
+0005f2  e9cd1004          STRD     r1,r0,[sp,#0x10]
+0005f6  a0f5              ADR      r0,|L2.2508|
+0005f8  a3f5              ADR      r3,|L2.2512|
+0005fa  460a              MOV      r2,r1
+0005fc  e9cd1000          STRD     r1,r0,[sp,#0]
+000600  a1f4              ADR      r1,|L2.2516|
+000602  48ee              LDR      r0,|L2.2492|
+000604  f7fffffe          BL       __2sprintf
+;;;394    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+000608  4aec              LDR      r2,|L2.2492|
+00060a  f2af11a4          ADR      r1,|L2.1128|
+00060e  48da              LDR      r0,|L2.2424|
+000610  f7fffffe          BL       USART_OUT
+;;;395    					AES_Encrypt((char *)expressText, cipherText, aesKey);
+000614  4af5              LDR      r2,|L2.2540|
+000616  49ea              LDR      r1,|L2.2496|
+000618  48e8              LDR      r0,|L2.2492|
+00061a  f7fffffe          BL       AES_Encrypt
+;;;396    					USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+00061e  4ae8              LDR      r2,|L2.2496|
+000620  f2af1198          ADR      r1,|L2.1164|
+000624  48d4              LDR      r0,|L2.2424|
+000626  f7fffffe          BL       USART_OUT
+;;;397    					
+;;;398    					ret = gprs_send_at(cipherText, "OK", 300, 0);
+00062a  2300              MOVS     r3,#0
+00062c  f44f7296          MOV      r2,#0x12c
+000630  f2af1198          ADR      r1,|L2.1180|
+000634  48e2              LDR      r0,|L2.2496|
+000636  f7fffffe          BL       gprs_send_at
+00063a  4604              MOV      r4,r0
+;;;399    					if(ret != NULL)
+00063c  b11c              CBZ      r4,|L2.1606|
+;;;400    					{
+;;;401    						timer_is_timeout_1ms(timer_heartbeat, 0);
+00063e  2100              MOVS     r1,#0
+000640  2006              MOVS     r0,#6
+000642  f7fffffe          BL       timer_is_timeout_1ms
+                  |L2.1606|
+;;;402    					}
+;;;403    				}			
+;;;404    			}
+;;;405    			
+;;;406    			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1 && lock_open_err_flag == 1)//开锁超时异常处理
+000646  2110              MOVS     r1,#0x10
+000648  48e9              LDR      r0,|L2.2544|
+00064a  f7fffffe          BL       GPIO_ReadInputDataBit
+00064e  2800              CMP      r0,#0
+000650  d163              BNE      |L2.1818|
+000652  2120              MOVS     r1,#0x20
+000654  48e6              LDR      r0,|L2.2544|
+000656  f7fffffe          BL       GPIO_ReadInputDataBit
+00065a  2801              CMP      r0,#1
+00065c  d15d              BNE      |L2.1818|
+00065e  48e5              LDR      r0,|L2.2548|
+000660  7800              LDRB     r0,[r0,#0]  ; lock_open_err_flag
+000662  2801              CMP      r0,#1
+000664  d159              BNE      |L2.1818|
+;;;407    			{
+;;;408    				lock_open_err_flag = 0;
+000666  2000              MOVS     r0,#0
+000668  49e2              LDR      r1,|L2.2548|
+00066a  7008              STRB     r0,[r1,#0]
+;;;409    				Lock_Open = 0;
+00066c  49c3              LDR      r1,|L2.2428|
+00066e  7008              STRB     r0,[r1,#0]
+;;;410    				lock_stop();
+000670  f7fffffe          BL       lock_stop
+;;;411    				Shaking = 0;
+000674  2000              MOVS     r0,#0
+000676  49c2              LDR      r1,|L2.2432|
+000678  7008              STRB     r0,[r1,#0]
+;;;412    				USART_OUT(USART1, "open lock unusual\r\n");
+00067a  a1df              ADR      r1,|L2.2552|
+00067c  48be              LDR      r0,|L2.2424|
+00067e  f7fffffe          BL       USART_OUT
+;;;413    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+000682  a0c0              ADR      r0,|L2.2436|
+000684  4bc1              LDR      r3,|L2.2444|
+000686  a2c2              ADR      r2,|L2.2448|
+000688  f2af2144          ADR      r1,|L2.1096|
+00068c  9000              STR      r0,[sp,#0]
+00068e  48c6              LDR      r0,|L2.2472|
+000690  f7fffffe          BL       __2sprintf
+;;;414    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+000694  4ac4              LDR      r2,|L2.2472|
+000696  a1c5              ADR      r1,|L2.2476|
+000698  48b7              LDR      r0,|L2.2424|
+00069a  f7fffffe          BL       USART_OUT
+;;;415    				ret = gprs_send_at(send_buff, ">", 300, 2000);
+00069e  f44f63fa          MOV      r3,#0x7d0
+0006a2  f44f7296          MOV      r2,#0x12c
+0006a6  f2af2158          ADR      r1,|L2.1104|
+0006aa  48bf              LDR      r0,|L2.2472|
+0006ac  f7fffffe          BL       gprs_send_at
+0006b0  4604              MOV      r4,r0
+;;;416    				if(ret != NULL)
+0006b2  b394              CBZ      r4,|L2.1818|
+;;;417    				{
+;;;418    					memset(expressText, 0 ,512);
+0006b4  f44f7100          MOV      r1,#0x200
+0006b8  48c0              LDR      r0,|L2.2492|
+0006ba  f7fffffe          BL       __aeabi_memclr
+;;;419    					memset(cipherText, 0 ,512);
+0006be  f44f7100          MOV      r1,#0x200
+0006c2  48bf              LDR      r0,|L2.2496|
+0006c4  f7fffffe          BL       __aeabi_memclr
+;;;420    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"1");
+0006c8  a0c0              ADR      r0,|L2.2508|
+0006ca  2122              MOVS     r1,#0x22
+0006cc  a2be              ADR      r2,|L2.2504|
+0006ce  e9cd1202          STRD     r1,r2,[sp,#8]
+0006d2  e9cd1004          STRD     r1,r0,[sp,#0x10]
+0006d6  a0bd              ADR      r0,|L2.2508|
+0006d8  a3bd              ADR      r3,|L2.2512|
+0006da  460a              MOV      r2,r1
+0006dc  e9cd1000          STRD     r1,r0,[sp,#0]
+0006e0  a1bc              ADR      r1,|L2.2516|
+0006e2  48b6              LDR      r0,|L2.2492|
+0006e4  f7fffffe          BL       __2sprintf
+;;;421    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+0006e8  4ab4              LDR      r2,|L2.2492|
+0006ea  f2af2184          ADR      r1,|L2.1128|
+0006ee  48a2              LDR      r0,|L2.2424|
+0006f0  f7fffffe          BL       USART_OUT
+;;;422    					AES_Encrypt((char *)expressText, cipherText, aesKey);
+0006f4  4abd              LDR      r2,|L2.2540|
+0006f6  49b2              LDR      r1,|L2.2496|
+0006f8  48b0              LDR      r0,|L2.2492|
+0006fa  f7fffffe          BL       AES_Encrypt
+;;;423    					ret = gprs_send_at(cipherText, "OK", 300, 0);
+0006fe  2300              MOVS     r3,#0
+000700  f44f7296          MOV      r2,#0x12c
+000704  f2af216c          ADR      r1,|L2.1180|
+000708  48ad              LDR      r0,|L2.2496|
+00070a  f7fffffe          BL       gprs_send_at
+00070e  4604              MOV      r4,r0
+;;;424    					if(ret != NULL)
+000710  b11c              CBZ      r4,|L2.1818|
+;;;425    					{
+;;;426    						timer_is_timeout_1ms(timer_heartbeat, 0);
+000712  2100              MOVS     r1,#0
+000714  2006              MOVS     r0,#6
+000716  f7fffffe          BL       timer_is_timeout_1ms
+                  |L2.1818|
+;;;427    					}
+;;;428    				}
+;;;429    				else
+;;;430    				{
+;;;431    
+;;;432    				}	
+;;;433    			}
+;;;434    		}
+;;;435    		//关锁逻辑
+;;;436    		if(Lock_Close == 1)
+00071a  48bc              LDR      r0,|L2.2572|
+00071c  7800              LDRB     r0,[r0,#0]  ; Lock_Close
+00071e  2801              CMP      r0,#1
+000720  d178              BNE      |L2.2068|
+;;;437    		{
+;;;438    			if(timer_is_timeout_1ms(timer_close_lock, 4000) == 0)
+000722  f44f617a          MOV      r1,#0xfa0
+000726  2004              MOVS     r0,#4
+000728  f7fffffe          BL       timer_is_timeout_1ms
+00072c  b940              CBNZ     r0,|L2.1856|
+;;;439    			{
+;;;440    				lock_open();
+00072e  f7fffffe          BL       lock_open
+;;;441    				lock_close_err_flag = 1;
+000732  2001              MOVS     r0,#1
+000734  49b6              LDR      r1,|L2.2576|
+000736  7008              STRB     r0,[r1,#0]
+;;;442    				USART_OUT(USART1, "Lock_Close timer\r\n");
+000738  a1b6              ADR      r1,|L2.2580|
+00073a  488f              LDR      r0,|L2.2424|
+00073c  f7fffffe          BL       USART_OUT
+                  |L2.1856|
+;;;443    			}
+;;;444    			USART_OUT(USART1, "lock close\r\n");
+000740  a1b9              ADR      r1,|L2.2600|
+000742  488d              LDR      r0,|L2.2424|
+000744  f7fffffe          BL       USART_OUT
+;;;445    			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	//正常关锁
+000748  2110              MOVS     r1,#0x10
+00074a  48a9              LDR      r0,|L2.2544|
+00074c  f7fffffe          BL       GPIO_ReadInputDataBit
+000750  2801              CMP      r0,#1
+000752  d10a              BNE      |L2.1898|
+000754  2120              MOVS     r1,#0x20
+000756  48a6              LDR      r0,|L2.2544|
+000758  f7fffffe          BL       GPIO_ReadInputDataBit
+00075c  b928              CBNZ     r0,|L2.1898|
+;;;446    			{
+;;;447    				lock_close();
+00075e  f7fffffe          BL       lock_close
+;;;448    				USART_OUT(USART1, "BBB lock close\r\n");
+000762  a1b5              ADR      r1,|L2.2616|
+000764  4884              LDR      r0,|L2.2424|
+000766  f7fffffe          BL       USART_OUT
+                  |L2.1898|
+;;;449    			}
+;;;450    			
+;;;451    //			if(LOCK_ON_READ() == 0)	//正常关锁
+;;;452    			if(lock_on_status_get() == 0)
+00076a  f7fffffe          BL       lock_on_status_get
+00076e  2800              CMP      r0,#0
+000770  d15a              BNE      |L2.2088|
+;;;453    			{
+;;;454    				Lock_Close = 0;
+000772  49a6              LDR      r1,|L2.2572|
+000774  7008              STRB     r0,[r1,#0]
+;;;455    				lock_stop();	//停止运行
+000776  f7fffffe          BL       lock_stop
+;;;456    				Shaking = 0;
+00077a  2000              MOVS     r0,#0
+00077c  4980              LDR      r1,|L2.2432|
+00077e  7008              STRB     r0,[r1,#0]
+;;;457    				USART_OUT(USART1, "BBB lock_stop\r\n");
+000780  a1b2              ADR      r1,|L2.2636|
+000782  487d              LDR      r0,|L2.2424|
+000784  f7fffffe          BL       USART_OUT
+;;;458    				
+;;;459    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+000788  a07e              ADR      r0,|L2.2436|
+00078a  4b80              LDR      r3,|L2.2444|
+00078c  a280              ADR      r2,|L2.2448|
+00078e  f2af3148          ADR      r1,|L2.1096|
+000792  9000              STR      r0,[sp,#0]
+000794  4884              LDR      r0,|L2.2472|
+000796  f7fffffe          BL       __2sprintf
+;;;460    				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+00079a  4a83              LDR      r2,|L2.2472|
+00079c  a1af              ADR      r1,|L2.2652|
+00079e  4876              LDR      r0,|L2.2424|
+0007a0  f7fffffe          BL       USART_OUT
+;;;461    				ret = gprs_send_at(send_buff, ">", 300, 2000);
+0007a4  f44f63fa          MOV      r3,#0x7d0
+0007a8  f44f7296          MOV      r2,#0x12c
+0007ac  f2af3160          ADR      r1,|L2.1104|
+0007b0  487d              LDR      r0,|L2.2472|
+0007b2  f7fffffe          BL       gprs_send_at
+0007b6  4604              MOV      r4,r0
+;;;462    				if(ret != NULL)
+0007b8  b36c              CBZ      r4,|L2.2070|
+;;;463    				{
+;;;464    					memset(expressText, 0 ,512);
+0007ba  f44f7100          MOV      r1,#0x200
+0007be  487f              LDR      r0,|L2.2492|
+0007c0  f7fffffe          BL       __aeabi_memclr
+;;;465    					memset(cipherText, 0 ,512);
+0007c4  f44f7100          MOV      r1,#0x200
+0007c8  487d              LDR      r0,|L2.2496|
+0007ca  f7fffffe          BL       __aeabi_memclr
+;;;466    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"0");
+0007ce  a07d              ADR      r0,|L2.2500|
+0007d0  2122              MOVS     r1,#0x22
+0007d2  a27d              ADR      r2,|L2.2504|
+0007d4  e9cd1202          STRD     r1,r2,[sp,#8]
+0007d8  e9cd1004          STRD     r1,r0,[sp,#0x10]
+0007dc  a0a5              ADR      r0,|L2.2676|
+0007de  a37c              ADR      r3,|L2.2512|
+0007e0  460a              MOV      r2,r1
+0007e2  e9cd1000          STRD     r1,r0,[sp,#0]
+0007e6  a17b              ADR      r1,|L2.2516|
+0007e8  4874              LDR      r0,|L2.2492|
+0007ea  f7fffffe          BL       __2sprintf
+;;;467    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+0007ee  4a73              LDR      r2,|L2.2492|
+0007f0  f2af318c          ADR      r1,|L2.1128|
+0007f4  4860              LDR      r0,|L2.2424|
+0007f6  f7fffffe          BL       USART_OUT
+;;;468    					AES_Encrypt((char *)expressText, cipherText, aesKey);
+0007fa  4a7c              LDR      r2,|L2.2540|
+0007fc  4970              LDR      r1,|L2.2496|
+0007fe  486f              LDR      r0,|L2.2492|
+000800  f7fffffe          BL       AES_Encrypt
+;;;469    					ret = gprs_send_at(cipherText, "OK", 300, 0);
+000804  2300              MOVS     r3,#0
+000806  f44f7296          MOV      r2,#0x12c
+00080a  f2af3170          ADR      r1,|L2.1180|
+00080e  486c              LDR      r0,|L2.2496|
+000810  e002              B        |L2.2072|
+                  |L2.2066|
+000812  e1e9              B        |L2.3048|
+                  |L2.2068|
+000814  e06c              B        |L2.2288|
+                  |L2.2070|
+000816  e007              B        |L2.2088|
+                  |L2.2072|
+000818  f7fffffe          BL       gprs_send_at
+00081c  4604              MOV      r4,r0
+;;;470    					if(ret != NULL)
+00081e  b11c              CBZ      r4,|L2.2088|
+;;;471    					{
+;;;472    						timer_is_timeout_1ms(timer_heartbeat, 0);
+000820  2100              MOVS     r1,#0
+000822  2006              MOVS     r0,#6
+000824  f7fffffe          BL       timer_is_timeout_1ms
+                  |L2.2088|
+;;;473    					}
+;;;474    				}
+;;;475    			}
+;;;476    			
+;;;477    			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0 && lock_close_err_flag == 1) //关锁超时处理
+000828  2110              MOVS     r1,#0x10
+00082a  4871              LDR      r0,|L2.2544|
+00082c  f7fffffe          BL       GPIO_ReadInputDataBit
+000830  2801              CMP      r0,#1
+000832  d15d              BNE      |L2.2288|
+000834  2120              MOVS     r1,#0x20
+000836  486e              LDR      r0,|L2.2544|
+000838  f7fffffe          BL       GPIO_ReadInputDataBit
+00083c  2800              CMP      r0,#0
+00083e  d157              BNE      |L2.2288|
+000840  4873              LDR      r0,|L2.2576|
+000842  7800              LDRB     r0,[r0,#0]  ; lock_close_err_flag
+000844  2801              CMP      r0,#1
+000846  d153              BNE      |L2.2288|
+;;;478    			{
+;;;479    				lock_close_err_flag = 0;
+000848  2000              MOVS     r0,#0
+00084a  4971              LDR      r1,|L2.2576|
+00084c  7008              STRB     r0,[r1,#0]
+;;;480    				Lock_Close = 0;
+00084e  496f              LDR      r1,|L2.2572|
+000850  7008              STRB     r0,[r1,#0]
+;;;481    				lock_stop();	//停止运行
+000852  f7fffffe          BL       lock_stop
+;;;482    				Shaking = 0;
+000856  2000              MOVS     r0,#0
+000858  4949              LDR      r1,|L2.2432|
+00085a  7008              STRB     r0,[r1,#0]
+;;;483    				USART_OUT(USART1, "close lock unusual\r\n");
+00085c  a186              ADR      r1,|L2.2680|
+00085e  4846              LDR      r0,|L2.2424|
+000860  f7fffffe          BL       USART_OUT
+;;;484    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+000864  a047              ADR      r0,|L2.2436|
+000866  4b49              LDR      r3,|L2.2444|
+000868  a249              ADR      r2,|L2.2448|
+00086a  f2af4124          ADR      r1,|L2.1096|
+00086e  9000              STR      r0,[sp,#0]
+000870  484d              LDR      r0,|L2.2472|
+000872  f7fffffe          BL       __2sprintf
+;;;485    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+000876  4a4c              LDR      r2,|L2.2472|
+000878  a14c              ADR      r1,|L2.2476|
+00087a  483f              LDR      r0,|L2.2424|
+00087c  f7fffffe          BL       USART_OUT
+;;;486    				ret = gprs_send_at(send_buff, ">", 300, 2000);
+000880  f44f63fa          MOV      r3,#0x7d0
+000884  f44f7296          MOV      r2,#0x12c
+000888  f2af413c          ADR      r1,|L2.1104|
+00088c  4846              LDR      r0,|L2.2472|
+00088e  f7fffffe          BL       gprs_send_at
+000892  4604              MOV      r4,r0
+;;;487    				if(ret != NULL)
+000894  b364              CBZ      r4,|L2.2288|
+;;;488    				{
+;;;489    					memset(expressText, 0 ,512);
+000896  f44f7100          MOV      r1,#0x200
+00089a  4848              LDR      r0,|L2.2492|
+00089c  f7fffffe          BL       __aeabi_memclr
+;;;490    					memset(cipherText, 0 ,512);
+0008a0  f44f7100          MOV      r1,#0x200
+0008a4  4846              LDR      r0,|L2.2496|
+0008a6  f7fffffe          BL       __aeabi_memclr
+;;;491    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"1");
+0008aa  a048              ADR      r0,|L2.2508|
+0008ac  2122              MOVS     r1,#0x22
+0008ae  a246              ADR      r2,|L2.2504|
+0008b0  e9cd1202          STRD     r1,r2,[sp,#8]
+0008b4  e9cd1004          STRD     r1,r0,[sp,#0x10]
+0008b8  a06e              ADR      r0,|L2.2676|
+0008ba  a345              ADR      r3,|L2.2512|
+0008bc  460a              MOV      r2,r1
+0008be  e9cd1000          STRD     r1,r0,[sp,#0]
+0008c2  a144              ADR      r1,|L2.2516|
+0008c4  483d              LDR      r0,|L2.2492|
+0008c6  f7fffffe          BL       __2sprintf
+;;;492    					AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+0008ca  4a48              LDR      r2,|L2.2540|
+0008cc  493c              LDR      r1,|L2.2496|
+0008ce  483b              LDR      r0,|L2.2492|
+0008d0  f7fffffe          BL       AES_Encrypt
+;;;493    				
+;;;494    					ret = gprs_send_at(cipherText, "OK", 300, 0);
+0008d4  2300              MOVS     r3,#0
+0008d6  f44f7296          MOV      r2,#0x12c
+0008da  f2af4140          ADR      r1,|L2.1180|
+0008de  4838              LDR      r0,|L2.2496|
+0008e0  f7fffffe          BL       gprs_send_at
+0008e4  4604              MOV      r4,r0
+;;;495    					if(ret != NULL)
+0008e6  b11c              CBZ      r4,|L2.2288|
+;;;496    					{
+;;;497    						timer_is_timeout_1ms(timer_heartbeat, 0);
+0008e8  2100              MOVS     r1,#0
+0008ea  2006              MOVS     r0,#6
+0008ec  f7fffffe          BL       timer_is_timeout_1ms
+                  |L2.2288|
+;;;498    					}
+;;;499    				}
+;;;500    			}		
+;;;501    		}
+;;;502    		//按键
+;;;503    		if(button_get_value() == 0)
+0008f0  f7fffffe          BL       button_get_value
+0008f4  b960              CBNZ     r0,|L2.2320|
+;;;504    		{
+;;;505    			USART_OUT(USART1, "button_get_value\r\n");
+0008f6  a166              ADR      r1,|L2.2704|
+0008f8  481f              LDR      r0,|L2.2424|
+0008fa  f7fffffe          BL       USART_OUT
+;;;506    			timer_is_timeout_1ms(timer_close_lock, 0);
+0008fe  2100              MOVS     r1,#0
+000900  2004              MOVS     r0,#4
+000902  f7fffffe          BL       timer_is_timeout_1ms
+;;;507    			Lock_Close = 1;
+000906  2001              MOVS     r0,#1
+000908  4940              LDR      r1,|L2.2572|
+00090a  7008              STRB     r0,[r1,#0]
+;;;508    			Shaking=1;	
+00090c  491c              LDR      r1,|L2.2432|
+00090e  7008              STRB     r0,[r1,#0]
+                  |L2.2320|
+;;;509    		}
+;;;510    			
+;;;511    		
+;;;512    		//报警器
+;;;513    		p1 = strstr((char*)protocol_buff, "topic: bell/");
+000910  a164              ADR      r1,|L2.2724|
+000912  4868              LDR      r0,|L2.2740|
+000914  f7fffffe          BL       strstr
+000918  4967              LDR      r1,|L2.2744|
+00091a  6008              STR      r0,[r1,#0]  ; p1
+;;;514    		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
+00091c  491b              LDR      r1,|L2.2444|
+00091e  4866              LDR      r0,|L2.2744|
+000920  6800              LDR      r0,[r0,#0]  ; p1
+000922  f7fffffe          BL       strstr
+000926  4965              LDR      r1,|L2.2748|
+000928  6008              STR      r0,[r1,#0]  ; p2
+;;;515    		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
+00092a  220c              MOVS     r2,#0xc
+00092c  a15d              ADR      r1,|L2.2724|
+00092e  4862              LDR      r0,|L2.2744|
+000930  6800              LDR      r0,[r0,#0]  ; p1
+000932  f7fffffe          BL       strncmp
+000936  b9a8              CBNZ     r0,|L2.2404|
+000938  4861              LDR      r0,|L2.2752|
+00093a  7800              LDRB     r0,[r0,#0]  ; bell_flag
+00093c  b990              CBNZ     r0,|L2.2404|
+;;;516    		{
+;;;517    			timer_is_timeout_1ms(timer_heartbeat, 0);
+00093e  2100              MOVS     r1,#0
+000940  2006              MOVS     r0,#6
+000942  f7fffffe          BL       timer_is_timeout_1ms
+;;;518    			USART_OUT(USART1, "bell\r\n");
+000946  a15f              ADR      r1,|L2.2756|
+000948  480b              LDR      r0,|L2.2424|
+00094a  f7fffffe          BL       USART_OUT
+;;;519    			memset(protocol_buff, 0, 512);	
+00094e  f44f7100          MOV      r1,#0x200
+000952  4858              LDR      r0,|L2.2740|
+000954  f7fffffe          BL       __aeabi_memclr
+;;;520    			bell_flag=1;
+000958  2001              MOVS     r0,#1
+00095a  4959              LDR      r1,|L2.2752|
+00095c  7008              STRB     r0,[r1,#0]
+;;;521      	
+;;;522    			BEEP_ON();
+00095e  2108              MOVS     r1,#8
+000960  485a              LDR      r0,|L2.2764|
+000962  e0b5              B        |L2.2768|
+                  |L2.2404|
+000964  e0bd              B        |L2.2786|
+000966  0000              DCW      0x0000
+                  |L2.2408|
+000968  41414120          DCB      "AAA lock_stop\r\n",0
+00096c  6c6f636b
+000970  5f73746f
+000974  700d0a00
                   |L2.2424|
-000978  4c6f636b          DCB      "Lock_Open timer\r\n",0
-00097c  5f4f7065
-000980  6e207469
-000984  6d65720d
-000988  0a00    
-00098a  00                DCB      0
-00098b  00                DCB      0
-                  |L2.2444|
-00098c  4c6f636b          DCB      "Lock_Open\r\n",0
-000990  5f4f7065
-000994  6e0d0a00
-                  |L2.2456|
-                          DCD      0x40010800
-                  |L2.2460|
-00099c  41414120          DCB      "AAA lock_open\r\n",0
-0009a0  6c6f636b
-0009a4  5f6f7065
-0009a8  6e0d0a00
-                  |L2.2476|
-0009ac  41414120          DCB      "AAA lock_stop\r\n",0
-0009b0  6c6f636b
-0009b4  5f73746f
-0009b8  700d0a00
-                  |L2.2492|
+                          DCD      0x40013800
+                  |L2.2428|
+                          DCD      Lock_Open
+                  |L2.2432|
                           DCD      Shaking
-                  |L2.2496|
-0009c0  2c34342c          DCB      ",44,2\r\n",0
-0009c4  320d0a00
-                  |L2.2504|
+                  |L2.2436|
+000984  2c34342c          DCB      ",44,2\r\n",0
+000988  320d0a00
+                  |L2.2444|
                           DCD      PARK_LOCK_Buffer
-                  |L2.2508|
-0009cc  41542b50          DCB      "AT+PUBLISH=lockback/",0
-0009d0  55424c49
-0009d4  53483d6c
-0009d8  6f636b62
-0009dc  61636b2f
-0009e0  00      
-0009e1  00                DCB      0
-0009e2  00                DCB      0
-0009e3  00                DCB      0
-                  |L2.2532|
+                  |L2.2448|
+000990  41542b50          DCB      "AT+PUBLISH=lockback/",0
+000994  55424c49
+000998  53483d6c
+00099c  6f636b62
+0009a0  61636b2f
+0009a4  00      
+0009a5  00                DCB      0
+0009a6  00                DCB      0
+0009a7  00                DCB      0
+                  |L2.2472|
                           DCD      send_buff
-                  |L2.2536|
+                  |L2.2476|
+0009ac  73656e64          DCB      "send_buff=%s\r\n",0
+0009b0  5f627566
+0009b4  663d2573
+0009b8  0d0a00  
+0009bb  00                DCB      0
+                  |L2.2492|
+                          DCD      expressText
+                  |L2.2496|
                           DCD      cipherText
+                  |L2.2500|
+0009c4  3000              DCB      "0",0
+0009c6  00                DCB      0
+0009c7  00                DCB      0
+                  |L2.2504|
+0009c8  6f6b00            DCB      "ok",0
+0009cb  00                DCB      0
+                  |L2.2508|
+0009cc  3100              DCB      "1",0
+0009ce  00                DCB      0
+0009cf  00                DCB      0
+                  |L2.2512|
+0009d0  636d6400          DCB      "cmd",0
+                  |L2.2516|
+0009d4  7b256325          DCB      "{%c%s%c:%s,%c%s%c:%s}",0
+0009d8  7325633a
+0009dc  25732c25
+0009e0  63257325
+0009e4  633a2573
+0009e8  7d00    
+0009ea  00                DCB      0
+0009eb  00                DCB      0
                   |L2.2540|
-0009ec  3000              DCB      "0",0
-0009ee  00                DCB      0
-0009ef  00                DCB      0
-                  |L2.2544|
-0009f0  6f6b00            DCB      "ok",0
-0009f3  00                DCB      0
-                  |L2.2548|
-0009f4  3100              DCB      "1",0
-0009f6  00                DCB      0
-0009f7  00                DCB      0
-                  |L2.2552|
-0009f8  636d6400          DCB      "cmd",0
-                  |L2.2556|
-0009fc  7b256325          DCB      "{%c%s%c:%s,%c%s%c:%s}",0
-000a00  7325633a
-000a04  25732c25
-000a08  63257325
-000a0c  633a2573
-000a10  7d00    
-000a12  00                DCB      0
-000a13  00                DCB      0
-                  |L2.2580|
                           DCD      aesKey
-                  |L2.2584|
-000a18  6f70656e          DCB      "open lock unusual\r\n",0
-000a1c  206c6f63
-000a20  6b20756e
-000a24  75737561
-000a28  6c0d0a00
-                  |L2.2604|
+                  |L2.2544|
+                          DCD      0x40010800
+                  |L2.2548|
+                          DCD      lock_open_err_flag
+                  |L2.2552|
+0009f8  6f70656e          DCB      "open lock unusual\r\n",0
+0009fc  206c6f63
+000a00  6b20756e
+000a04  75737561
+000a08  6c0d0a00
+                  |L2.2572|
+                          DCD      Lock_Close
+                  |L2.2576|
                           DCD      lock_close_err_flag
-                  |L2.2608|
-000a30  4c6f636b          DCB      "Lock_Close timer\r\n",0
-000a34  5f436c6f
-000a38  73652074
-000a3c  696d6572
-000a40  0d0a00  
-000a43  00                DCB      0
-                  |L2.2628|
-000a44  6c6f636b          DCB      "lock close\r\n",0
-000a48  20636c6f
-000a4c  73650d0a
-000a50  00      
-000a51  00                DCB      0
-000a52  00                DCB      0
-000a53  00                DCB      0
-                  |L2.2644|
-000a54  42424220          DCB      "BBB lock close\r\n",0
-000a58  6c6f636b
-000a5c  20636c6f
-000a60  73650d0a
-000a64  00      
-000a65  00                DCB      0
-000a66  00                DCB      0
-000a67  00                DCB      0
-                  |L2.2664|
-000a68  42424220          DCB      "BBB lock_stop\r\n",0
-000a6c  6c6f636b
-000a70  5f73746f
-000a74  700d0a00
+                  |L2.2580|
+000a14  4c6f636b          DCB      "Lock_Close timer\r\n",0
+000a18  5f436c6f
+000a1c  73652074
+000a20  696d6572
+000a24  0d0a00  
+000a27  00                DCB      0
+                  |L2.2600|
+000a28  6c6f636b          DCB      "lock close\r\n",0
+000a2c  20636c6f
+000a30  73650d0a
+000a34  00      
+000a35  00                DCB      0
+000a36  00                DCB      0
+000a37  00                DCB      0
+                  |L2.2616|
+000a38  42424220          DCB      "BBB lock close\r\n",0
+000a3c  6c6f636b
+000a40  20636c6f
+000a44  73650d0a
+000a48  00      
+000a49  00                DCB      0
+000a4a  00                DCB      0
+000a4b  00                DCB      0
+                  |L2.2636|
+000a4c  42424220          DCB      "BBB lock_stop\r\n",0
+000a50  6c6f636b
+000a54  5f73746f
+000a58  700d0a00
+                  |L2.2652|
+000a5c  5075626c          DCB      "PublishLockBackbuf=%s\r\n",0
+000a60  6973684c
+000a64  6f636b42
+000a68  61636b62
+000a6c  75663d25
+000a70  730d0a00
+                  |L2.2676|
+000a74  3200              DCB      "2",0
+000a76  00                DCB      0
+000a77  00                DCB      0
                   |L2.2680|
-000a78  5075626c          DCB      "PublishLockBackbuf=%s\r\n",0
-000a7c  6973684c
-000a80  6f636b42
-000a84  61636b62
-000a88  75663d25
-000a8c  730d0a00
+000a78  636c6f73          DCB      "close lock unusual\r\n",0
+000a7c  65206c6f
+000a80  636b2075
+000a84  6e757375
+000a88  616c0d0a
+000a8c  00      
+000a8d  00                DCB      0
+000a8e  00                DCB      0
+000a8f  00                DCB      0
                   |L2.2704|
-000a90  3200              DCB      "2",0
-000a92  00                DCB      0
-000a93  00                DCB      0
-                  |L2.2708|
-000a94  636c6f73          DCB      "close lock unusual\r\n",0
-000a98  65206c6f
-000a9c  636b2075
-000aa0  6e757375
-000aa4  616c0d0a
-000aa8  00      
-000aa9  00                DCB      0
-000aaa  00                DCB      0
-000aab  00                DCB      0
-                  |L2.2732|
-000aac  62757474          DCB      "button_get_value\r\n",0
-000ab0  6f6e5f67
-000ab4  65745f76
-000ab8  616c7565
-000abc  0d0a00  
-000abf  00                DCB      0
+000a90  62757474          DCB      "button_get_value\r\n",0
+000a94  6f6e5f67
+000a98  65745f76
+000a9c  616c7565
+000aa0  0d0a00  
+000aa3  00                DCB      0
+                  |L2.2724|
+000aa4  746f7069          DCB      "topic: bell/",0
+000aa8  633a2062
+000aac  656c6c2f
+000ab0  00      
+000ab1  00                DCB      0
+000ab2  00                DCB      0
+000ab3  00                DCB      0
+                  |L2.2740|
+                          DCD      protocol_buff
+                  |L2.2744|
+                          DCD      ||p1||
+                  |L2.2748|
+                          DCD      ||p2||
                   |L2.2752|
-000ac0  495a              LDR      r1,|L2.3116|
-000ac2  7008              STRB     r0,[r1,#0]
-;;;493    			Shaking=1;	
-000ac4  495a              LDR      r1,|L2.3120|
-000ac6  7008              STRB     r0,[r1,#0]
-                  |L2.2760|
-;;;494    		}
-;;;495    			
-;;;496    		
-;;;497    		//报警器
-;;;498    		p1 = strstr((char*)protocol_buff, "topic: bell/");
-000ac8  a15a              ADR      r1,|L2.3124|
-000aca  485e              LDR      r0,|L2.3140|
-000acc  f7fffffe          BL       strstr
-000ad0  495d              LDR      r1,|L2.3144|
-000ad2  6008              STR      r0,[r1,#0]  ; p1
-;;;499    		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
-000ad4  495d              LDR      r1,|L2.3148|
-000ad6  485c              LDR      r0,|L2.3144|
-000ad8  6800              LDR      r0,[r0,#0]  ; p1
-000ada  f7fffffe          BL       strstr
-000ade  495c              LDR      r1,|L2.3152|
-000ae0  6008              STR      r0,[r1,#0]  ; p2
-;;;500    		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
-000ae2  220c              MOVS     r2,#0xc
-000ae4  a153              ADR      r1,|L2.3124|
-000ae6  4858              LDR      r0,|L2.3144|
-000ae8  6800              LDR      r0,[r0,#0]  ; p1
-000aea  f7fffffe          BL       strncmp
-000aee  b9c8              CBNZ     r0,|L2.2852|
-000af0  4858              LDR      r0,|L2.3156|
-000af2  7800              LDRB     r0,[r0,#0]  ; bell_flag
-000af4  b9b0              CBNZ     r0,|L2.2852|
-;;;501    		{
-;;;502    			
-;;;503    			USART_OUT(USART1, "bell\r\n");
-000af6  a158              ADR      r1,|L2.3160|
-000af8  4859              LDR      r0,|L2.3168|
-000afa  f7fffffe          BL       USART_OUT
-;;;504    			memset(protocol_buff, 0, 512);	
-000afe  f44f7100          MOV      r1,#0x200
-000b02  4850              LDR      r0,|L2.3140|
-000b04  f7fffffe          BL       __aeabi_memclr
-;;;505    			bell_flag=1;
-000b08  2001              MOVS     r0,#1
-000b0a  4952              LDR      r1,|L2.3156|
-000b0c  7008              STRB     r0,[r1,#0]
-;;;506      	
-;;;507    			BEEP_ON();
-000b0e  2108              MOVS     r1,#8
-000b10  4854              LDR      r0,|L2.3172|
-000b12  f7fffffe          BL       GPIO_SetBits
-;;;508    			timer_delay_1ms(100);
-000b16  2064              MOVS     r0,#0x64
-000b18  f7fffffe          BL       timer_delay_1ms
-;;;509    			BEEP_OFF();
-000b1c  2108              MOVS     r1,#8
-000b1e  4851              LDR      r0,|L2.3172|
-000b20  f7fffffe          BL       GPIO_ResetBits
-                  |L2.2852|
-;;;510    		}
-;;;511    				
-;;;512    		if(bell_flag == 1)
-000b24  484b              LDR      r0,|L2.3156|
-000b26  7800              LDRB     r0,[r0,#0]  ; bell_flag
-000b28  2801              CMP      r0,#1
-000b2a  d102              BNE      |L2.2866|
-;;;513    		{
-;;;514    			bell_flag = 0;
-000b2c  2000              MOVS     r0,#0
-000b2e  4949              LDR      r1,|L2.3156|
-000b30  7008              STRB     r0,[r1,#0]
-                  |L2.2866|
-;;;515    		}
-;;;516    		//晃动报警
-;;;517    		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1 && Shaking==0)
-000b32  2110              MOVS     r1,#0x10
-000b34  484c              LDR      r0,|L2.3176|
-000b36  f7fffffe          BL       GPIO_ReadInputDataBit
-000b3a  2801              CMP      r0,#1
-000b3c  d121              BNE      |L2.2946|
-000b3e  2120              MOVS     r1,#0x20
-000b40  4849              LDR      r0,|L2.3176|
-000b42  f7fffffe          BL       GPIO_ReadInputDataBit
-000b46  2801              CMP      r0,#1
-000b48  d11b              BNE      |L2.2946|
-000b4a  4839              LDR      r0,|L2.3120|
-000b4c  7800              LDRB     r0,[r0,#0]  ; Shaking
-000b4e  b9c0              CBNZ     r0,|L2.2946|
-;;;518    		{
-;;;519    			USART_OUT(USART1, "Sharking\r\n");
-000b50  a146              ADR      r1,|L2.3180|
-000b52  4843              LDR      r0,|L2.3168|
-000b54  f7fffffe          BL       USART_OUT
-;;;520    			if(timer_is_timeout_1ms(timer_bell_1, 400) == 0)
-000b58  f44f71c8          MOV      r1,#0x190
-000b5c  2008              MOVS     r0,#8
-000b5e  f7fffffe          BL       timer_is_timeout_1ms
-000b62  b918              CBNZ     r0,|L2.2924|
-;;;521    			{
-;;;522    				BEEP_ON();
-000b64  2108              MOVS     r1,#8
-000b66  483f              LDR      r0,|L2.3172|
-000b68  f7fffffe          BL       GPIO_SetBits
-                  |L2.2924|
-;;;523    			}
-;;;524    			if(timer_is_timeout_1ms(timer_bell_2, 800) == 0)
-000b6c  f44f7148          MOV      r1,#0x320
-000b70  2009              MOVS     r0,#9
-000b72  f7fffffe          BL       timer_is_timeout_1ms
-000b76  b940              CBNZ     r0,|L2.2954|
-;;;525    			{
-;;;526    				BEEP_OFF();
-000b78  2108              MOVS     r1,#8
-000b7a  483a              LDR      r0,|L2.3172|
-000b7c  f7fffffe          BL       GPIO_ResetBits
-000b80  e003              B        |L2.2954|
-                  |L2.2946|
-;;;527    			}
-;;;528    		}
-;;;529    		else
-;;;530    		{
-;;;531    			BEEP_OFF();
-000b82  2108              MOVS     r1,#8
-000b84  4837              LDR      r0,|L2.3172|
-000b86  f7fffffe          BL       GPIO_ResetBits
-                  |L2.2954|
-;;;532    		}
-;;;533    		
-;;;534    		//断线重连
-;;;535    		p1 = strstr((char*)protocol_buff, "MQTT CLOSE");
-000b8a  a13b              ADR      r1,|L2.3192|
-000b8c  482d              LDR      r0,|L2.3140|
-000b8e  f7fffffe          BL       strstr
-000b92  492d              LDR      r1,|L2.3144|
-000b94  6008              STR      r0,[r1,#0]  ; p1
-;;;536    		if(p1 !=NULL)
-000b96  4608              MOV      r0,r1
-000b98  6800              LDR      r0,[r0,#0]  ; p1
-000b9a  b158              CBZ      r0,|L2.2996|
-;;;537    		{
-;;;538    			memset(protocol_buff, 0, 512);	
-000b9c  f44f7100          MOV      r1,#0x200
-000ba0  4828              LDR      r0,|L2.3140|
-000ba2  f7fffffe          BL       __aeabi_memclr
-;;;539    			gprs_status = 0;
-000ba6  2000              MOVS     r0,#0
-000ba8  4936              LDR      r1,|L2.3204|
-000baa  7008              STRB     r0,[r1,#0]
-;;;540    			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
-000bac  a136              ADR      r1,|L2.3208|
-000bae  482c              LDR      r0,|L2.3168|
-000bb0  f7fffffe          BL       USART_OUT
-                  |L2.2996|
-;;;541    		}
-;;;542    		
-;;;543    
-;;;544    		//心跳
-;;;545    		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
-000bb4  4939              LDR      r1,|L2.3228|
-000bb6  2006              MOVS     r0,#6
-000bb8  f7fffffe          BL       timer_is_timeout_1ms
-000bbc  bb60              CBNZ     r0,|L2.3096|
-;;;546    		{
-;;;547    			memset(send_buff, 0, 100);
-000bbe  2164              MOVS     r1,#0x64
-000bc0  4837              LDR      r0,|L2.3232|
-000bc2  f7fffffe          BL       __aeabi_memclr
-;;;548    			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
-000bc6  a037              ADR      r0,|L2.3236|
-000bc8  4b20              LDR      r3,|L2.3148|
-000bca  f2af7298          ADR      r2,|L2.1076|
-000bce  f2af7184          ADR      r1,|L2.1100|
-000bd2  9000              STR      r0,[sp,#0]
-000bd4  4832              LDR      r0,|L2.3232|
-000bd6  f7fffffe          BL       __2sprintf
-;;;549    	
-;;;550    			USART_OUT(USART1, "ssss=%s\r\n", send_buff);
-000bda  4a31              LDR      r2,|L2.3232|
-000bdc  a133              ADR      r1,|L2.3244|
-000bde  4820              LDR      r0,|L2.3168|
-000be0  f7fffffe          BL       USART_OUT
-;;;551    			ret = gprs_send_at(send_buff, ">", 300, 0);
-000be4  2300              MOVS     r3,#0
-000be6  f44f7296          MOV      r2,#0x12c
-000bea  f2af7198          ADR      r1,|L2.1108|
-000bee  482c              LDR      r0,|L2.3232|
-000bf0  f7fffffe          BL       gprs_send_at
-000bf4  4604              MOV      r4,r0
-;;;552    			if(ret != NULL)
-000bf6  b17c              CBZ      r4,|L2.3096|
-;;;553    			{
-;;;554    				memset(heartbeat_buff, 0, 2);
-000bf8  482f              LDR      r0,|L2.3256|
-000bfa  2100              MOVS     r1,#0
-000bfc  8001              STRH     r1,[r0,#0]
-;;;555    				heartbeat_buff[0] = 0x30;
-000bfe  2030              MOVS     r0,#0x30
-000c00  492d              LDR      r1,|L2.3256|
-000c02  7008              STRB     r0,[r1,#0]
-;;;556    				ret = gprs_send_at(heartbeat_buff, "OK", 300, 0);
-000c04  2300              MOVS     r3,#0
-000c06  f44f7296          MOV      r2,#0x12c
-000c0a  f2af716c          ADR      r1,|L2.1184|
-000c0e  482a              LDR      r0,|L2.3256|
-000c10  f7fffffe          BL       gprs_send_at
-000c14  4604              MOV      r4,r0
-;;;557    				if(ret != NULL)
-000c16  bf00              NOP      
-                  |L2.3096|
-;;;558    				{
-;;;559    					
-;;;560    				}	
-;;;561    			}
-;;;562    		}	
-;;;563    		
-;;;564    		
-;;;565    		if(timer_is_timeout_1ms(timer_gps_cycle, 1000*60*60*24) == 0)
-000c18  4928              LDR      r1,|L2.3260|
-000c1a  2002              MOVS     r0,#2
-000c1c  f7fffffe          BL       timer_is_timeout_1ms
-000c20  b910              CBNZ     r0,|L2.3112|
-;;;566    		{
-;;;567    			
-;;;568    			gps_flag = 1;
-000c22  2001              MOVS     r0,#1
-000c24  4926              LDR      r1,|L2.3264|
-000c26  7008              STRB     r0,[r1,#0]
-                  |L2.3112|
-000c28  f7ffb9f5          B        |L2.22|
-;;;569    		}
-;;;570    		
-;;;571    		
-;;;572    
-;;;573    	}	 
-;;;574    }
-;;;575     
+                          DCD      bell_flag
+                  |L2.2756|
+000ac4  62656c6c          DCB      "bell\r\n",0
+000ac8  0d0a00  
+000acb  00                DCB      0
+                  |L2.2764|
+                          DCD      0x40011000
+                  |L2.2768|
+000ad0  f7fffffe          BL       GPIO_SetBits
+;;;523    			timer_delay_1ms(100);
+000ad4  2064              MOVS     r0,#0x64
+000ad6  f7fffffe          BL       timer_delay_1ms
+;;;524    			BEEP_OFF();
+000ada  2108              MOVS     r1,#8
+000adc  4843              LDR      r0,|L2.3052|
+000ade  f7fffffe          BL       GPIO_ResetBits
+                  |L2.2786|
+;;;525    		}
+;;;526    				
+;;;527    		if(bell_flag == 1)
+000ae2  4843              LDR      r0,|L2.3056|
+000ae4  7800              LDRB     r0,[r0,#0]  ; bell_flag
+000ae6  2801              CMP      r0,#1
+000ae8  d102              BNE      |L2.2800|
+;;;528    		{
+;;;529    			bell_flag = 0;
+000aea  2000              MOVS     r0,#0
+000aec  4940              LDR      r1,|L2.3056|
+000aee  7008              STRB     r0,[r1,#0]
+                  |L2.2800|
+;;;530    		}
+;;;531    		//晃动报警
+;;;532    		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1 && Shaking==0)
+000af0  2110              MOVS     r1,#0x10
+000af2  4840              LDR      r0,|L2.3060|
+000af4  f7fffffe          BL       GPIO_ReadInputDataBit
+000af8  2801              CMP      r0,#1
+000afa  d121              BNE      |L2.2880|
+000afc  2120              MOVS     r1,#0x20
+000afe  483d              LDR      r0,|L2.3060|
+000b00  f7fffffe          BL       GPIO_ReadInputDataBit
+000b04  2801              CMP      r0,#1
+000b06  d11b              BNE      |L2.2880|
+000b08  483b              LDR      r0,|L2.3064|
+000b0a  7800              LDRB     r0,[r0,#0]  ; Shaking
+000b0c  b9c0              CBNZ     r0,|L2.2880|
+;;;533    		{
+;;;534    			USART_OUT(USART1, "Sharking\r\n");
+000b0e  a13b              ADR      r1,|L2.3068|
+000b10  483d              LDR      r0,|L2.3080|
+000b12  f7fffffe          BL       USART_OUT
+;;;535    			if(timer_is_timeout_1ms(timer_bell_1, 400) == 0)
+000b16  f44f71c8          MOV      r1,#0x190
+000b1a  2008              MOVS     r0,#8
+000b1c  f7fffffe          BL       timer_is_timeout_1ms
+000b20  b918              CBNZ     r0,|L2.2858|
+;;;536    			{
+;;;537    				BEEP_ON();
+000b22  2108              MOVS     r1,#8
+000b24  4831              LDR      r0,|L2.3052|
+000b26  f7fffffe          BL       GPIO_SetBits
+                  |L2.2858|
+;;;538    			}
+;;;539    			if(timer_is_timeout_1ms(timer_bell_2, 800) == 0)
+000b2a  f44f7148          MOV      r1,#0x320
+000b2e  2009              MOVS     r0,#9
+000b30  f7fffffe          BL       timer_is_timeout_1ms
+000b34  b940              CBNZ     r0,|L2.2888|
+;;;540    			{
+;;;541    				BEEP_OFF();
+000b36  2108              MOVS     r1,#8
+000b38  482c              LDR      r0,|L2.3052|
+000b3a  f7fffffe          BL       GPIO_ResetBits
+000b3e  e003              B        |L2.2888|
+                  |L2.2880|
+;;;542    			}
+;;;543    		}
+;;;544    		else
+;;;545    		{
+;;;546    			BEEP_OFF();
+000b40  2108              MOVS     r1,#8
+000b42  482a              LDR      r0,|L2.3052|
+000b44  f7fffffe          BL       GPIO_ResetBits
+                  |L2.2888|
+;;;547    		}
+;;;548    		
+;;;549    		//断线重连
+;;;550    		p1 = strstr((char*)protocol_buff, "MQTT CLOSE");
+000b48  a130              ADR      r1,|L2.3084|
+000b4a  4833              LDR      r0,|L2.3096|
+000b4c  f7fffffe          BL       strstr
+000b50  4932              LDR      r1,|L2.3100|
+000b52  6008              STR      r0,[r1,#0]  ; p1
+;;;551    		if(p1 !=NULL)
+000b54  4608              MOV      r0,r1
+000b56  6800              LDR      r0,[r0,#0]  ; p1
+000b58  b158              CBZ      r0,|L2.2930|
+;;;552    		{
+;;;553    			memset(protocol_buff, 0, 512);	
+000b5a  f44f7100          MOV      r1,#0x200
+000b5e  482e              LDR      r0,|L2.3096|
+000b60  f7fffffe          BL       __aeabi_memclr
+;;;554    			gprs_status = 0;
+000b64  2000              MOVS     r0,#0
+000b66  492e              LDR      r1,|L2.3104|
+000b68  7008              STRB     r0,[r1,#0]
+;;;555    			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
+000b6a  a12e              ADR      r1,|L2.3108|
+000b6c  4826              LDR      r0,|L2.3080|
+000b6e  f7fffffe          BL       USART_OUT
+                  |L2.2930|
+;;;556    		}
+;;;557    		
+;;;558    
+;;;559    		//心跳
+;;;560    		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*3) == 0)
+000b72  4931              LDR      r1,|L2.3128|
+000b74  2006              MOVS     r0,#6
+000b76  f7fffffe          BL       timer_is_timeout_1ms
+000b7a  bb68              CBNZ     r0,|L2.3032|
+;;;561    		{
+;;;562    			memset(send_buff, 0, 100);
+000b7c  2164              MOVS     r1,#0x64
+000b7e  482f              LDR      r0,|L2.3132|
+000b80  f7fffffe          BL       __aeabi_memclr
+;;;563    			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
+000b84  a02e              ADR      r0,|L2.3136|
+000b86  4b30              LDR      r3,|L2.3144|
+000b88  f2af725c          ADR      r2,|L2.1072|
+000b8c  f2af7148          ADR      r1,|L2.1096|
+000b90  9000              STR      r0,[sp,#0]
+000b92  482a              LDR      r0,|L2.3132|
+000b94  f7fffffe          BL       __2sprintf
+;;;564    	
+;;;565    			USART_OUT(USART1, "heartbeat=%s\r\n", send_buff);
+000b98  4a28              LDR      r2,|L2.3132|
+000b9a  a12c              ADR      r1,|L2.3148|
+000b9c  481a              LDR      r0,|L2.3080|
+000b9e  f7fffffe          BL       USART_OUT
+;;;566    			ret = gprs_send_at(send_buff, ">", 300, 2000);
+000ba2  f44f63fa          MOV      r3,#0x7d0
+000ba6  f44f7296          MOV      r2,#0x12c
+000baa  f2af715c          ADR      r1,|L2.1104|
+000bae  4823              LDR      r0,|L2.3132|
+000bb0  f7fffffe          BL       gprs_send_at
+000bb4  4604              MOV      r4,r0
+;;;567    			if(ret != NULL)
+000bb6  b17c              CBZ      r4,|L2.3032|
+;;;568    			{
+;;;569    				memset(heartbeat_buff, 0, 2);
+000bb8  4828              LDR      r0,|L2.3164|
+000bba  2100              MOVS     r1,#0
+000bbc  8001              STRH     r1,[r0,#0]
+;;;570    				heartbeat_buff[0] = 0x30;
+000bbe  2030              MOVS     r0,#0x30
+000bc0  4926              LDR      r1,|L2.3164|
+000bc2  7008              STRB     r0,[r1,#0]
+;;;571    				ret = gprs_send_at(heartbeat_buff, "OK", 300, 0);
+000bc4  2300              MOVS     r3,#0
+000bc6  f44f7296          MOV      r2,#0x12c
+000bca  f2af7130          ADR      r1,|L2.1180|
+000bce  4823              LDR      r0,|L2.3164|
+000bd0  f7fffffe          BL       gprs_send_at
+000bd4  4604              MOV      r4,r0
+;;;572    				if(ret != NULL)
+000bd6  bf00              NOP      
+                  |L2.3032|
+;;;573    				{
+;;;574    					
+;;;575    				}	
+;;;576    			}
+;;;577    			else
+;;;578    			{
+;;;579    				
+;;;580    			}
+;;;581    		}	
+;;;582    		
+;;;583    		
+;;;584    		if(timer_is_timeout_1ms(timer_gps_cycle, 1000*60*60*24) == 0)
+000bd8  4921              LDR      r1,|L2.3168|
+000bda  2002              MOVS     r0,#2
+000bdc  f7fffffe          BL       timer_is_timeout_1ms
+000be0  b910              CBNZ     r0,|L2.3048|
+;;;585    		{
+;;;586    			
+;;;587    			gps_flag = 1;
+000be2  2001              MOVS     r0,#1
+000be4  491f              LDR      r1,|L2.3172|
+000be6  7008              STRB     r0,[r1,#0]
+                  |L2.3048|
+000be8  f7ffba15          B        |L2.22|
+;;;588    		}
+;;;589    		
+;;;590    		
+;;;591    
+;;;592    	}	 
+;;;593    }
+;;;594     
                           ENDP
 
-                  |L2.3116|
-                          DCD      Lock_Close
-                  |L2.3120|
-                          DCD      Shaking
-                  |L2.3124|
-000c34  746f7069          DCB      "topic: bell/",0
-000c38  633a2062
-000c3c  656c6c2f
-000c40  00      
-000c41  00                DCB      0
-000c42  00                DCB      0
-000c43  00                DCB      0
-                  |L2.3140|
-                          DCD      protocol_buff
-                  |L2.3144|
-                          DCD      ||p1||
-                  |L2.3148|
-                          DCD      PARK_LOCK_Buffer
-                  |L2.3152|
-                          DCD      ||p2||
-                  |L2.3156|
-                          DCD      bell_flag
-                  |L2.3160|
-000c58  62656c6c          DCB      "bell\r\n",0
-000c5c  0d0a00  
-000c5f  00                DCB      0
-                  |L2.3168|
-                          DCD      0x40013800
-                  |L2.3172|
+                  |L2.3052|
                           DCD      0x40011000
-                  |L2.3176|
+                  |L2.3056|
+                          DCD      bell_flag
+                  |L2.3060|
                           DCD      0x40010800
-                  |L2.3180|
-000c6c  53686172          DCB      "Sharking\r\n",0
-000c70  6b696e67
-000c74  0d0a00  
-000c77  00                DCB      0
-                  |L2.3192|
-000c78  4d515454          DCB      "MQTT CLOSE",0
-000c7c  20434c4f
-000c80  534500  
-000c83  00                DCB      0
-                  |L2.3204|
+                  |L2.3064|
+                          DCD      Shaking
+                  |L2.3068|
+000bfc  53686172          DCB      "Sharking\r\n",0
+000c00  6b696e67
+000c04  0d0a00  
+000c07  00                DCB      0
+                  |L2.3080|
+                          DCD      0x40013800
+                  |L2.3084|
+000c0c  4d515454          DCB      "MQTT CLOSE",0
+000c10  20434c4f
+000c14  534500  
+000c17  00                DCB      0
+                  |L2.3096|
+                          DCD      protocol_buff
+                  |L2.3100|
+                          DCD      ||p1||
+                  |L2.3104|
                           DCD      gprs_status
-                  |L2.3208|
-000c88  4d515454          DCB      "MQTT SERVER CLOSE\r\n",0
-000c8c  20534552
-000c90  56455220
-000c94  434c4f53
-000c98  450d0a00
-                  |L2.3228|
-                          DCD      0x000927c0
-                  |L2.3232|
+                  |L2.3108|
+000c24  4d515454          DCB      "MQTT SERVER CLOSE\r\n",0
+000c28  20534552
+000c2c  56455220
+000c30  434c4f53
+000c34  450d0a00
+                  |L2.3128|
+                          DCD      0x0002bf20
+                  |L2.3132|
                           DCD      send_buff
-                  |L2.3236|
-000ca4  2c312c32          DCB      ",1,2\r\n",0
-000ca8  0d0a00  
-000cab  00                DCB      0
-                  |L2.3244|
-000cac  73737373          DCB      "ssss=%s\r\n",0
-000cb0  3d25730d
-000cb4  0a00    
-000cb6  00                DCB      0
-000cb7  00                DCB      0
-                  |L2.3256|
+                  |L2.3136|
+000c40  2c312c32          DCB      ",1,2\r\n",0
+000c44  0d0a00  
+000c47  00                DCB      0
+                  |L2.3144|
+                          DCD      PARK_LOCK_Buffer
+                  |L2.3148|
+000c4c  68656172          DCB      "heartbeat=%s\r\n",0
+000c50  74626561
+000c54  743d2573
+000c58  0d0a00  
+000c5b  00                DCB      0
+                  |L2.3164|
                           DCD      heartbeat_buff
-                  |L2.3260|
+                  |L2.3168|
                           DCD      0x05265c00
-                  |L2.3264|
+                  |L2.3172|
                           DCD      gps_flag
 
                           AREA ||i.test_encrypt_ecb||, CODE, READONLY, ALIGN=2

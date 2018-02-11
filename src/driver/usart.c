@@ -212,48 +212,6 @@ void usart3_init(u32 band_rate)
 
 /*
 *********************************************************************************************************
-*                                          usart4_init()
-*
-* Description : 对usart4进行初始化
-*
-* Argument(s) : none
-*
-* Return(s)   : none
-*
-* Caller(s)   : AppTaskStart()
-*
-* Note(s)     : none.
-*********************************************************************************************************
-*/
-void usart4_init(u32 band_rate)
-{
-	USART_InitTypeDef usart_init_structre;
-	
-	usart_init_structre.USART_BaudRate = band_rate;
-	usart_init_structre.USART_WordLength = USART_WordLength_8b;
-	usart_init_structre.USART_StopBits = USART_StopBits_1;
-	usart_init_structre.USART_Parity = USART_Parity_No;
-	usart_init_structre.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	usart_init_structre.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-	USART_Init(UART4, &usart_init_structre);
-		
-
-	USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
-	
-	
-	USART_Cmd(UART4, ENABLE);
-	
-	
-
-}
-
-
-
-
-
-
-/*
-*********************************************************************************************************
 *                                          USART1_IRQHandler()
 *
 * Description : Create application kernel objects tasks.
@@ -468,56 +426,8 @@ void usart3_recv_data(void)
 }
 
 
-void USART2_Clear(void)
-{
-	memset(usart2_buff, 0, strlen(usart2_buff));
-    usart2_cnt = 0;
-}
-
-/*
-*  @brief USART2????api
-*/
-void USART2_Write(USART_TypeDef* USARTx, uint8_t *Data, uint8_t len)
-{
-    uint8_t i;
-    USART_ClearFlag(USARTx, USART_FLAG_TC);
-    for(i = 0; i < len; i++)
-    {
-        USART_SendData(USARTx, *Data++);
-        while( USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET );
-    }
-}
 
 
-
-
-void SendCmd(char* cmd, char* result, int timeOut)
-{
-	USART2_Clear();
-    while(1)
-    { 
-		USART2_Clear();
-        USART2_Write(USART2, cmd, strlen(cmd));
-        timer_delay_1ms(timeOut);
-
-//		delay_ms(timeOut);
-//		printf("send_cmd:%s\r\n", usart2_rcv_buf);
-        if((NULL != strstr(usart2_buff, result)))	//??????????
-        {
-					  usart2_cnt=0;
-			
-//					  myfree(usart2_rcv_buf);
-//					  myfree(cmd);
-//					  myfree(result);
-            break;
-        }
-//        else
-//        {
-//            delay_ms(200);
-////			timer_delay_1ms(200);
-//        }
-    }
-}
 
 
 

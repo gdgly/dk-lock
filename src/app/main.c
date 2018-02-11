@@ -195,7 +195,7 @@ int main(void)
 							
 					memset(send_buff, 0, 100);
 					sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/", PARK_LOCK_Buffer,",64,2\r\n");
-					ret = gprs_send_at(send_buff, ">", 300, 0);
+					ret = gprs_send_at(send_buff, ">", 300, 2000);
 					if(ret != NULL)
 					{
 						memset(expressText, 0 ,512);
@@ -208,9 +208,13 @@ int main(void)
 						ret = gprs_send_at(cipherText, "OK", 400, 0);
 						if(ret != NULL)
 						{
-							
+							timer_is_timeout_1ms(timer_heartbeat, 0);
 						}	
-					}	
+					}
+					else
+					{
+						
+					}
 
 					GPS_POW_LOW();
 					gps_send_flag = 1;
@@ -239,7 +243,6 @@ int main(void)
 		Bat_Pre=(Bat_V-5000)*100/2400;
 		
 		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
-//		if(timer_is_timeout_1ms(timer_open_lock, 200000) == 0)
 		{	
 			Bat_Pre_Flag =  1;
 			memset(send_buff, 0, 100);	
@@ -247,7 +250,7 @@ int main(void)
 
 			USART_OUT(USART1, "ccc=%s\r\n", send_buff);
 
-			ret = gprs_send_at(send_buff, ">", 300, 0);
+			ret = gprs_send_at(send_buff, ">", 300, 2000);
 			if(ret != NULL)
 			{
 				memset(expressText, 0 ,512);
@@ -261,42 +264,50 @@ int main(void)
 				ret = gprs_send_at(cipherText, "OK", 300, 0);
 				if(ret != NULL)
 				{
-					
+					timer_is_timeout_1ms(timer_heartbeat, 0);
 				}			
 			}
-////			
-			if(Bat_Pre<10&&Bat_Pre_Flag==1)
+			else
 			{
-				Bat_Pre_Flag=0;
-
-				memset(send_buff, 0, 100);
-				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-				ret = gprs_send_at(send_buff, ">", 300, 0);
-				if(ret != NULL)
-				{
-					memset(expressText, 0 ,512);
-					memset(cipherText, 0 ,512);
-					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
-					AES_Encrypt((char *)expressText, cipherText, aesKey);
-					memset(tmp, 0, 20);
-					tmp[0] = 0x31;
-					ret = gprs_send_at(tmp, "OK", 300, 0);
-					if(ret == NULL)
-					{
-						
-					}
-				}
+				
 			}
+////			
+//			if(Bat_Pre<10&&Bat_Pre_Flag==1)
+//			{
+//				Bat_Pre_Flag=0;
+
+//				memset(send_buff, 0, 100);
+//				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
+//				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+//				ret = gprs_send_at(send_buff, ">", 300, 2000);
+//				if(ret != NULL)
+//				{
+//					memset(expressText, 0 ,512);
+//					memset(cipherText, 0 ,512);
+//					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
+//					AES_Encrypt((char *)expressText, cipherText, aesKey);
+
+//					ret = gprs_send_at(cipherText, "OK", 300, 0);
+//					if(ret != NULL)
+//					{
+//						timer_is_timeout_1ms(timer_heartbeat, 0);
+//					}
+//				}
+//				else
+//				{
+//					
+//				}
+//			}
 		}
 //		//接收锁数据
 		p1 = strstr((u8*)protocol_buff, "topic: lock/");
 		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
 		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
 		{
-		
+			
 			if(LOCK_ON_READ()==0 || LOCK_OFF_READ()==0)
 			{
+			timer_is_timeout_1ms(timer_heartbeat, 0);
 			USART_OUT(USART1, "lock data\r\n");
 			memset(receiveText ,0 , 512);
 			memset(expressText ,0 , 512);
@@ -374,7 +385,7 @@ int main(void)
 				
 				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
 				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-				ret = gprs_send_at(send_buff, ">", 300, 0);
+				ret = gprs_send_at(send_buff, ">", 300, 2000);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
@@ -385,9 +396,9 @@ int main(void)
 					USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
 					
 					ret = gprs_send_at(cipherText, "OK", 300, 0);
-					if(ret == NULL)
+					if(ret != NULL)
 					{
-						
+						timer_is_timeout_1ms(timer_heartbeat, 0);
 					}
 				}			
 			}
@@ -401,7 +412,7 @@ int main(void)
 				USART_OUT(USART1, "open lock unusual\r\n");
 				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
 				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-				ret = gprs_send_at(send_buff, ">", 300, 0);
+				ret = gprs_send_at(send_buff, ">", 300, 2000);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
@@ -410,10 +421,14 @@ int main(void)
 					USART_OUT(USART1, "expressText=%s\r\n", expressText);
 					AES_Encrypt((char *)expressText, cipherText, aesKey);
 					ret = gprs_send_at(cipherText, "OK", 300, 0);
-					if(ret == NULL)
+					if(ret != NULL)
 					{
-						
+						timer_is_timeout_1ms(timer_heartbeat, 0);
 					}
+				}
+				else
+				{
+
 				}	
 			}
 		}
@@ -443,7 +458,7 @@ int main(void)
 				
 				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
 				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
-				ret = gprs_send_at(send_buff, ">", 300, 0);
+				ret = gprs_send_at(send_buff, ">", 300, 2000);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
@@ -452,9 +467,9 @@ int main(void)
 					USART_OUT(USART1, "expressText=%s\r\n", expressText);
 					AES_Encrypt((char *)expressText, cipherText, aesKey);
 					ret = gprs_send_at(cipherText, "OK", 300, 0);
-					if(ret == NULL)
+					if(ret != NULL)
 					{
-						
+						timer_is_timeout_1ms(timer_heartbeat, 0);
 					}
 				}
 			}
@@ -468,7 +483,7 @@ int main(void)
 				USART_OUT(USART1, "close lock unusual\r\n");
 				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
 				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-				ret = gprs_send_at(send_buff, ">", 300, 0);
+				ret = gprs_send_at(send_buff, ">", 300, 2000);
 				if(ret != NULL)
 				{
 					memset(expressText, 0 ,512);
@@ -477,9 +492,9 @@ int main(void)
 					AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
 				
 					ret = gprs_send_at(cipherText, "OK", 300, 0);
-					if(ret == NULL)
+					if(ret != NULL)
 					{
-						
+						timer_is_timeout_1ms(timer_heartbeat, 0);
 					}
 				}
 			}		
@@ -499,7 +514,7 @@ int main(void)
 		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
 		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
 		{
-			
+			timer_is_timeout_1ms(timer_heartbeat, 0);
 			USART_OUT(USART1, "bell\r\n");
 			memset(protocol_buff, 0, 512);	
 			bell_flag=1;
@@ -542,13 +557,13 @@ int main(void)
 		
 
 		//心跳
-		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
+		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*3) == 0)
 		{
 			memset(send_buff, 0, 100);
 			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
 	
-			USART_OUT(USART1, "ssss=%s\r\n", send_buff);
-			ret = gprs_send_at(send_buff, ">", 300, 0);
+			USART_OUT(USART1, "heartbeat=%s\r\n", send_buff);
+			ret = gprs_send_at(send_buff, ">", 300, 2000);
 			if(ret != NULL)
 			{
 				memset(heartbeat_buff, 0, 2);
@@ -558,6 +573,10 @@ int main(void)
 				{
 					
 				}	
+			}
+			else
+			{
+				
 			}
 		}	
 		

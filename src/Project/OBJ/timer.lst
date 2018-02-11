@@ -23868,8 +23868,6 @@ N//Copyright(C) 正点原子 2009-2019
 N//All rights reserved
 N////////////////////////////////////////////////////////////////////////////////// 	  
 N 
-Nextern u8 Lock_Close_Tim5s;
-Nextern u8 Lock_Open_Tim5s;
 N
 N
 N

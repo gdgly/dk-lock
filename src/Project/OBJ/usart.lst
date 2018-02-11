@@ -26349,56 +26349,6 @@ N
 N
 N/*
 N*********************************************************************************************************
-N*                                          usart4_init()
-N*
-N* Description : 对usart4进行初始化
-N*
-N* Argument(s) : none
-N*
-N* Return(s)   : none
-N*
-N* Caller(s)   : AppTaskStart()
-N*
-N* Note(s)     : none.
-N*********************************************************************************************************
-N*/
-Nvoid usart4_init(u32 band_rate)
-N{
-N	USART_InitTypeDef usart_init_structre;
-N	
-N	usart_init_structre.USART_BaudRate = band_rate;
-N	usart_init_structre.USART_WordLength = USART_WordLength_8b;
-X	usart_init_structre.USART_WordLength = ((uint16_t)0x0000);
-N	usart_init_structre.USART_StopBits = USART_StopBits_1;
-X	usart_init_structre.USART_StopBits = ((uint16_t)0x0000);
-N	usart_init_structre.USART_Parity = USART_Parity_No;
-X	usart_init_structre.USART_Parity = ((uint16_t)0x0000);
-N	usart_init_structre.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-X	usart_init_structre.USART_HardwareFlowControl = ((uint16_t)0x0000);
-N	usart_init_structre.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-X	usart_init_structre.USART_Mode = ((uint16_t)0x0004) | ((uint16_t)0x0008);
-N	USART_Init(UART4, &usart_init_structre);
-X	USART_Init(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4C00)), &usart_init_structre);
-N		
-N
-N	USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
-X	USART_ITConfig(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4C00)), ((uint16_t)0x0525), 1);
-N	
-N	
-N	USART_Cmd(UART4, ENABLE);
-X	USART_Cmd(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4C00)), 1);
-N	
-N	
-N
-N}
-N
-N
-N
-N
-N
-N
-N/*
-N*********************************************************************************************************
 N*                                          USART1_IRQHandler()
 N*
 N* Description : Create application kernel objects tasks.
@@ -26636,60 +26586,8 @@ N	}
 N}
 N
 N
-Nvoid USART2_Clear(void)
-N{
-N	memset(usart2_buff, 0, strlen(usart2_buff));
-N    usart2_cnt = 0;
-N}
-N
-N/*
-N*  @brief USART2????api
-N*/
-Nvoid USART2_Write(USART_TypeDef* USARTx, uint8_t *Data, uint8_t len)
-N{
-N    uint8_t i;
-N    USART_ClearFlag(USARTx, USART_FLAG_TC);
-X    USART_ClearFlag(USARTx, ((uint16_t)0x0040));
-N    for(i = 0; i < len; i++)
-N    {
-N        USART_SendData(USARTx, *Data++);
-N        while( USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET );
-X        while( USART_GetFlagStatus(USARTx, ((uint16_t)0x0040)) == RESET );
-N    }
-N}
 N
 N
-N
-N
-Nvoid SendCmd(char* cmd, char* result, int timeOut)
-N{
-N	USART2_Clear();
-N    while(1)
-N    { 
-N		USART2_Clear();
-N        USART2_Write(USART2, cmd, strlen(cmd));
-X        USART2_Write(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), cmd, strlen(cmd));
-N        timer_delay_1ms(timeOut);
-N
-N//		delay_ms(timeOut);
-N//		printf("send_cmd:%s\r\n", usart2_rcv_buf);
-N        if((NULL != strstr(usart2_buff, result)))	//??????????
-X        if((0 != strstr(usart2_buff, result)))	
-N        {
-N					  usart2_cnt=0;
-N			
-N//					  myfree(usart2_rcv_buf);
-N//					  myfree(cmd);
-N//					  myfree(result);
-N            break;
-N        }
-N//        else
-N//        {
-N//            delay_ms(200);
-N////			timer_delay_1ms(200);
-N//        }
-N    }
-N}
 N
 N
 N
