@@ -26934,7 +26934,7 @@ N		}
 N		
 N
 N		//ÐÄÌø
-N		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*3) == 0)
+N		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
 N		{
 N			memset(send_buff, 0, 100);
 N			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");

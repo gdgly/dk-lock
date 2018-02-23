@@ -557,7 +557,7 @@ int main(void)
 		
 
 		//ÐÄÌø
-		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*3) == 0)
+		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
 		{
 			memset(send_buff, 0, 100);
 			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");

@@ -1779,7 +1779,7 @@
 ;;;557    		
 ;;;558    
 ;;;559    		//ÐÄÌø
-;;;560    		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*3) == 0)
+;;;560    		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
 000b72  4931              LDR      r1,|L2.3128|
 000b74  2006              MOVS     r0,#6
 000b76  f7fffffe          BL       timer_is_timeout_1ms
@@ -1897,7 +1897,7 @@
 000c30  434c4f53
 000c34  450d0a00
                   |L2.3128|
-                          DCD      0x0002bf20
+                          DCD      0x000927c0
                   |L2.3132|
                           DCD      send_buff
                   |L2.3136|
