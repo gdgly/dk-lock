@@ -178,7 +178,7 @@ int main(void)
 			}
 		}
 	//GPS
-		if(gps_send_flag == 0)
+		if(gps_send_flag == 1)
 		{
 		    GPS_POW_HIGH();  
 			while(1)
@@ -242,7 +242,8 @@ int main(void)
 		Bat_V=Bat_V*88/20;
 		Bat_Pre=(Bat_V-5000)*100/2400;
 		
-		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
+//		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
+		if(timer_is_timeout_1ms(timer_batt, 1000*60*60) == 0)
 		{	
 			Bat_Pre_Flag =  1;
 			memset(send_buff, 0, 100);	
@@ -581,11 +582,10 @@ int main(void)
 		}	
 		
 		
-		if(timer_is_timeout_1ms(timer_gps_cycle, 1000*60*60*24) == 0)
-		{
-			
-			gps_flag = 1;
-		}
+//		if(timer_is_timeout_1ms(timer_gps_cycle, 1000*60*60*24) == 0)
+//		{
+//			gps_flag = 1;
+//		}
 		
 		
 
