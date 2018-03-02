@@ -681,22 +681,21 @@
                           AREA ||i.gprs_init_task_fun||, CODE, READONLY, ALIGN=2
 
                   gprs_init_task_fun PROC
-;;;390    */
-;;;391    static void gprs_init_task_fun(void *p_arg)
+;;;389    *********************************************************************************************************
+;;;390    */void gprs_init_task_fun(void)
 000000  e1e5              B        |L3.974|
                   |L3.2|
-;;;392    {
-;;;393    //	OS_ERR err;
-;;;394    //	OS_MSG_SIZE size = 0;
-;;;395    	u8 *msg;
-;;;396    	u8 size1;
-;;;397    	u8 *ret;
-;;;398    	static u8 gprs_init_flag = true;		//
-;;;399    		
-;;;400    	while(1)
-;;;401    	{
-;;;402    		
-;;;403    		switch(gprs_status)
+;;;391    {
+;;;392    
+;;;393    	u8 *msg;
+;;;394    	u8 size1;
+;;;395    	u8 *ret;
+;;;396    	static u8 gprs_init_flag = true;		//
+;;;397    		
+;;;398    	while(1)
+;;;399    	{
+;;;400    		
+;;;401    		switch(gprs_status)
 000002  48f3              LDR      r0,|L3.976|
 000004  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000006  2808              CMP      r0,#8
@@ -727,135 +726,135 @@
 000036  28ff              CMP      r0,#0xff
 000038  d1f7              BNE      |L3.42|
 00003a  e1c5              B        |L3.968|
-;;;404    		{
-;;;405    			case 0:
-;;;406    //				gprs_power_on();
-;;;407    //				OSTimeDlyHMSM(0,0,3,0,OS_OPT_TIME_HMSM_STRICT,&err);
-;;;408    				gprs_status = 1;
+;;;402    		{
+;;;403    			case 0:
+;;;404    //				gprs_power_on();
+;;;405    //				OSTimeDlyHMSM(0,0,3,0,OS_OPT_TIME_HMSM_STRICT,&err);
+;;;406    				gprs_status = 1;
 00003c  2001              MOVS     r0,#1
 00003e  49e4              LDR      r1,|L3.976|
 000040  7008              STRB     r0,[r1,#0]
-;;;409    				gprs_err_cnt = 0;
+;;;407    				gprs_err_cnt = 0;
 000042  2000              MOVS     r0,#0
 000044  49e3              LDR      r1,|L3.980|
 000046  7008              STRB     r0,[r1,#0]
-;;;410    			break;
+;;;408    			break;
 000048  e1c0              B        |L3.972|
-;;;411    					
-;;;412    			case 1:
-;;;413    				ret = gprs_send_at("\r\nAT\r\n", "OK", 800,10000);
+;;;409    					
+;;;410    			case 1:
+;;;411    				ret = gprs_send_at("\r\nAT\r\n", "OK", 800,10000);
 00004a  f2427310          MOV      r3,#0x2710
 00004e  f44f7248          MOV      r2,#0x320
 000052  a1e1              ADR      r1,|L3.984|
 000054  a0e1              ADR      r0,|L3.988|
 000056  f7fffffe          BL       gprs_send_at
 00005a  4604              MOV      r4,r0
-;;;414    				if (ret == 0)
+;;;412    				if (ret == 0)
 00005c  b944              CBNZ     r4,|L3.112|
-;;;415    				{
-;;;416    					gprs_status++;
+;;;413    				{
+;;;414    					gprs_status++;
 00005e  48dc              LDR      r0,|L3.976|
 000060  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000062  1c40              ADDS     r0,r0,#1
 000064  49da              LDR      r1,|L3.976|
 000066  7008              STRB     r0,[r1,#0]
-;;;417    					gprs_err_cnt = 0;
+;;;415    					gprs_err_cnt = 0;
 000068  2000              MOVS     r0,#0
 00006a  49da              LDR      r1,|L3.980|
 00006c  7008              STRB     r0,[r1,#0]
 00006e  e00b              B        |L3.136|
                   |L3.112|
-;;;418    				}
-;;;419    				else
-;;;420    				{
-;;;421    					gprs_err_cnt++;
+;;;416    				}
+;;;417    				else
+;;;418    				{
+;;;419    					gprs_err_cnt++;
 000070  48d8              LDR      r0,|L3.980|
 000072  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000074  1c40              ADDS     r0,r0,#1
 000076  49d7              LDR      r1,|L3.980|
 000078  7008              STRB     r0,[r1,#0]
-;;;422    					if (gprs_err_cnt > 5)
+;;;420    					if (gprs_err_cnt > 5)
 00007a  4608              MOV      r0,r1
 00007c  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 00007e  2805              CMP      r0,#5
 000080  dd02              BLE      |L3.136|
-;;;423    					{
-;;;424    						gprs_status = 0;
+;;;421    					{
+;;;422    						gprs_status = 0;
 000082  2000              MOVS     r0,#0
 000084  49d2              LDR      r1,|L3.976|
 000086  7008              STRB     r0,[r1,#0]
                   |L3.136|
-;;;425    					}
-;;;426    				}
-;;;427    			break;
+;;;423    					}
+;;;424    				}
+;;;425    			break;
 000088  e1a0              B        |L3.972|
-;;;428    			
-;;;429    			case 2:
-;;;430    				ret = gprs_send_at("\r\nATI\r\n", "OK", 800, 10000);
+;;;426    			
+;;;427    			case 2:
+;;;428    				ret = gprs_send_at("\r\nATI\r\n", "OK", 800, 10000);
 00008a  f2427310          MOV      r3,#0x2710
 00008e  f44f7248          MOV      r2,#0x320
 000092  a1d1              ADR      r1,|L3.984|
 000094  a0d3              ADR      r0,|L3.996|
 000096  f7fffffe          BL       gprs_send_at
 00009a  4604              MOV      r4,r0
-;;;431    				if (ret == 0)
+;;;429    				if (ret == 0)
 00009c  b944              CBNZ     r4,|L3.176|
-;;;432    				{
-;;;433    					gprs_status++;
+;;;430    				{
+;;;431    					gprs_status++;
 00009e  48cc              LDR      r0,|L3.976|
 0000a0  7800              LDRB     r0,[r0,#0]  ; gprs_status
 0000a2  1c40              ADDS     r0,r0,#1
 0000a4  49ca              LDR      r1,|L3.976|
 0000a6  7008              STRB     r0,[r1,#0]
-;;;434    					gprs_err_cnt = 0;
+;;;432    					gprs_err_cnt = 0;
 0000a8  2000              MOVS     r0,#0
 0000aa  49ca              LDR      r1,|L3.980|
 0000ac  7008              STRB     r0,[r1,#0]
 0000ae  e00b              B        |L3.200|
                   |L3.176|
-;;;435    				}
-;;;436    				else
-;;;437    				{
-;;;438    					gprs_err_cnt++;
+;;;433    				}
+;;;434    				else
+;;;435    				{
+;;;436    					gprs_err_cnt++;
 0000b0  48c8              LDR      r0,|L3.980|
 0000b2  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0000b4  1c40              ADDS     r0,r0,#1
 0000b6  49c7              LDR      r1,|L3.980|
 0000b8  7008              STRB     r0,[r1,#0]
-;;;439    					if (gprs_err_cnt > 5)
+;;;437    					if (gprs_err_cnt > 5)
 0000ba  4608              MOV      r0,r1
 0000bc  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0000be  2805              CMP      r0,#5
 0000c0  dd02              BLE      |L3.200|
-;;;440    					{
-;;;441    						gprs_status = 0;
+;;;438    					{
+;;;439    						gprs_status = 0;
 0000c2  2000              MOVS     r0,#0
 0000c4  49c2              LDR      r1,|L3.976|
 0000c6  7008              STRB     r0,[r1,#0]
                   |L3.200|
-;;;442    					}
-;;;443    				}
-;;;444    			break;
+;;;440    					}
+;;;441    				}
+;;;442    			break;
 0000c8  e180              B        |L3.972|
-;;;445    			
-;;;446    			case 3:			
-;;;447    				ret = gprs_send_at("\r\nAT+CPIN?\r\n", "OK", 800, 10000);
+;;;443    			
+;;;444    			case 3:			
+;;;445    				ret = gprs_send_at("\r\nAT+CPIN?\r\n", "OK", 800, 10000);
 0000ca  f2427310          MOV      r3,#0x2710
 0000ce  f44f7248          MOV      r2,#0x320
 0000d2  a1c1              ADR      r1,|L3.984|
 0000d4  a0c5              ADR      r0,|L3.1004|
 0000d6  f7fffffe          BL       gprs_send_at
 0000da  4604              MOV      r4,r0
-;;;448    				if (ret == 0)
+;;;446    				if (ret == 0)
 0000dc  b96c              CBNZ     r4,|L3.250|
-;;;449    				{
-;;;450    					gprs_status++;
+;;;447    				{
+;;;448    					gprs_status++;
 0000de  48bc              LDR      r0,|L3.976|
 0000e0  7800              LDRB     r0,[r0,#0]  ; gprs_status
 0000e2  1c40              ADDS     r0,r0,#1
 0000e4  49ba              LDR      r1,|L3.976|
 0000e6  7008              STRB     r0,[r1,#0]
-;;;451    					gprs_err_cnt = 0;
+;;;449    					gprs_err_cnt = 0;
 0000e8  2000              MOVS     r0,#0
 0000ea  49ba              LDR      r1,|L3.980|
 0000ec  7008              STRB     r0,[r1,#0]
@@ -871,587 +870,587 @@
                   |L3.248|
 0000f8  e0c9              B        |L3.654|
                   |L3.250|
-;;;452    				}
-;;;453    				else
-;;;454    				{
-;;;455    					gprs_err_cnt++;
+;;;450    				}
+;;;451    				else
+;;;452    				{
+;;;453    					gprs_err_cnt++;
 0000fa  48b6              LDR      r0,|L3.980|
 0000fc  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0000fe  1c40              ADDS     r0,r0,#1
 000100  49b4              LDR      r1,|L3.980|
 000102  7008              STRB     r0,[r1,#0]
-;;;456    					if (gprs_err_cnt > 5)
+;;;454    					if (gprs_err_cnt > 5)
 000104  4608              MOV      r0,r1
 000106  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000108  2805              CMP      r0,#5
 00010a  dd02              BLE      |L3.274|
-;;;457    					{
-;;;458    						gprs_status = 0;
+;;;455    					{
+;;;456    						gprs_status = 0;
 00010c  2000              MOVS     r0,#0
 00010e  49b0              LDR      r1,|L3.976|
 000110  7008              STRB     r0,[r1,#0]
                   |L3.274|
-;;;459    					}
-;;;460    				}
-;;;461    			break;
+;;;457    					}
+;;;458    				}
+;;;459    			break;
 000112  e15b              B        |L3.972|
                   |L3.276|
 000114  e11a              B        |L3.844|
                   |L3.278|
 000116  e139              B        |L3.908|
-;;;462    			
-;;;463    			case 4:
-;;;464    				ret = gprs_send_at("\r\nAT+CREG=1\r\n", "OK", 800, 10000);
+;;;460    			
+;;;461    			case 4:
+;;;462    				ret = gprs_send_at("\r\nAT+CREG=1\r\n", "OK", 800, 10000);
 000118  f2427310          MOV      r3,#0x2710
 00011c  f44f7248          MOV      r2,#0x320
 000120  a1ad              ADR      r1,|L3.984|
 000122  a0b6              ADR      r0,|L3.1020|
 000124  f7fffffe          BL       gprs_send_at
 000128  4604              MOV      r4,r0
-;;;465    				if (ret == 0)
+;;;463    				if (ret == 0)
 00012a  b944              CBNZ     r4,|L3.318|
-;;;466    				{
-;;;467    					gprs_status++;
+;;;464    				{
+;;;465    					gprs_status++;
 00012c  48a8              LDR      r0,|L3.976|
 00012e  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000130  1c40              ADDS     r0,r0,#1
 000132  49a7              LDR      r1,|L3.976|
 000134  7008              STRB     r0,[r1,#0]
-;;;468    					gprs_err_cnt = 0;
+;;;466    					gprs_err_cnt = 0;
 000136  2000              MOVS     r0,#0
 000138  49a6              LDR      r1,|L3.980|
 00013a  7008              STRB     r0,[r1,#0]
 00013c  e00b              B        |L3.342|
                   |L3.318|
-;;;469    				}
-;;;470    				else
-;;;471    				{
-;;;472    					gprs_err_cnt++;
+;;;467    				}
+;;;468    				else
+;;;469    				{
+;;;470    					gprs_err_cnt++;
 00013e  48a5              LDR      r0,|L3.980|
 000140  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000142  1c40              ADDS     r0,r0,#1
 000144  49a3              LDR      r1,|L3.980|
 000146  7008              STRB     r0,[r1,#0]
-;;;473    					if (gprs_err_cnt > 5)
+;;;471    					if (gprs_err_cnt > 5)
 000148  4608              MOV      r0,r1
 00014a  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 00014c  2805              CMP      r0,#5
 00014e  dd02              BLE      |L3.342|
-;;;474    					{
-;;;475    						gprs_status = 0;
+;;;472    					{
+;;;473    						gprs_status = 0;
 000150  2000              MOVS     r0,#0
 000152  499f              LDR      r1,|L3.976|
 000154  7008              STRB     r0,[r1,#0]
                   |L3.342|
-;;;476    					}
-;;;477    				}
-;;;478    			break;
+;;;474    					}
+;;;475    				}
+;;;476    			break;
 000156  e139              B        |L3.972|
-;;;479    			
-;;;480    			case 5:
-;;;481    				ret = gprs_send_at("\r\nAT+CSQ\r\n", "OK", 800, 10000);
+;;;477    			
+;;;478    			case 5:
+;;;479    				ret = gprs_send_at("\r\nAT+CSQ\r\n", "OK", 800, 10000);
 000158  f2427310          MOV      r3,#0x2710
 00015c  f44f7248          MOV      r2,#0x320
 000160  a19d              ADR      r1,|L3.984|
 000162  a0aa              ADR      r0,|L3.1036|
 000164  f7fffffe          BL       gprs_send_at
 000168  4604              MOV      r4,r0
-;;;482    				if (ret == 0)
+;;;480    				if (ret == 0)
 00016a  b944              CBNZ     r4,|L3.382|
-;;;483    				{
-;;;484    					gprs_status++;
+;;;481    				{
+;;;482    					gprs_status++;
 00016c  4898              LDR      r0,|L3.976|
 00016e  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000170  1c40              ADDS     r0,r0,#1
 000172  4997              LDR      r1,|L3.976|
 000174  7008              STRB     r0,[r1,#0]
-;;;485    					gprs_err_cnt = 0;
+;;;483    					gprs_err_cnt = 0;
 000176  2000              MOVS     r0,#0
 000178  4996              LDR      r1,|L3.980|
 00017a  7008              STRB     r0,[r1,#0]
 00017c  e006              B        |L3.396|
                   |L3.382|
-;;;486    				}
-;;;487    				else
-;;;488    				{
-;;;489    					if (gprs_err_cnt > 5)
+;;;484    				}
+;;;485    				else
+;;;486    				{
+;;;487    					if (gprs_err_cnt > 5)
 00017e  4895              LDR      r0,|L3.980|
 000180  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000182  2805              CMP      r0,#5
 000184  dd02              BLE      |L3.396|
-;;;490    					{
-;;;491    						gprs_status = 0;
+;;;488    					{
+;;;489    						gprs_status = 0;
 000186  2000              MOVS     r0,#0
 000188  4991              LDR      r1,|L3.976|
 00018a  7008              STRB     r0,[r1,#0]
                   |L3.396|
-;;;492    					}
-;;;493    				}
-;;;494    			break;
+;;;490    					}
+;;;491    				}
+;;;492    			break;
 00018c  e11e              B        |L3.972|
-;;;495    			
-;;;496    			case 6:
-;;;497    				ret = gprs_send_at("\r\nAT+CREG?\r\n", "OK", 800, 10000);
+;;;493    			
+;;;494    			case 6:
+;;;495    				ret = gprs_send_at("\r\nAT+CREG?\r\n", "OK", 800, 10000);
 00018e  f2427310          MOV      r3,#0x2710
 000192  f44f7248          MOV      r2,#0x320
 000196  a190              ADR      r1,|L3.984|
 000198  a09f              ADR      r0,|L3.1048|
 00019a  f7fffffe          BL       gprs_send_at
 00019e  4604              MOV      r4,r0
-;;;498    				if (ret == 0)
+;;;496    				if (ret == 0)
 0001a0  b944              CBNZ     r4,|L3.436|
-;;;499    				{
-;;;500    					gprs_status++;
+;;;497    				{
+;;;498    					gprs_status++;
 0001a2  488b              LDR      r0,|L3.976|
 0001a4  7800              LDRB     r0,[r0,#0]  ; gprs_status
 0001a6  1c40              ADDS     r0,r0,#1
 0001a8  4989              LDR      r1,|L3.976|
 0001aa  7008              STRB     r0,[r1,#0]
-;;;501    					gprs_err_cnt = 0;
+;;;499    					gprs_err_cnt = 0;
 0001ac  2000              MOVS     r0,#0
 0001ae  4989              LDR      r1,|L3.980|
 0001b0  7008              STRB     r0,[r1,#0]
 0001b2  e00b              B        |L3.460|
                   |L3.436|
-;;;502    				}
-;;;503    				else
-;;;504    				{
-;;;505    					gprs_err_cnt++;
+;;;500    				}
+;;;501    				else
+;;;502    				{
+;;;503    					gprs_err_cnt++;
 0001b4  4887              LDR      r0,|L3.980|
 0001b6  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0001b8  1c40              ADDS     r0,r0,#1
 0001ba  4986              LDR      r1,|L3.980|
 0001bc  7008              STRB     r0,[r1,#0]
-;;;506    					if (gprs_err_cnt > 5)
+;;;504    					if (gprs_err_cnt > 5)
 0001be  4608              MOV      r0,r1
 0001c0  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0001c2  2805              CMP      r0,#5
 0001c4  dd02              BLE      |L3.460|
-;;;507    					{
-;;;508    						gprs_status = 0;
+;;;505    					{
+;;;506    						gprs_status = 0;
 0001c6  2000              MOVS     r0,#0
 0001c8  4981              LDR      r1,|L3.976|
 0001ca  7008              STRB     r0,[r1,#0]
                   |L3.460|
-;;;509    					}
-;;;510    				}
-;;;511    			break;
+;;;507    					}
+;;;508    				}
+;;;509    			break;
 0001cc  e0fe              B        |L3.972|
-;;;512    			
-;;;513    			case 7:
-;;;514    				ret = gprs_send_at("\r\nAT^SICS=0,conType,GPRS0\r\n", "OK", 800, 10000);//?¨á￠á??óProfile éè??conType
+;;;510    			
+;;;511    			case 7:
+;;;512    				ret = gprs_send_at("\r\nAT^SICS=0,conType,GPRS0\r\n", "OK", 800, 10000);//?¨á￠á??óProfile éè??conType
 0001ce  f2427310          MOV      r3,#0x2710
 0001d2  f44f7248          MOV      r2,#0x320
 0001d6  a180              ADR      r1,|L3.984|
 0001d8  a093              ADR      r0,|L3.1064|
 0001da  f7fffffe          BL       gprs_send_at
 0001de  4604              MOV      r4,r0
-;;;515    				if (ret == 0)
+;;;513    				if (ret == 0)
 0001e0  b944              CBNZ     r4,|L3.500|
-;;;516    				{
-;;;517    					gprs_status++;
+;;;514    				{
+;;;515    					gprs_status++;
 0001e2  487b              LDR      r0,|L3.976|
 0001e4  7800              LDRB     r0,[r0,#0]  ; gprs_status
 0001e6  1c40              ADDS     r0,r0,#1
 0001e8  4979              LDR      r1,|L3.976|
 0001ea  7008              STRB     r0,[r1,#0]
-;;;518    					gprs_err_cnt = 0;
+;;;516    					gprs_err_cnt = 0;
 0001ec  2000              MOVS     r0,#0
 0001ee  4979              LDR      r1,|L3.980|
 0001f0  7008              STRB     r0,[r1,#0]
 0001f2  e00b              B        |L3.524|
                   |L3.500|
-;;;519    				}
-;;;520    				else
-;;;521    				{
-;;;522    					gprs_err_cnt++;
+;;;517    				}
+;;;518    				else
+;;;519    				{
+;;;520    					gprs_err_cnt++;
 0001f4  4877              LDR      r0,|L3.980|
 0001f6  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0001f8  1c40              ADDS     r0,r0,#1
 0001fa  4976              LDR      r1,|L3.980|
 0001fc  7008              STRB     r0,[r1,#0]
-;;;523    					if (gprs_err_cnt > 5)
+;;;521    					if (gprs_err_cnt > 5)
 0001fe  4608              MOV      r0,r1
 000200  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000202  2805              CMP      r0,#5
 000204  dd02              BLE      |L3.524|
-;;;524    					{
-;;;525    						gprs_status = 0;
+;;;522    					{
+;;;523    						gprs_status = 0;
 000206  2000              MOVS     r0,#0
 000208  4971              LDR      r1,|L3.976|
 00020a  7008              STRB     r0,[r1,#0]
                   |L3.524|
-;;;526    					}
-;;;527    				}
-;;;528    			break;
+;;;524    					}
+;;;525    				}
+;;;526    			break;
 00020c  e0de              B        |L3.972|
                   |L3.526|
-;;;529    			
-;;;530    			case 8:
-;;;531    				ret = gprs_send_at("\r\nAT^SICS=0,APN,CMNET\r\n", "OK", 800, 10000);//
+;;;527    			
+;;;528    			case 8:
+;;;529    				ret = gprs_send_at("\r\nAT^SICS=0,APN,CMNET\r\n", "OK", 800, 10000);//
 00020e  f2427310          MOV      r3,#0x2710
 000212  f44f7248          MOV      r2,#0x320
 000216  a170              ADR      r1,|L3.984|
 000218  a08a              ADR      r0,|L3.1092|
 00021a  f7fffffe          BL       gprs_send_at
 00021e  4604              MOV      r4,r0
-;;;532    				if (ret == 0)
+;;;530    				if (ret == 0)
 000220  b944              CBNZ     r4,|L3.564|
-;;;533    				{
-;;;534    					gprs_status++;
+;;;531    				{
+;;;532    					gprs_status++;
 000222  486b              LDR      r0,|L3.976|
 000224  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000226  1c40              ADDS     r0,r0,#1
 000228  4969              LDR      r1,|L3.976|
 00022a  7008              STRB     r0,[r1,#0]
-;;;535    					gprs_err_cnt = 0;
+;;;533    					gprs_err_cnt = 0;
 00022c  2000              MOVS     r0,#0
 00022e  4969              LDR      r1,|L3.980|
 000230  7008              STRB     r0,[r1,#0]
 000232  e00b              B        |L3.588|
                   |L3.564|
-;;;536    				}
-;;;537    				else
-;;;538    				{
-;;;539    					gprs_err_cnt++;
+;;;534    				}
+;;;535    				else
+;;;536    				{
+;;;537    					gprs_err_cnt++;
 000234  4867              LDR      r0,|L3.980|
 000236  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000238  1c40              ADDS     r0,r0,#1
 00023a  4966              LDR      r1,|L3.980|
 00023c  7008              STRB     r0,[r1,#0]
-;;;540    					if (gprs_err_cnt > 5)
+;;;538    					if (gprs_err_cnt > 5)
 00023e  4608              MOV      r0,r1
 000240  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000242  2805              CMP      r0,#5
 000244  dd02              BLE      |L3.588|
-;;;541    					{
-;;;542    						gprs_status = 0;
+;;;539    					{
+;;;540    						gprs_status = 0;
 000246  2000              MOVS     r0,#0
 000248  4961              LDR      r1,|L3.976|
 00024a  7008              STRB     r0,[r1,#0]
                   |L3.588|
-;;;543    					}
-;;;544    				}
-;;;545    			break;
+;;;541    					}
+;;;542    				}
+;;;543    			break;
 00024c  e0be              B        |L3.972|
                   |L3.590|
-;;;546    			
-;;;547    			case 9:
-;;;548    				ret = gprs_send_at("\r\nAT^SISS=0,srvType,Socket\r\n", "OK", 800, 10000);//
+;;;544    			
+;;;545    			case 9:
+;;;546    				ret = gprs_send_at("\r\nAT^SISS=0,srvType,Socket\r\n", "OK", 800, 10000);//
 00024e  f2427310          MOV      r3,#0x2710
 000252  f44f7248          MOV      r2,#0x320
 000256  a160              ADR      r1,|L3.984|
 000258  a080              ADR      r0,|L3.1116|
 00025a  f7fffffe          BL       gprs_send_at
 00025e  4604              MOV      r4,r0
-;;;549    				if (ret == 0)
+;;;547    				if (ret == 0)
 000260  b944              CBNZ     r4,|L3.628|
-;;;550    				{
-;;;551    					gprs_status++;
+;;;548    				{
+;;;549    					gprs_status++;
 000262  485b              LDR      r0,|L3.976|
 000264  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000266  1c40              ADDS     r0,r0,#1
 000268  4959              LDR      r1,|L3.976|
 00026a  7008              STRB     r0,[r1,#0]
-;;;552    					gprs_err_cnt = 0;
+;;;550    					gprs_err_cnt = 0;
 00026c  2000              MOVS     r0,#0
 00026e  4959              LDR      r1,|L3.980|
 000270  7008              STRB     r0,[r1,#0]
 000272  e00b              B        |L3.652|
                   |L3.628|
-;;;553    				}
-;;;554    				else
-;;;555    				{
-;;;556    					gprs_err_cnt++;
+;;;551    				}
+;;;552    				else
+;;;553    				{
+;;;554    					gprs_err_cnt++;
 000274  4857              LDR      r0,|L3.980|
 000276  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000278  1c40              ADDS     r0,r0,#1
 00027a  4956              LDR      r1,|L3.980|
 00027c  7008              STRB     r0,[r1,#0]
-;;;557    					if (gprs_err_cnt > 5)
+;;;555    					if (gprs_err_cnt > 5)
 00027e  4608              MOV      r0,r1
 000280  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000282  2805              CMP      r0,#5
 000284  dd02              BLE      |L3.652|
-;;;558    					{
-;;;559    						gprs_status = 0;
+;;;556    					{
+;;;557    						gprs_status = 0;
 000286  2000              MOVS     r0,#0
 000288  4951              LDR      r1,|L3.976|
 00028a  7008              STRB     r0,[r1,#0]
                   |L3.652|
-;;;560    					}
-;;;561    				}
-;;;562    			break;
+;;;558    					}
+;;;559    				}
+;;;560    			break;
 00028c  e09e              B        |L3.972|
                   |L3.654|
-;;;563    			
-;;;564    			case 10:
-;;;565    				ret = gprs_send_at("\r\nAT^SISS=0,conId,0\r\n", "OK", 800, 10000);//
+;;;561    			
+;;;562    			case 10:
+;;;563    				ret = gprs_send_at("\r\nAT^SISS=0,conId,0\r\n", "OK", 800, 10000);//
 00028e  f2427310          MOV      r3,#0x2710
 000292  f44f7248          MOV      r2,#0x320
 000296  a150              ADR      r1,|L3.984|
 000298  a078              ADR      r0,|L3.1148|
 00029a  f7fffffe          BL       gprs_send_at
 00029e  4604              MOV      r4,r0
-;;;566    				if (ret == 0)
+;;;564    				if (ret == 0)
 0002a0  b944              CBNZ     r4,|L3.692|
-;;;567    				{
-;;;568    					gprs_status++;
+;;;565    				{
+;;;566    					gprs_status++;
 0002a2  484b              LDR      r0,|L3.976|
 0002a4  7800              LDRB     r0,[r0,#0]  ; gprs_status
 0002a6  1c40              ADDS     r0,r0,#1
 0002a8  4949              LDR      r1,|L3.976|
 0002aa  7008              STRB     r0,[r1,#0]
-;;;569    					gprs_err_cnt = 0;
+;;;567    					gprs_err_cnt = 0;
 0002ac  2000              MOVS     r0,#0
 0002ae  4949              LDR      r1,|L3.980|
 0002b0  7008              STRB     r0,[r1,#0]
 0002b2  e00b              B        |L3.716|
                   |L3.692|
-;;;570    				}
-;;;571    				else
-;;;572    				{
-;;;573    					gprs_err_cnt++;
+;;;568    				}
+;;;569    				else
+;;;570    				{
+;;;571    					gprs_err_cnt++;
 0002b4  4847              LDR      r0,|L3.980|
 0002b6  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0002b8  1c40              ADDS     r0,r0,#1
 0002ba  4946              LDR      r1,|L3.980|
 0002bc  7008              STRB     r0,[r1,#0]
-;;;574    					if (gprs_err_cnt > 5)
+;;;572    					if (gprs_err_cnt > 5)
 0002be  4608              MOV      r0,r1
 0002c0  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0002c2  2805              CMP      r0,#5
 0002c4  dd02              BLE      |L3.716|
-;;;575    					{
-;;;576    						gprs_status = 0;
+;;;573    					{
+;;;574    						gprs_status = 0;
 0002c6  2000              MOVS     r0,#0
 0002c8  4941              LDR      r1,|L3.976|
 0002ca  7008              STRB     r0,[r1,#0]
                   |L3.716|
-;;;577    					}
-;;;578    				}
-;;;579    			break;
+;;;575    					}
+;;;576    				}
+;;;577    			break;
 0002cc  e07e              B        |L3.972|
                   |L3.718|
-;;;580    					
-;;;581    			case 11:
-;;;582    				ret = gprs_send_at("\r\nAT^SISS=0,address,\"socktcp://180.169.14.34:16650\"\r\n", "OK", 800, 10000);//
+;;;578    					
+;;;579    			case 11:
+;;;580    				ret = gprs_send_at("\r\nAT^SISS=0,address,\"socktcp://180.169.14.34:16650\"\r\n", "OK", 800, 10000);//
 0002ce  f2427310          MOV      r3,#0x2710
 0002d2  f44f7248          MOV      r2,#0x320
 0002d6  a140              ADR      r1,|L3.984|
 0002d8  a06e              ADR      r0,|L3.1172|
 0002da  f7fffffe          BL       gprs_send_at
 0002de  4604              MOV      r4,r0
-;;;583    				if (ret == 0)
+;;;581    				if (ret == 0)
 0002e0  b944              CBNZ     r4,|L3.756|
-;;;584    				{
-;;;585    					gprs_status++;
+;;;582    				{
+;;;583    					gprs_status++;
 0002e2  483b              LDR      r0,|L3.976|
 0002e4  7800              LDRB     r0,[r0,#0]  ; gprs_status
 0002e6  1c40              ADDS     r0,r0,#1
 0002e8  4939              LDR      r1,|L3.976|
 0002ea  7008              STRB     r0,[r1,#0]
-;;;586    					gprs_err_cnt = 0;
+;;;584    					gprs_err_cnt = 0;
 0002ec  2000              MOVS     r0,#0
 0002ee  4939              LDR      r1,|L3.980|
 0002f0  7008              STRB     r0,[r1,#0]
 0002f2  e00b              B        |L3.780|
                   |L3.756|
-;;;587    				}
-;;;588    				else
-;;;589    				{
-;;;590    					gprs_err_cnt++;
+;;;585    				}
+;;;586    				else
+;;;587    				{
+;;;588    					gprs_err_cnt++;
 0002f4  4837              LDR      r0,|L3.980|
 0002f6  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0002f8  1c40              ADDS     r0,r0,#1
 0002fa  4936              LDR      r1,|L3.980|
 0002fc  7008              STRB     r0,[r1,#0]
-;;;591    					if (gprs_err_cnt > 5)
+;;;589    					if (gprs_err_cnt > 5)
 0002fe  4608              MOV      r0,r1
 000300  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000302  2805              CMP      r0,#5
 000304  dd02              BLE      |L3.780|
-;;;592    					{
-;;;593    						gprs_status = 0;
+;;;590    					{
+;;;591    						gprs_status = 0;
 000306  2000              MOVS     r0,#0
 000308  4931              LDR      r1,|L3.976|
 00030a  7008              STRB     r0,[r1,#0]
                   |L3.780|
-;;;594    					}
-;;;595    				}
-;;;596    			break;
+;;;592    					}
+;;;593    				}
+;;;594    			break;
 00030c  e05e              B        |L3.972|
                   |L3.782|
-;;;597    			
-;;;598    			case 12:
-;;;599    				ret = gprs_send_at("\r\nAT^SISO=0\r\n", "OK", 5000, 20000);//
+;;;595    			
+;;;596    			case 12:
+;;;597    				ret = gprs_send_at("\r\nAT^SISO=0\r\n", "OK", 5000, 20000);//
 00030e  f6446320          MOV      r3,#0x4e20
 000312  109a              ASRS     r2,r3,#2
 000314  a130              ADR      r1,|L3.984|
 000316  a06d              ADR      r0,|L3.1228|
 000318  f7fffffe          BL       gprs_send_at
 00031c  4604              MOV      r4,r0
-;;;600    				if (ret == 0)
+;;;598    				if (ret == 0)
 00031e  b944              CBNZ     r4,|L3.818|
-;;;601    				{
-;;;602    					gprs_status++;
+;;;599    				{
+;;;600    					gprs_status++;
 000320  482b              LDR      r0,|L3.976|
 000322  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000324  1c40              ADDS     r0,r0,#1
 000326  492a              LDR      r1,|L3.976|
 000328  7008              STRB     r0,[r1,#0]
-;;;603    					gprs_err_cnt = 0;
+;;;601    					gprs_err_cnt = 0;
 00032a  2000              MOVS     r0,#0
 00032c  4929              LDR      r1,|L3.980|
 00032e  7008              STRB     r0,[r1,#0]
 000330  e00b              B        |L3.842|
                   |L3.818|
-;;;604    				}
-;;;605    				else
-;;;606    				{
-;;;607    					gprs_err_cnt++;
+;;;602    				}
+;;;603    				else
+;;;604    				{
+;;;605    					gprs_err_cnt++;
 000332  4828              LDR      r0,|L3.980|
 000334  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000336  1c40              ADDS     r0,r0,#1
 000338  4926              LDR      r1,|L3.980|
 00033a  7008              STRB     r0,[r1,#0]
-;;;608    					if (gprs_err_cnt > 5)
+;;;606    					if (gprs_err_cnt > 5)
 00033c  4608              MOV      r0,r1
 00033e  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000340  2805              CMP      r0,#5
 000342  dd02              BLE      |L3.842|
-;;;609    					{
-;;;610    						gprs_status = 0;
+;;;607    					{
+;;;608    						gprs_status = 0;
 000344  2000              MOVS     r0,#0
 000346  4922              LDR      r1,|L3.976|
 000348  7008              STRB     r0,[r1,#0]
                   |L3.842|
-;;;611    					}
-;;;612    				}
-;;;613    
-;;;614    			break;
+;;;609    					}
+;;;610    				}
+;;;611    
+;;;612    			break;
 00034a  e03f              B        |L3.972|
                   |L3.844|
-;;;615    			
-;;;616    			case 13:
-;;;617    				ret = gprs_send_at("\r\nAT^IPCFL=5,20\r\n", "OK", 800, 10000);//
+;;;613    			
+;;;614    			case 13:
+;;;615    				ret = gprs_send_at("\r\nAT^IPCFL=5,20\r\n", "OK", 800, 10000);//
 00034c  f2427310          MOV      r3,#0x2710
 000350  f44f7248          MOV      r2,#0x320
 000354  a120              ADR      r1,|L3.984|
 000356  a061              ADR      r0,|L3.1244|
 000358  f7fffffe          BL       gprs_send_at
 00035c  4604              MOV      r4,r0
-;;;618    				if (ret == 0)
+;;;616    				if (ret == 0)
 00035e  b944              CBNZ     r4,|L3.882|
-;;;619    				{
-;;;620    					gprs_status++;
+;;;617    				{
+;;;618    					gprs_status++;
 000360  481b              LDR      r0,|L3.976|
 000362  7800              LDRB     r0,[r0,#0]  ; gprs_status
 000364  1c40              ADDS     r0,r0,#1
 000366  491a              LDR      r1,|L3.976|
 000368  7008              STRB     r0,[r1,#0]
-;;;621    					gprs_err_cnt = 0;
+;;;619    					gprs_err_cnt = 0;
 00036a  2000              MOVS     r0,#0
 00036c  4919              LDR      r1,|L3.980|
 00036e  7008              STRB     r0,[r1,#0]
 000370  e00b              B        |L3.906|
                   |L3.882|
-;;;622    				}
-;;;623    				else
-;;;624    				{
-;;;625    					gprs_err_cnt++;
+;;;620    				}
+;;;621    				else
+;;;622    				{
+;;;623    					gprs_err_cnt++;
 000372  4818              LDR      r0,|L3.980|
 000374  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000376  1c40              ADDS     r0,r0,#1
 000378  4916              LDR      r1,|L3.980|
 00037a  7008              STRB     r0,[r1,#0]
-;;;626    					if (gprs_err_cnt > 5)
+;;;624    					if (gprs_err_cnt > 5)
 00037c  4608              MOV      r0,r1
 00037e  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 000380  2805              CMP      r0,#5
 000382  dd02              BLE      |L3.906|
-;;;627    					{
-;;;628    						gprs_status = 0;
+;;;625    					{
+;;;626    						gprs_status = 0;
 000384  2000              MOVS     r0,#0
 000386  4912              LDR      r1,|L3.976|
 000388  7008              STRB     r0,[r1,#0]
                   |L3.906|
-;;;629    					}
-;;;630    				}
-;;;631    
-;;;632    			break;
+;;;627    					}
+;;;628    				}
+;;;629    
+;;;630    			break;
 00038a  e01f              B        |L3.972|
                   |L3.908|
-;;;633    			
-;;;634    			case 14:
-;;;635    				ret = gprs_send_at("\r\nAT^IPENTRANS=0\r\n", "OK", 800, 10000);//
+;;;631    			
+;;;632    			case 14:
+;;;633    				ret = gprs_send_at("\r\nAT^IPENTRANS=0\r\n", "OK", 800, 10000);//
 00038c  f2427310          MOV      r3,#0x2710
 000390  f44f7248          MOV      r2,#0x320
 000394  a110              ADR      r1,|L3.984|
 000396  a056              ADR      r0,|L3.1264|
 000398  f7fffffe          BL       gprs_send_at
 00039c  4604              MOV      r4,r0
-;;;636    				if (ret == 0)
+;;;634    				if (ret == 0)
 00039e  b934              CBNZ     r4,|L3.942|
-;;;637    				{
-;;;638    					gprs_status = 255;
+;;;635    				{
+;;;636    					gprs_status = 255;
 0003a0  20ff              MOVS     r0,#0xff
 0003a2  490b              LDR      r1,|L3.976|
 0003a4  7008              STRB     r0,[r1,#0]
-;;;639    					gprs_init_flag = false;
+;;;637    					gprs_init_flag = false;
 0003a6  2000              MOVS     r0,#0
 0003a8  4956              LDR      r1,|L3.1284|
 0003aa  7008              STRB     r0,[r1,#0]
 0003ac  e00b              B        |L3.966|
                   |L3.942|
-;;;640    				}
-;;;641    				else
-;;;642    				{
-;;;643    					gprs_err_cnt++;
+;;;638    				}
+;;;639    				else
+;;;640    				{
+;;;641    					gprs_err_cnt++;
 0003ae  4809              LDR      r0,|L3.980|
 0003b0  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0003b2  1c40              ADDS     r0,r0,#1
 0003b4  4907              LDR      r1,|L3.980|
 0003b6  7008              STRB     r0,[r1,#0]
-;;;644    					if (gprs_err_cnt > 5)
+;;;642    					if (gprs_err_cnt > 5)
 0003b8  4608              MOV      r0,r1
 0003ba  7800              LDRB     r0,[r0,#0]  ; gprs_err_cnt
 0003bc  2805              CMP      r0,#5
 0003be  dd02              BLE      |L3.966|
-;;;645    					{
-;;;646    						gprs_status = 0;
+;;;643    					{
+;;;644    						gprs_status = 0;
 0003c0  2000              MOVS     r0,#0
 0003c2  4903              LDR      r1,|L3.976|
 0003c4  7008              STRB     r0,[r1,#0]
                   |L3.966|
-;;;647    					}
-;;;648    				}		
-;;;649    			break;
+;;;645    					}
+;;;646    				}		
+;;;647    			break;
 0003c6  e001              B        |L3.972|
                   |L3.968|
+;;;648    				
+;;;649    			case 255:	//gprs 初始化完成后进行数据传输
 ;;;650    				
-;;;651    			case 255:	//gprs 初始化完成后进行数据传输
-;;;652    				
-;;;653    //				gprs_recv_task_create();
-;;;654    			
-;;;655    			break;
+;;;651    //				gprs_recv_task_create();
+;;;652    			
+;;;653    			break;
 0003c8  e000              B        |L3.972|
                   |L3.970|
-;;;656    				
-;;;657    				
-;;;658    			default:
-;;;659    			break;		
+;;;654    				
+;;;655    				
+;;;656    			default:
+;;;657    			break;		
 0003ca  bf00              NOP      
                   |L3.972|
-0003cc  bf00              NOP                            ;410
+0003cc  bf00              NOP                            ;408
                   |L3.974|
 0003ce  e618              B        |L3.2|
-;;;660    		}	//switch end			
-;;;661    	} // while end
-;;;662    	
-;;;663    		
-;;;664    }
-;;;665    
+;;;658    		}	//switch end			
+;;;659    	} // while end
+;;;660    	
+;;;661    		
+;;;662    }
+;;;663    
                           ENDP
 
                   |L3.976|

@@ -25551,7 +25551,7 @@ Nextern u16 usart2_cnt;
 Nextern u8 PARK_LOCK_Buffer[17];
 Nextern u8 protocol_buff[512];
 N
-N
+Ns8 a;
 N
 Nvoid protocol_analyze(void)
 N{

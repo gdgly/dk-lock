@@ -62,8 +62,8 @@ uint8_t gprs_init(void);
 void gprs_task_create(void);
 void gprs_config(void);
 
-static void gprs_init_task_fun(void *p_arg);
-static void gprs_recv_task_fun(void *p_arg);
+void gprs_init_task_fun(void);
+
 
 #endif
 

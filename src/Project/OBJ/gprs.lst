@@ -25506,8 +25506,8 @@ Nuint8_t gprs_init(void);
 Nvoid gprs_task_create(void);
 Nvoid gprs_config(void);
 N
-Nstatic void gprs_init_task_fun(void *p_arg);
-Nstatic void gprs_recv_task_fun(void *p_arg);
+Nvoid gprs_init_task_fun(void);
+N
 N
 N#endif
 N
@@ -26025,11 +26025,9 @@ N* Caller(s)   :
 N*
 N* Note(s)     : none.
 N*********************************************************************************************************
-N*/
-Nstatic void gprs_init_task_fun(void *p_arg)
+N*/void gprs_init_task_fun(void)
 N{
-N//	OS_ERR err;
-N//	OS_MSG_SIZE size = 0;
+N
 N	u8 *msg;
 N	u8 size1;
 N	u8 *ret;
@@ -26302,9 +26300,6 @@ N	} // while end
 N	
 N		
 N}
-N
-N
-N
 N
 N
 N

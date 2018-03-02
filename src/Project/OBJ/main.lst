@@ -26085,8 +26085,8 @@ Nuint8_t gprs_init(void);
 Nvoid gprs_task_create(void);
 Nvoid gprs_config(void);
 N
-Nstatic void gprs_init_task_fun(void *p_arg);
-Nstatic void gprs_recv_task_fun(void *p_arg);
+Nvoid gprs_init_task_fun(void);
+N
 N
 N#endif
 N
@@ -26558,17 +26558,20 @@ N
 N		usart1_recv_data();
 N		usart2_recv_data();
 N	
-N		// 电池信息
-N		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
-X		Bat_V =Get_Adc_Average(((uint8_t)0x00),10);
-N		Bat_V=Bat_V*3300/4096;
-N		Bat_V=Bat_V*88/20;
-N		Bat_Pre=(Bat_V-5000)*100/2400;
+N
 N		
 N//		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
 N		if(timer_is_timeout_1ms(timer_batt, 1000*60*60) == 0)
 N		{	
-N			Bat_Pre_Flag =  1;
+N			
+N			// 电池信息
+N			Bat_V =Get_Adc_Average(ADC_Channel_0,10);
+X			Bat_V =Get_Adc_Average(((uint8_t)0x00),10);
+N			Bat_V=Bat_V*3300/4096;
+N			Bat_V=Bat_V*88/20;
+N			Bat_Pre=(Bat_V-5000)*100/2400;
+N			
+N	
 N			memset(send_buff, 0, 100);	
 N			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
 N
@@ -26600,35 +26603,9 @@ N			}
 N			else
 N			{
 N				
-N			}
-N////			
-N//			if(Bat_Pre<10&&Bat_Pre_Flag==1)
-N//			{
-N//				Bat_Pre_Flag=0;
-N
-N//				memset(send_buff, 0, 100);
-N//				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-N//				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-N//				ret = gprs_send_at(send_buff, ">", 300, 2000);
-N//				if(ret != NULL)
-N//				{
-N//					memset(expressText, 0 ,512);
-N//					memset(cipherText, 0 ,512);
-N//					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
-N//					AES_Encrypt((char *)expressText, cipherText, aesKey);
-N
-N//					ret = gprs_send_at(cipherText, "OK", 300, 0);
-N//					if(ret != NULL)
-N//					{
-N//						timer_is_timeout_1ms(timer_heartbeat, 0);
-N//					}
-N//				}
-N//				else
-N//				{
-N//					
-N//				}
-N//			}
+N			}	
 N		}
+N		
 N//		//接收锁数据
 N		p1 = strstr((u8*)protocol_buff, "topic: lock/");
 N		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);

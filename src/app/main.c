@@ -236,16 +236,19 @@ int main(void)
 		usart1_recv_data();
 		usart2_recv_data();
 	
-		// 电池信息
-		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
-		Bat_V=Bat_V*3300/4096;
-		Bat_V=Bat_V*88/20;
-		Bat_Pre=(Bat_V-5000)*100/2400;
+
 		
 //		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
 		if(timer_is_timeout_1ms(timer_batt, 1000*60*60) == 0)
 		{	
-			Bat_Pre_Flag =  1;
+			
+			// 电池信息
+			Bat_V =Get_Adc_Average(ADC_Channel_0,10);
+			Bat_V=Bat_V*3300/4096;
+			Bat_V=Bat_V*88/20;
+			Bat_Pre=(Bat_V-5000)*100/2400;
+			
+	
 			memset(send_buff, 0, 100);	
 			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
 
@@ -271,35 +274,9 @@ int main(void)
 			else
 			{
 				
-			}
-////			
-//			if(Bat_Pre<10&&Bat_Pre_Flag==1)
-//			{
-//				Bat_Pre_Flag=0;
-
-//				memset(send_buff, 0, 100);
-//				sprintf((char *)send_buff,"%s%s%","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-//				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-//				ret = gprs_send_at(send_buff, ">", 300, 2000);
-//				if(ret != NULL)
-//				{
-//					memset(expressText, 0 ,512);
-//					memset(cipherText, 0 ,512);
-//					sprintf((char *)expressText,"{%c%s%c:%s}",'"',"battery",'"',"10");
-//					AES_Encrypt((char *)expressText, cipherText, aesKey);
-
-//					ret = gprs_send_at(cipherText, "OK", 300, 0);
-//					if(ret != NULL)
-//					{
-//						timer_is_timeout_1ms(timer_heartbeat, 0);
-//					}
-//				}
-//				else
-//				{
-//					
-//				}
-//			}
+			}	
 		}
+		
 //		//接收锁数据
 		p1 = strstr((u8*)protocol_buff, "topic: lock/");
 		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);

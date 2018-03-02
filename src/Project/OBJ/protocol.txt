@@ -143,3 +143,8 @@
                           DCD      usart2_buff
                   |L1.188|
                           DCD      0x40010800
+
+                          AREA ||.data||, DATA, ALIGN=0
+
+                  a
+000000  00                DCB      0x00

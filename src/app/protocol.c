@@ -13,7 +13,7 @@ extern u16 usart2_cnt;
 extern u8 PARK_LOCK_Buffer[17];
 extern u8 protocol_buff[512];
 
-
+s8 a;
 
 void protocol_analyze(void)
 {

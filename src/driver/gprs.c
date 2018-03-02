@@ -387,11 +387,9 @@ void gprs_config(void)
 *
 * Note(s)     : none.
 *********************************************************************************************************
-*/
-static void gprs_init_task_fun(void *p_arg)
+*/void gprs_init_task_fun(void)
 {
-//	OS_ERR err;
-//	OS_MSG_SIZE size = 0;
+
 	u8 *msg;
 	u8 size1;
 	u8 *ret;
@@ -662,9 +660,6 @@ static void gprs_init_task_fun(void *p_arg)
 	
 		
 }
-
-
-
 
 
 
