@@ -25509,7 +25509,8 @@ Nvoid usart2_recv_data(void);
 Nvoid usart3_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
-Nvoid usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...);
+Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
+N
 N#endif
 N
 N

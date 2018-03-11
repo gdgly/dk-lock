@@ -24265,7 +24265,9 @@ N
 Nenum timer
 N{
 N    tim1_cnt,
+N	timer_connect,
 N    timer_batt,
+N	timer_mqtt_keep_alive,
 N	timer_gps_cycle,
 N	tiemr_gps_location,
 N	timer_close_lock,

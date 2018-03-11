@@ -25414,7 +25414,6 @@ N#endif /* __stdlib_h */
 N
 N/* end of stdlib.h */
 L 6 "..\app\main.c" 2
-N
 N#include "adc.h"
 L 1 "..\driver\adc.h" 1
 N#ifndef __ADC_H
@@ -25935,7 +25934,7 @@ Nu16  Get_Adc(u8 ch);
 Nu16 Get_Adc_Average(u8 ch,u8 times); 
 N 
 N#endif 
-L 8 "..\app\main.c" 2
+L 7 "..\app\main.c" 2
 N#include "bsp.h"
 N#include "timer.h"
 L 1 "..\driver\timer.h" 1
@@ -25953,7 +25952,9 @@ N
 Nenum timer
 N{
 N    tim1_cnt,
+N	timer_connect,
 N    timer_batt,
+N	timer_mqtt_keep_alive,
 N	timer_gps_cycle,
 N	tiemr_gps_location,
 N	timer_close_lock,
@@ -25989,7 +25990,7 @@ N
 N
 N 
 N#endif
-L 10 "..\app\main.c" 2
+L 9 "..\app\main.c" 2
 N#include "gprs.h"
 L 1 "..\driver\gprs.h" 1
 N/*************************************************
@@ -26081,16 +26082,17 @@ N
 N
 Nu8 *gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout);
 Nuint8_t send_at_cmd(uint8_t *cmd, uint8_t *str, uint32_t timeout);
+Nvoid gprs_send_data(u8 *data, u16 data_len, u16 waittime);
 Nuint8_t gprs_init(void);
-Nvoid gprs_task_create(void);
+N
 Nvoid gprs_config(void);
 N
-Nvoid gprs_init_task_fun(void);
+Nvoid gprs_init_task(void);
 N
 N
 N#endif
 N
-L 11 "..\app\main.c" 2
+L 10 "..\app\main.c" 2
 N#include "usart.h"
 L 1 "..\driver\usart.h" 1
 N/*************************************************
@@ -26160,13 +26162,14 @@ Nvoid usart2_recv_data(void);
 Nvoid usart3_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
-Nvoid usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...);
+Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
+N
 N#endif
 N
 N
 N
 N
-L 12 "..\app\main.c" 2
+L 11 "..\app\main.c" 2
 N#include "aes.h"
 L 1 "..\tplib\aes.h" 1
 N#ifndef _AES_H_
@@ -26176,7 +26179,7 @@ N#define RoundKeyLEN  300
 Nvoid AES_Encrypt(char* pExpressText , char* pCipherText , char* pAeskey);
 Nvoid AES_Decrypt(char* pExpressText , char* pCipherText , char* pAeskey);
 N#endif
-L 13 "..\app\main.c" 2
+L 12 "..\app\main.c" 2
 N#include "aes128.h"
 L 1 "..\tplib\aes128.h" 1
 N#ifndef _AES128_H_
@@ -26278,7 +26281,7 @@ N#endif // #if defined(CTR) && (CTR == 1)
 N
 N
 N#endif //_AES_H_
-L 14 "..\app\main.c" 2
+L 13 "..\app\main.c" 2
 N#include "app_md5.h"
 L 1 "..\tplib\app_md5.h" 1
 N#ifndef _APP_MD5_H
@@ -26318,7 +26321,48 @@ Nvoid MD5Update(MD5_CTX *, unsigned char *, unsigned int);
 Nvoid MD5Final(unsigned char [16], MD5_CTX *);   
 NMD5_CHECK MakeFile_MD5_Checksum(u8 *pPacket, u32 pPacket_len);
 N#endif//_APP_MD5_H
+L 14 "..\app\main.c" 2
+N#include "transport.h"
+L 1 "..\MQTT\transport.h" 1
+N/*******************************************************************************
+N * Copyright (c) 2014 IBM Corp.
+N *
+N * All rights reserved. This program and the accompanying materials
+N * are made available under the terms of the Eclipse Public License v1.0
+N * and Eclipse Distribution License v1.0 which accompany this distribution.
+N *
+N * The Eclipse Public License is available at
+N *    http://www.eclipse.org/legal/epl-v10.html
+N * and the Eclipse Distribution License is available at
+N *   http://www.eclipse.org/org/documents/edl-v10.php.
+N *
+N * Contributors:
+N *    Ian Craggs - initial API and implementation and/or initial documentation
+N *    Sergio R. Caprile - "commonalization" from prior samples and/or documentation extension
+N *******************************************************************************/
+N#ifndef __TRANSPORT_H_
+N#define __TRANSPORT_H_
+N
+N
+N
+Nint transport_sendPacketBuffer(int sock, unsigned char* buf, int buflen);
+Nint transport_getdata(unsigned char* buf, int count);
+Nint transport_getdatanb(void *sck, unsigned char* buf, int count);
+Nint transport_open(char* host, int port);
+Nint transport_close(int sock);
+Nvoid mqtt_qos0(void);
+Nvoid mqtt_qos2(void);
+Nvoid mqtt_keep_alive(void);
+N
+N
+Nint mqtt_connect(void);
+N
+N
+N
+N
+N#endif
 L 15 "..\app\main.c" 2
+N
 N
 N
 Nu8 receiveText[24];
@@ -26404,19 +26448,7 @@ N
 Nu8 tmp[20];
 Nu8 heartbeat_buff[2] = {0};
 N
-Nvoid Gps_Msg_Show(void)
-N{
-N 	float tp;		   
-N 
-N	tp=gpsx.longitude;	   
-N	sprintf((char *)longitudedtbuf,"%clongitude%c:%.5f %1c",'"','"',tp/=100000,gpsx.ewhemi);	
-N 	
-N	tp=gpsx.latitude;	   
-N	sprintf((char *)latitudedtbuf,"%clatitude%c:%.5f %1c",'"','"',tp/=100000,gpsx.nshemi);	
 N
-N	tp=gpsx.altitude;	   
-N 	sprintf((char *)dtbuf,"Altitude:%.1fm     ",tp/=10);	    			
-N}
 N
 Nstatic void test_encrypt_ecb(void)
 N{
@@ -26460,16 +26492,23 @@ X        USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x38
 N    }
 N}
 N
+N
+N
 Nint main(void)
 N{ 
 N	u16 j,i,rxlen;
-N	u16 k=0;
+N	u16 k = 0x1A;
 N	u8 upload=0; 
 N	u8 *ret;
 N	uint8_t status = 0;
 N//	u8 tt = 0;
 N	static u8 gps_send_flag = 0;
-N//	struct AES_ctx ctx;
+N//	u8 buf 
+N	u8 end_char[1];
+N	
+N	
+N	end_char[0] = 0x1A;//结束字符
+N
 N	
 N	bsp_init();
 N	
@@ -26477,6 +26516,37 @@ N
 N	USART_OUT(USART1, "uart1 is ok\r\n");
 X	USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "uart1 is ok\r\n");
 N
+N	
+N//	mqtt_keep_alive();
+N//	
+N//	mqtt_qos0();
+N	
+N	while(1)
+N	{
+N	
+N		gprs_init_task();
+N
+N		mqtt_connect();
+N		
+N		
+N		
+N//		ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
+N//		if(ret != NULL)
+N//		{
+N//			sprintf((char *)send_buff,"aaaaa%s\r\n", end_char);
+N
+N//			gprs_send_at(send_buff, 0, 500, 500);
+N////			gprs_send_data(send_buff, 8, 500);
+N
+N//			timer_delay_1ms(5000);
+N//		}
+N
+N		usart1_recv_data();
+N	}
+N	
+N	
+N	
+N	
 N	while(1)
 N	{	 
 N
@@ -26489,89 +26559,22 @@ N				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);
 N				break;
 N			}
 N		}
-N	//GPS
-N		if(gps_send_flag == 1)
-N		{
-N		    GPS_POW_HIGH();  
-X		    GPIO_SetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0010));  
-N			while(1)
-N			{
-N				usart3_recv_data();
-N				GPS_Analysis(&gpsx, gps_buff);
-N				Gps_Msg_Show();
-N				if(gpsx.latitude>0 && gpsx.longitude>0)
-N				{
-N					memset(gps_buff, 0, 512);
-N					
-N					USART_OUT(USART1,"%s\r\n", latitudedtbuf);
-X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),"%s\r\n", latitudedtbuf);
-N					USART_OUT(USART1,"%s\r\n", longitudedtbuf);	
-X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),"%s\r\n", longitudedtbuf);	
-N							
-N					memset(send_buff, 0, 100);
-N					sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/", PARK_LOCK_Buffer,",64,2\r\n");
-N					ret = gprs_send_at(send_buff, ">", 300, 2000);
-N					if(ret != NULL)
-X					if(ret != 0)
-N					{
-N						memset(expressText, 0 ,512);
-N						memset(cipherText, 0 ,512);
-N						sprintf((char *)expressText,"%c%s,%s%c",'{',longitudedtbuf,latitudedtbuf,'}',48);
-N						USART_OUT(USART1, "expressText=%s\r\n", expressText);
-X						USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "expressText=%s\r\n", expressText);
-N						AES_Encrypt((char *)expressText, cipherText, aesKey);
-N						USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-X						USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "aesKey=%s\r\n", aesKey);
-N						USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-X						USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "cipherText=%s\r\n", cipherText);
-N						ret = gprs_send_at(cipherText, "OK", 400, 0);
-N						if(ret != NULL)
-X						if(ret != 0)
-N						{
-N							timer_is_timeout_1ms(timer_heartbeat, 0);
-N						}	
-N					}
-N					else
-N					{
-N						
-N					}
-N
-N					GPS_POW_LOW();
-X					GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0010));
-N					gps_send_flag = 1;
-N					break;
-N				}
-N				else 
-N				{
-N					if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
-N					{
-N						GPS_POW_LOW();
-X						GPIO_ResetBits(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), ((uint16_t)0x0010));
-N						gps_send_flag = 1;
-N						break;
-N					}
-N
-N				}				
-N			}
-N		}
+N	
 N		
 N		usart1_recv_data();
 N		usart2_recv_data();
 N	
-N
+N		// 电池信息
+N		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
+X		Bat_V =Get_Adc_Average(((uint8_t)0x00),10);
+N		Bat_V=Bat_V*3300/4096;
+N		Bat_V=Bat_V*88/20;
+N		Bat_Pre=(Bat_V-5000)*100/2400;
 N		
 N//		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
 N		if(timer_is_timeout_1ms(timer_batt, 1000*60*60) == 0)
 N		{	
-N			
-N			// 电池信息
-N			Bat_V =Get_Adc_Average(ADC_Channel_0,10);
-X			Bat_V =Get_Adc_Average(((uint8_t)0x00),10);
-N			Bat_V=Bat_V*3300/4096;
-N			Bat_V=Bat_V*88/20;
-N			Bat_Pre=(Bat_V-5000)*100/2400;
-N			
-N	
+N			Bat_Pre_Flag =  1;
 N			memset(send_buff, 0, 100);	
 N			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
 N
@@ -26602,10 +26605,9 @@ N				}
 N			}
 N			else
 N			{
-N				
-N			}	
+N			}
+N
 N		}
-N		
 N//		//接收锁数据
 N		p1 = strstr((u8*)protocol_buff, "topic: lock/");
 N		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);

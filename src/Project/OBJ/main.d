@@ -26,3 +26,4 @@
 .\obj\main.o: ..\tplib\aes.h
 .\obj\main.o: ..\tplib\aes128.h
 .\obj\main.o: ..\tplib\app_md5.h
+.\obj\main.o: ..\MQTT\transport.h

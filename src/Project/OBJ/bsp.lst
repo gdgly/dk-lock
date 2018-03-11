@@ -23798,7 +23798,9 @@ N
 Nenum timer
 N{
 N    tim1_cnt,
+N	timer_connect,
 N    timer_batt,
+N	timer_mqtt_keep_alive,
 N	timer_gps_cycle,
 N	tiemr_gps_location,
 N	timer_close_lock,
@@ -23904,7 +23906,8 @@ Nvoid usart2_recv_data(void);
 Nvoid usart3_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
-Nvoid usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...);
+Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
+N
 N#endif
 N
 N

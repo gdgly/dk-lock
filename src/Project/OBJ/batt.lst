@@ -26012,7 +26012,8 @@ Nvoid usart2_recv_data(void);
 Nvoid usart3_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
-Nvoid usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...);
+Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
+N
 N#endif
 N
 N
@@ -26110,11 +26111,12 @@ N
 N
 Nu8 *gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout);
 Nuint8_t send_at_cmd(uint8_t *cmd, uint8_t *str, uint32_t timeout);
+Nvoid gprs_send_data(u8 *data, u16 data_len, u16 waittime);
 Nuint8_t gprs_init(void);
-Nvoid gprs_task_create(void);
+N
 Nvoid gprs_config(void);
 N
-Nvoid gprs_init_task_fun(void);
+Nvoid gprs_init_task(void);
 N
 N
 N#endif

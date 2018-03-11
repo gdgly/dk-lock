@@ -26065,7 +26065,8 @@ Nvoid usart2_recv_data(void);
 Nvoid usart3_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
-Nvoid usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...);
+Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
+N
 N#endif
 N
 N
@@ -26088,7 +26089,9 @@ N
 Nenum timer
 N{
 N    tim1_cnt,
+N	timer_connect,
 N    timer_batt,
+N	timer_mqtt_keep_alive,
 N	timer_gps_cycle,
 N	tiemr_gps_location,
 N	timer_close_lock,
@@ -26133,7 +26136,7 @@ Nextern u8 gps_buff[512];
 N
 Nstatic usart_buff_t sb = SerialBuffDefault();
 Xstatic usart_buff_t sb = {0,0,{0}};
-N
+Nusart_buff_t *gprs_buff = &sb;			//GPRS 接收缓冲区
 Nusart_buff_t *usart1_rx_buff = &sb;
 Nusart_buff_t *usart2_rx_buff = &sb;
 Nusart_buff_t *usart3_rx_buff = &sb;
@@ -26381,19 +26384,16 @@ N
 N//		if(usart1_rx_status == 0)
 N		{
 N			
-N			if (usart1_cnt < USART_BUFF_LENGHT)
-X			if (usart1_cnt < 512)
-N			{
-N				
-N				usart1_buff[usart1_cnt++] = ch;
-N//				USART_SendData(USART1, ch);	 
-N				usart1_rx_status = 1;
+N			if (usart1_rx_buff->index < USART_BUFF_LENGHT)
+X			if (usart1_rx_buff->index < 512)
+N			{	
+N				usart1_rx_buff->pdata[usart1_rx_buff->index++] = ch;
+N//				usart1_rx_status = 1;
 N			}
 N			else
 N			{
 N				memset(usart1_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-N				memset(usart1_buff, 0, 512);	
-N				usart1_cnt = 0;			
+N					
 N			}
 N		}
 N	}
@@ -26411,16 +26411,18 @@ N
 Nvoid usart1_recv_data(void)
 N{
 N
-N	if(timer_is_timeout_1ms(timer_uart1, 40) == 0)	//40ms没接收到数据认为接收数据完成		
+N	if(timer_is_timeout_1ms(timer_uart1, 20) == 0)	//40ms没接收到数据认为接收数据完成		
 N	{
 N
-N		USART_OUT(USART2, usart1_buff);
-X		USART_OUT(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), usart1_buff);
-N		USART_OUT(USART1, usart1_buff);
-X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), usart1_buff);
+N//		USART_OUT(USART2, usart1_buff);
+N//		USART_OUT(USART1, usart1_rx_buff->pdata);
 N		
-N		memset(usart1_buff, 0, 512);	
-N		usart1_cnt = 0;	
+N		memcpy(gprs_buff, usart1_rx_buff, sizeof(usart_buff_t));
+N		
+N		USART_OUT(USART1, gprs_buff->pdata);
+X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), gprs_buff->pdata);
+N		
+N		memset(usart1_rx_buff, 0, sizeof(usart_buff_t));
 N	}
 N
 N}
@@ -26457,17 +26459,15 @@ N		{
 N			ch = USART_ReceiveData(USART2);	 
 X			ch = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)));	 
 N			
-N			if (usart2_cnt < USART_BUFF_LENGHT)
-X			if (usart2_cnt < 512)
+N			if (usart2_rx_buff->index < USART_BUFF_LENGHT)
+X			if (usart2_rx_buff->index < 512)
 N			{			
-N				usart2_buff[usart2_cnt++] = ch;
+N				usart2_rx_buff->pdata[usart2_rx_buff->index++] = ch;
 N
 N			}
 N			else
 N			{
-N//				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-N				memset(usart2_buff, 0, 512);	
-N				usart2_cnt = 0;			
+N				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 N			}
 N		}
 N
@@ -26492,9 +26492,7 @@ N		USART_OUT(USART1, usart2_buff);
 X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), usart2_buff);
 N		memcpy(protocol_buff, usart2_buff, 512);
 N		
-N		memset(usart2_buff, 0, 512);	
-N		usart2_cnt = 0;	
-N		
+N		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 N	}	
 N}
 N
@@ -26679,7 +26677,7 @@ N
 N
 N
 N
-Nvoid usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...)
+Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...)
 N{ 
 N	const char *s;
 N    int d;  
@@ -26726,7 +26724,7 @@ N					data++;
 N                	break;
 N            	case 'd':										 
 N                	d = __va_arg(ap, int);
-N					
+N
 N					sprintf(buf, "%d", d);
 N                	for (s = buf; *s; s++) 
 N					{
@@ -26746,6 +26744,7 @@ N			USART_SendData(USARTx, *data++);
 N		while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
 X		while(USART_GetFlagStatus(USARTx, ((uint16_t)0x0040))==RESET);
 N	}
+N	
 N}
 N
 N

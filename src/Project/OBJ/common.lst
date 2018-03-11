@@ -24569,7 +24569,14 @@ N    return string;
 N} 
 N
 N
+Nchar *memcat(void *dest, size_t dest_len, const char *src, size_t src_len)
+N{
 N
+N//	memcpy(dest+dest_len, src, src_len);
+N
+N//	return dest;
+N
+N}
 N
 N
 N

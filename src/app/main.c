@@ -3,7 +3,6 @@
 #include "gps.h"
 #include "string.h"		
 #include "stdlib.h"
-
 #include "adc.h"
 #include "bsp.h"
 #include "timer.h"
@@ -12,6 +11,8 @@
 #include "aes.h"
 #include "aes128.h"
 #include "app_md5.h"
+#include "transport.h"
+
 
 
 u8 receiveText[24];
@@ -97,19 +98,7 @@ u8 gps_err_cnt = 0;
 u8 tmp[20];
 u8 heartbeat_buff[2] = {0};
 
-void Gps_Msg_Show(void)
-{
- 	float tp;		   
- 
-	tp=gpsx.longitude;	   
-	sprintf((char *)longitudedtbuf,"%clongitude%c:%.5f %1c",'"','"',tp/=100000,gpsx.ewhemi);	
- 	
-	tp=gpsx.latitude;	   
-	sprintf((char *)latitudedtbuf,"%clatitude%c:%.5f %1c",'"','"',tp/=100000,gpsx.nshemi);	
 
-	tp=gpsx.altitude;	   
- 	sprintf((char *)dtbuf,"Altitude:%.1fm     ",tp/=10);	    			
-}
 
 static void test_encrypt_ecb(void)
 {
@@ -149,22 +138,60 @@ static void test_encrypt_ecb(void)
     }
 }
 
+
+
 int main(void)
 { 
 	u16 j,i,rxlen;
-	u16 k=0;
+	u16 k = 0x1A;
 	u8 upload=0; 
 	u8 *ret;
 	uint8_t status = 0;
 //	u8 tt = 0;
 	static u8 gps_send_flag = 0;
-//	struct AES_ctx ctx;
+//	u8 buf 
+	u8 end_char[1];
+	
+	
+	end_char[0] = 0x1A;//结束字符
+
 	
 	bsp_init();
 	
                          
 	USART_OUT(USART1, "uart1 is ok\r\n");
 
+	
+//	mqtt_keep_alive();
+//	
+//	mqtt_qos0();
+	
+	while(1)
+	{
+	
+		gprs_init_task();
+
+		mqtt_connect();
+		
+		
+		
+//		ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
+//		if(ret != NULL)
+//		{
+//			sprintf((char *)send_buff,"aaaaa%s\r\n", end_char);
+
+//			gprs_send_at(send_buff, 0, 500, 500);
+////			gprs_send_data(send_buff, 8, 500);
+
+//			timer_delay_1ms(5000);
+//		}
+
+		usart1_recv_data();
+	}
+	
+	
+	
+	
 	while(1)
 	{	 
 
@@ -177,78 +204,21 @@ int main(void)
 				break;
 			}
 		}
-	//GPS
-		if(gps_send_flag == 1)
-		{
-		    GPS_POW_HIGH();  
-			while(1)
-			{
-				usart3_recv_data();
-				GPS_Analysis(&gpsx, gps_buff);
-				Gps_Msg_Show();
-				if(gpsx.latitude>0 && gpsx.longitude>0)
-				{
-					memset(gps_buff, 0, 512);
-					
-					USART_OUT(USART1,"%s\r\n", latitudedtbuf);
-					USART_OUT(USART1,"%s\r\n", longitudedtbuf);	
-							
-					memset(send_buff, 0, 100);
-					sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/", PARK_LOCK_Buffer,",64,2\r\n");
-					ret = gprs_send_at(send_buff, ">", 300, 2000);
-					if(ret != NULL)
-					{
-						memset(expressText, 0 ,512);
-						memset(cipherText, 0 ,512);
-						sprintf((char *)expressText,"%c%s,%s%c",'{',longitudedtbuf,latitudedtbuf,'}',48);
-						USART_OUT(USART1, "expressText=%s\r\n", expressText);
-						AES_Encrypt((char *)expressText, cipherText, aesKey);
-						USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-						USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-						ret = gprs_send_at(cipherText, "OK", 400, 0);
-						if(ret != NULL)
-						{
-							timer_is_timeout_1ms(timer_heartbeat, 0);
-						}	
-					}
-					else
-					{
-						
-					}
-
-					GPS_POW_LOW();
-					gps_send_flag = 1;
-					break;
-				}
-				else 
-				{
-					if(timer_is_timeout_1ms(tiemr_gps_location, 1000*60*5) == 0)
-					{
-						GPS_POW_LOW();
-						gps_send_flag = 1;
-						break;
-					}
-
-				}				
-			}
-		}
+	
 		
 		usart1_recv_data();
 		usart2_recv_data();
 	
-
+		// 电池信息
+		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
+		Bat_V=Bat_V*3300/4096;
+		Bat_V=Bat_V*88/20;
+		Bat_Pre=(Bat_V-5000)*100/2400;
 		
 //		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
 		if(timer_is_timeout_1ms(timer_batt, 1000*60*60) == 0)
 		{	
-			
-			// 电池信息
-			Bat_V =Get_Adc_Average(ADC_Channel_0,10);
-			Bat_V=Bat_V*3300/4096;
-			Bat_V=Bat_V*88/20;
-			Bat_Pre=(Bat_V-5000)*100/2400;
-			
-	
+			Bat_Pre_Flag =  1;
 			memset(send_buff, 0, 100);	
 			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
 
@@ -273,10 +243,9 @@ int main(void)
 			}
 			else
 			{
-				
-			}	
+			}
+
 		}
-		
 //		//接收锁数据
 		p1 = strstr((u8*)protocol_buff, "topic: lock/");
 		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);

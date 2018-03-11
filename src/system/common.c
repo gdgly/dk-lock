@@ -240,7 +240,14 @@ char *itoa(int value, char *string, int radix)
 } 
 
 
+char *memcat(void *dest, size_t dest_len, const char *src, size_t src_len)
+{
 
+//	memcpy(dest+dest_len, src, src_len);
+
+//	return dest;
+
+}
 
 
 

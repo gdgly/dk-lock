@@ -32,7 +32,7 @@ extern u8 protocol_buff[512];
 extern u8 gps_buff[512];
 
 static usart_buff_t sb = SerialBuffDefault();
-
+usart_buff_t *gprs_buff = &sb;			//GPRS 接收缓冲区
 usart_buff_t *usart1_rx_buff = &sb;
 usart_buff_t *usart2_rx_buff = &sb;
 usart_buff_t *usart3_rx_buff = &sb;
@@ -241,18 +241,15 @@ void USART1_IRQHandler(void)
 //		if(usart1_rx_status == 0)
 		{
 			
-			if (usart1_cnt < USART_BUFF_LENGHT)
-			{
-				
-				usart1_buff[usart1_cnt++] = ch;
-//				USART_SendData(USART1, ch);	 
-				usart1_rx_status = 1;
+			if (usart1_rx_buff->index < USART_BUFF_LENGHT)
+			{	
+				usart1_rx_buff->pdata[usart1_rx_buff->index++] = ch;
+//				usart1_rx_status = 1;
 			}
 			else
 			{
 				memset(usart1_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-				memset(usart1_buff, 0, 512);	
-				usart1_cnt = 0;			
+					
 			}
 		}
 	}
@@ -268,14 +265,17 @@ void USART1_IRQHandler(void)
 void usart1_recv_data(void)
 {
 
-	if(timer_is_timeout_1ms(timer_uart1, 40) == 0)	//40ms没接收到数据认为接收数据完成		
+	if(timer_is_timeout_1ms(timer_uart1, 20) == 0)	//40ms没接收到数据认为接收数据完成		
 	{
 
-		USART_OUT(USART2, usart1_buff);
-		USART_OUT(USART1, usart1_buff);
+//		USART_OUT(USART2, usart1_buff);
+//		USART_OUT(USART1, usart1_rx_buff->pdata);
 		
-		memset(usart1_buff, 0, 512);	
-		usart1_cnt = 0;	
+		memcpy(gprs_buff, usart1_rx_buff, sizeof(usart_buff_t));
+		
+		USART_OUT(USART1, gprs_buff->pdata);
+		
+		memset(usart1_rx_buff, 0, sizeof(usart_buff_t));
 	}
 
 }
@@ -309,16 +309,14 @@ void USART2_IRQHandler(void)
 		{
 			ch = USART_ReceiveData(USART2);	 
 			
-			if (usart2_cnt < USART_BUFF_LENGHT)
+			if (usart2_rx_buff->index < USART_BUFF_LENGHT)
 			{			
-				usart2_buff[usart2_cnt++] = ch;
+				usart2_rx_buff->pdata[usart2_rx_buff->index++] = ch;
 
 			}
 			else
 			{
-//				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-				memset(usart2_buff, 0, 512);	
-				usart2_cnt = 0;			
+				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 			}
 		}
 
@@ -340,9 +338,7 @@ void usart2_recv_data(void)
 		USART_OUT(USART1, usart2_buff);
 		memcpy(protocol_buff, usart2_buff, 512);
 		
-		memset(usart2_buff, 0, 512);	
-		usart2_cnt = 0;	
-		
+		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 	}	
 }
 
@@ -515,7 +511,7 @@ void USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...)
 
 
 
-void usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...)
+void usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...)
 { 
 	const char *s;
     int d;  
@@ -560,7 +556,7 @@ void usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...)
                 	break;
             	case 'd':										 
                 	d = __va_arg(ap, int);
-					
+
 					sprintf(buf, "%d", d);
                 	for (s = buf; *s; s++) 
 					{
@@ -578,6 +574,7 @@ void usart_printf(USART_TypeDef* USARTx, uint16_t data_size, uint8_t *data,...)
 			USART_SendData(USARTx, *data++);
 		while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
 	}
+	
 }
 
 
