@@ -545,7 +545,7 @@ void gprs_init_task(void)
 			
 			case 6:
 				gprs_status++;
-//				ret = gprs_send_at("AT+CIPCLOSE\r\n", "OK", 800, 10000);//
+//				ret = gprs_send_at("AT+CIPHEAD=0\r\n", "OK", 800, 10000);//
 //				if (ret != NULL)
 //				{
 //					gprs_status++;
@@ -562,8 +562,8 @@ void gprs_init_task(void)
 			break;
 			
 			case 7:
-				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 10000);//
-//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 10000);
+//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 10000);//
+				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 10000);
 				if (ret != NULL)
 				{
 					gprs_status++;

@@ -26189,6 +26189,8 @@ N/* end of string.h */
 N
 L 22 "..\MQTT\MQTTPacket.c" 2
 N
+Nextern usart_buff_t *mqtt_buff;
+Nextern int mqtt_buff_len;
 N/**
 N * Encodes the message length according to the MQTT algorithm
 N * @param buf the buffer into which the encoded data is written
@@ -26472,16 +26474,11 @@ N	int len = 0;
 N	int rem_len = 0;
 N
 N	/* 1. read the header byte.  This has the packet type in it */
-N//	if ((*getfn)(buf, 1) != 1)
-N	if ((*getfn)(buf, 1) == 0)
+N	if ((*getfn)(buf, 1) != 1)
 N	{
-N//		USART_OUT(USART1, "MQTTPacket_read\r\n");
 N		goto exit;
 N	}
-N	else
-N	{
-N//		USART_OUT(USART1, "MQTTPacket_read222\r\n");
-N	}		
+N//	usart_send(USART1, buf, 1);
 N
 N	len = 1;
 N	/* 2. read the remaining length.  This is variable in itself */
@@ -26496,6 +26493,8 @@ N		goto exit;
 N
 N	header.byte = buf[0];
 N	rc = header.bits.type;
+N	memset(mqtt_buff, 0, sizeof(usart_buff_t));
+N	mqtt_buff_len = 0;
 Nexit:
 N	return rc;
 N}

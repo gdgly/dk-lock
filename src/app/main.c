@@ -15,6 +15,11 @@
 
 
 
+
+extern usart_buff_t *mqtt_buff;
+
+
+
 u8 receiveText[24];
 u8 expressText[512];  
 u8 cipherText[512];
@@ -148,10 +153,11 @@ int main(void)
 	u8 *ret;
 	uint8_t status = 0;
 //	u8 tt = 0;
-	static u8 gps_send_flag = 0;
+	static u8 mqtt_flag = 0;
 //	u8 buf 
 	u8 end_char[1];
-	
+	int mqtt_pub = 0;
+	int mqtt_con = 0;
 	
 	end_char[0] = 0x1A;//½áÊø×Ö·û
 
@@ -170,23 +176,38 @@ int main(void)
 	{
 	
 		gprs_init_task();
+		
+		if(mqtt_flag == 0)
+		{
+			timer_delay_1ms(1500);
+			mqtt_con = mqtt_connect();
+			if(1 == mqtt_con)
+			{
+				mqtt_flag = 1;
+				timer_delay_1ms(20);
+				USART_OUT(USART1, "mqtt_connect ok\r\n");
+			}
+		}
+		
+		usart2_recv_data();
+		usart1_recv_data();
+		
 
-		mqtt_connect();
-		
-		
-		
-//		ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
-//		if(ret != NULL)
+		p1 = strstr((char*)mqtt_buff->pdata, "CLOSE");
+		if(p1 !=NULL)
+		{
+			memset(mqtt_buff, 0, sizeof(usart_buff_t));	
+			mqtt_flag = 0;
+			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
+		}
+//		if(timer_is_timeout_1ms(timer_keep_alive, 1000*30) == 0)
 //		{
-//			sprintf((char *)send_buff,"aaaaa%s\r\n", end_char);
-
-//			gprs_send_at(send_buff, 0, 500, 500);
-////			gprs_send_data(send_buff, 8, 500);
+//			mqtt_keep_alive();
+//		}
 
 //			timer_delay_1ms(5000);
 //		}
 
-		usart1_recv_data();
 	}
 	
 	

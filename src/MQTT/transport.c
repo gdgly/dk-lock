@@ -33,6 +33,13 @@ extern usart_buff_t *gprs_buff;
 extern usart_buff_t *usart1_rx_buff;
 extern usart_buff_t *usart2_rx_buff;
 extern u8 send_buff[100];
+extern usart_buff_t *mqtt_buff;
+
+
+
+
+
+int mqtt_buff_len = 0;
 
 u32 packet_id = 0;
 
@@ -63,13 +70,13 @@ int transport_sendPacketBuffer(int sock, unsigned char* buf, int buflen)
 	ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
 	if(ret != NULL)
 	{
-//		usart_send(USART1, buf, buflen);
+
 		memcpy((char *)send_buff, buf, buflen);
 		memcpy((char *)send_buff+buflen, (char*)end_char, sizeof(end_char));
 //		usart_send(USART1, send_buff, buflen+3);
 //		gprs_send_at(send_buff, 0, 200, 200);
 
-		gprs_send_data(send_buff, buflen+3, 500);
+		gprs_send_data(send_buff, buflen+3, 300);
 	}
 	
 	rc = buflen;
@@ -79,20 +86,15 @@ int transport_sendPacketBuffer(int sock, unsigned char* buf, int buflen)
 
 int transport_getdata(unsigned char* buf, int count)
 {
-	int rc;   //接收到的数据
-		
-	if(timer_is_timeout_1ms(timer_uart2, 20) == 0)	//40ms没接收到数据认为接收数据完成		
-	{	
-		memcpy(buf, usart2_rx_buff->pdata, 512);
-
-		rc = usart2_rx_buff->index;
-		usart_send(USART1, buf, usart2_rx_buff->index);
-//		USART_OUT(USART1, "transport_getdata=%d\r", usart2_rx_buff->index);
-//		rc = 1;
-		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));
+	if(mqtt_buff->index > 0)
+	{
+		memcpy(buf, &mqtt_buff->pdata[mqtt_buff_len], count);
+//		usart_send(USART1, mqtt_buff->pdata, mqtt_buff->index);
+//		usart_send(USART1, &mqtt_buff->pdata[mqtt_buff_len], count);
+		mqtt_buff_len += count;
+		return count;
 	}
-
-	return rc;
+	
 }
 
 int transport_getdatanb(void *sck, unsigned char* buf, int count)
@@ -220,7 +222,7 @@ void mqtt_qos0(void)
 
 int mqtt_connect(void)
 {
-	u8 ret = 0;
+	int ret = 0;
 	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 	int rc = 0;
 	int mysock = 0;
@@ -241,17 +243,10 @@ int mqtt_connect(void)
 	len = MQTTSerialize_connect(buf, buflen, &data);
 		
 	rc = transport_sendPacketBuffer(mysock, buf, len);
-	timer_is_timeout_1ms(timer_connect, 0);
+//	timer_is_timeout_1ms(timer_connect, 0);
 	while(!ret)
-	{
-//		if(timer_is_timeout_1ms(timer_connect, 2000) == 0)
-//		{
-//			len = MQTTSerialize_connect(buf, buflen, &data);
-////			memset(usart2_rx_buff, 0, sizeof(usart_buff_t));
-//			rc = transport_sendPacketBuffer(mysock, buf, len);
-//		}
-
-		timer_delay_1ms(1000);
+	{ 
+		timer_delay_1ms(30);
 
 		if (MQTTPacket_read(buf, buflen, transport_getdata) == CONNACK)
 		{
@@ -264,7 +259,7 @@ int mqtt_connect(void)
 			else
 			{
 				ret = 1;
-//				USART_OUT(USART1, "connected\r\n");
+				break;
 			}
 		}
 	}
@@ -275,7 +270,7 @@ int mqtt_connect(void)
 
 
 
-int mqtt_publist(unsigned char* topic, unsigned char* payload, int payloadlen, int qos, unsigned short packetid)
+int mqtt_publist(unsigned char* topic, unsigned char* payload, int payload_len, int qos, unsigned short packetid)
 {
 	u8 ret = 0;
 	int rc = 0;
@@ -291,7 +286,10 @@ int mqtt_publist(unsigned char* topic, unsigned char* payload, int payloadlen, i
 		switch(publist_status)
 		{
 			case PUBLISH:
-				len = MQTTSerialize_publish((unsigned char *)buf , buflen, qos, 0, 0, packetid, topicString, (unsigned char *)payload, payloadlen);
+				topicString.cstring = topic;				
+//				strcpy(topicString.cstring, "test");
+
+				len = MQTTSerialize_publish((unsigned char *)buf , buflen, 0, qos, 0, packetid, topicString, (unsigned char *)payload, payload_len);
 				rc = transport_sendPacketBuffer(mysock, buf, len);
 				publist_status = PUBREC;
 				
@@ -305,13 +303,14 @@ int mqtt_publist(unsigned char* topic, unsigned char* payload, int payloadlen, i
 			break;
 				
 			case PUBREL:
+				timer_delay_1ms(50);
 				len = MQTTSerialize_pubrel(buf, buflen, 0, packetid);
 				rc = transport_sendPacketBuffer(mysock, buf, len);
 				publist_status = PUBCOMP;
 			break;
 
 			case PUBCOMP:
-				if (MQTTPacket_read(buf, buflen, transport_getdata) == PUBREC)
+				if (MQTTPacket_read(buf, buflen, transport_getdata) == PUBCOMP)
 				{
 					ret = 1;
 				}	
@@ -397,23 +396,28 @@ int mqtt_subscribe(unsigned char* topic, int req_qos, unsigned short msgid)
 
 void mqtt_keep_alive(void)
 {
-	
-	unsigned char buf[200];
-	int buflen = sizeof(buf);
+	int rc = 0;
+	int mysock = 0;
 	int len = 0;
+	unsigned char buf[20];
+	int buflen = sizeof(buf);
+	
 	
 //	if(timer_is_timeout_1ms(timer_mqtt_keep_alive, 1000*60) == 0)
 	{
+		len = MQTTSerialize_pingreq(buf, buflen);
+		rc = transport_sendPacketBuffer(mysock, buf, len);
+//		usart_send(USART1, buf, len);
+		
 		while(1)
 		{
+			timer_delay_1ms(50);
 			if(MQTTPacket_read(buf, buflen, transport_getdata) == PINGRESP)
 			{
+				USART_OUT(USART1, "mqtt_keep_alive ok\r\n", buf);
 				break;
 			}
 			
-			len = MQTTSerialize_pingreq(buf, buflen);
-			usart_send(USART1, buf, len);
-			USART_OUT(USART1, "MQTTSerialize_pingreq=%s\r\n", buf);
 		}
 	}
 }

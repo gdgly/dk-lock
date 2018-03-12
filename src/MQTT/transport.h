@@ -30,7 +30,7 @@ void mqtt_keep_alive(void);
 
 
 int mqtt_connect(void);
-
+int mqtt_publist(unsigned char* topic, unsigned char* payload, int payload_len, int qos, unsigned short packetid);
 
 
 

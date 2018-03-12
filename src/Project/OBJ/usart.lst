@@ -26090,6 +26090,7 @@ Nenum timer
 N{
 N    tim1_cnt,
 N	timer_connect,
+N	timer_keep_alive,
 N    timer_batt,
 N	timer_mqtt_keep_alive,
 N	timer_gps_cycle,
@@ -26134,13 +26135,16 @@ N
 Nextern u8 protocol_buff[512];
 Nextern u8 gps_buff[512];
 N
+N
+N
+N
 Nstatic usart_buff_t sb = SerialBuffDefault();
 Xstatic usart_buff_t sb = {0,0,{0}};
-Nusart_buff_t *gprs_buff = &sb;			//GPRS 接收缓冲区
+N//usart_buff_t *gprs_buff = &sb;			//GPRS 接收缓冲区
 Nusart_buff_t *usart1_rx_buff = &sb;
 Nusart_buff_t *usart2_rx_buff = &sb;
 Nusart_buff_t *usart3_rx_buff = &sb;
-N
+Nusart_buff_t *mqtt_buff = &sb;
 N
 Nu8 usart1_buff[USART_BUFF_LENGHT] = {0};
 Xu8 usart1_buff[512] = {0};
@@ -26157,6 +26161,7 @@ Nu8 usart2_rx_status = 0;
 Nu8 usart3_rx_status = 0;
 Nu8 usart4_rx_status = 0;
 Nu8 usart5_rx_status = 0;
+N
 N
 N
 N
@@ -26381,9 +26386,8 @@ X        ch = USART_ReceiveData(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x
 N		
 N		timer_is_timeout_1ms(timer_uart1, 0);
 N		
-N//		if(usart1_rx_status == 0)
+N		if(usart1_rx_status == 0)
 N		{
-N			
 N			if (usart1_rx_buff->index < USART_BUFF_LENGHT)
 X			if (usart1_rx_buff->index < 512)
 N			{	
@@ -26392,8 +26396,7 @@ N//				usart1_rx_status = 1;
 N			}
 N			else
 N			{
-N				memset(usart1_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-N					
+N				memset(usart1_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区		
 N			}
 N		}
 N	}
@@ -26403,8 +26406,7 @@ X	if(USART_GetITStatus(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 
 N  	{ 
 N     	USART_ITConfig(USART1, USART_IT_TXE, DISABLE);					   
 X     	USART_ITConfig(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), ((uint16_t)0x0727), 0);					   
-N  	}	
-N	
+N  	}		
 N
 N}
 N
@@ -26413,14 +26415,11 @@ N{
 N
 N	if(timer_is_timeout_1ms(timer_uart1, 20) == 0)	//40ms没接收到数据认为接收数据完成		
 N	{
-N
-N//		USART_OUT(USART2, usart1_buff);
-N//		USART_OUT(USART1, usart1_rx_buff->pdata);
 N		
-N		memcpy(gprs_buff, usart1_rx_buff, sizeof(usart_buff_t));
+N//		memcpy(gprs_buff, usart1_rx_buff, sizeof(usart_buff_t));
 N		
-N		USART_OUT(USART1, gprs_buff->pdata);
-X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), gprs_buff->pdata);
+N		USART_OUT(USART1, usart1_rx_buff->pdata);
+X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), usart1_rx_buff->pdata);
 N		
 N		memset(usart1_rx_buff, 0, sizeof(usart_buff_t));
 N	}
@@ -26454,7 +26453,7 @@ X	    USART_ClearITPendingBit(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x440
 N		
 N		timer_is_timeout_1ms(timer_uart2, 0);		//定时器清零
 N		
-N		if(usart2_rx_status == 0)
+N//		if(usart2_rx_status == 0)
 N		{
 N			ch = USART_ReceiveData(USART2);	 
 X			ch = USART_ReceiveData(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)));	 
@@ -26463,14 +26462,13 @@ N			if (usart2_rx_buff->index < USART_BUFF_LENGHT)
 X			if (usart2_rx_buff->index < 512)
 N			{			
 N				usart2_rx_buff->pdata[usart2_rx_buff->index++] = ch;
-N
+N//				USART_OUT(USART1, &ch);
 N			}
 N			else
 N			{
 N				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 N			}
 N		}
-N
 N	}
 N	
 N	if(USART_GetITStatus(USART2, USART_IT_TXE) != RESET)                  
@@ -26479,19 +26477,18 @@ N  	{
 N     	USART_ITConfig(USART2, USART_IT_TXE, DISABLE);					   
 X     	USART_ITConfig(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), ((uint16_t)0x0727), 0);					   
 N  	}	
-N	 	
+N 	
 N}
 N
 N
 Nvoid usart2_recv_data(void)
 N{		
-N	if(timer_is_timeout_1ms(timer_uart2, 40) == 0)	//40ms没接收到数据认为接收数据完成		
+N	if(timer_is_timeout_1ms(timer_uart2, 20) == 0)	//20ms没接收到数据认为接收数据完成		
 N	{
-N		
-N		USART_OUT(USART1, usart2_buff);
-X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), usart2_buff);
-N		memcpy(protocol_buff, usart2_buff, 512);
-N		
+N//		USART_OUT(USART1, usart2_rx_buff->pdata);
+N		memcpy(mqtt_buff, usart2_rx_buff, sizeof(usart_buff_t));
+N		usart_send(USART1, mqtt_buff->pdata, mqtt_buff->index);
+X		usart_send(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), mqtt_buff->pdata, mqtt_buff->index);
 N		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 N	}	
 N}

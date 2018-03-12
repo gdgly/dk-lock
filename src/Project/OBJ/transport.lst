@@ -53,7 +53,7 @@ Nvoid mqtt_keep_alive(void);
 N
 N
 Nint mqtt_connect(void);
-N
+Nint mqtt_publist(unsigned char* topic, unsigned char* payload, int payload_len, int qos, unsigned short packetid);
 N
 N
 N
@@ -27357,6 +27357,7 @@ Nenum timer
 N{
 N    tim1_cnt,
 N	timer_connect,
+N	timer_keep_alive,
 N    timer_batt,
 N	timer_mqtt_keep_alive,
 N	timer_gps_cycle,
@@ -27503,6 +27504,13 @@ Nextern usart_buff_t *gprs_buff;
 Nextern usart_buff_t *usart1_rx_buff;
 Nextern usart_buff_t *usart2_rx_buff;
 Nextern u8 send_buff[100];
+Nextern usart_buff_t *mqtt_buff;
+N
+N
+N
+N
+N
+Nint mqtt_buff_len = 0;
 N
 Nu32 packet_id = 0;
 N
@@ -27534,13 +27542,13 @@ N	ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
 N	if(ret != NULL)
 X	if(ret != 0)
 N	{
-N//		usart_send(USART1, buf, buflen);
+N
 N		memcpy((char *)send_buff, buf, buflen);
 N		memcpy((char *)send_buff+buflen, (char*)end_char, sizeof(end_char));
 N//		usart_send(USART1, send_buff, buflen+3);
 N//		gprs_send_at(send_buff, 0, 200, 200);
 N
-N		gprs_send_data(send_buff, buflen+3, 500);
+N		gprs_send_data(send_buff, buflen+3, 300);
 N	}
 N	
 N	rc = buflen;
@@ -27550,21 +27558,15 @@ N
 N
 Nint transport_getdata(unsigned char* buf, int count)
 N{
-N	int rc;   //接收到的数据
-N		
-N	if(timer_is_timeout_1ms(timer_uart2, 20) == 0)	//40ms没接收到数据认为接收数据完成		
-N	{	
-N		memcpy(buf, usart2_rx_buff->pdata, 512);
-N
-N		rc = usart2_rx_buff->index;
-N		usart_send(USART1, buf, usart2_rx_buff->index);
-X		usart_send(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), buf, usart2_rx_buff->index);
-N//		USART_OUT(USART1, "transport_getdata=%d\r", usart2_rx_buff->index);
-N//		rc = 1;
-N		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));
+N	if(mqtt_buff->index > 0)
+N	{
+N		memcpy(buf, &mqtt_buff->pdata[mqtt_buff_len], count);
+N//		usart_send(USART1, mqtt_buff->pdata, mqtt_buff->index);
+N//		usart_send(USART1, &mqtt_buff->pdata[mqtt_buff_len], count);
+N		mqtt_buff_len += count;
+N		return count;
 N	}
-N
-N	return rc;
+N	
 N}
 N
 Nint transport_getdatanb(void *sck, unsigned char* buf, int count)
@@ -27700,7 +27702,7 @@ N
 N
 Nint mqtt_connect(void)
 N{
-N	u8 ret = 0;
+N	int ret = 0;
 N	MQTTPacket_connectData data = MQTTPacket_connectData_initializer;
 X	MQTTPacket_connectData data = { {'M', 'Q', 'T', 'C'}, 0, 4, {0, {0, 0}}, 60, 1, 0, { {'M', 'Q', 'T', 'W'}, 0, {0, {0, 0}}, {0, {0, 0}}, 0, 0 }, {0, {0, 0}}, {0, {0, 0}} };
 N	int rc = 0;
@@ -27722,17 +27724,10 @@ N
 N	len = MQTTSerialize_connect(buf, buflen, &data);
 N		
 N	rc = transport_sendPacketBuffer(mysock, buf, len);
-N	timer_is_timeout_1ms(timer_connect, 0);
+N//	timer_is_timeout_1ms(timer_connect, 0);
 N	while(!ret)
-N	{
-N//		if(timer_is_timeout_1ms(timer_connect, 2000) == 0)
-N//		{
-N//			len = MQTTSerialize_connect(buf, buflen, &data);
-N////			memset(usart2_rx_buff, 0, sizeof(usart_buff_t));
-N//			rc = transport_sendPacketBuffer(mysock, buf, len);
-N//		}
-N
-N		timer_delay_1ms(1000);
+N	{ 
+N		timer_delay_1ms(30);
 N
 N		if (MQTTPacket_read(buf, buflen, transport_getdata) == CONNACK)
 N		{
@@ -27746,7 +27741,7 @@ N			}
 N			else
 N			{
 N				ret = 1;
-N//				USART_OUT(USART1, "connected\r\n");
+N				break;
 N			}
 N		}
 N	}
@@ -27757,7 +27752,7 @@ N
 N
 N
 N
-Nint mqtt_publist(unsigned char* topic, unsigned char* payload, int payloadlen, int qos, unsigned short packetid)
+Nint mqtt_publist(unsigned char* topic, unsigned char* payload, int payload_len, int qos, unsigned short packetid)
 N{
 N	u8 ret = 0;
 N	int rc = 0;
@@ -27774,7 +27769,10 @@ N	{
 N		switch(publist_status)
 N		{
 N			case PUBLISH:
-N				len = MQTTSerialize_publish((unsigned char *)buf , buflen, qos, 0, 0, packetid, topicString, (unsigned char *)payload, payloadlen);
+N				topicString.cstring = topic;				
+N//				strcpy(topicString.cstring, "test");
+N
+N				len = MQTTSerialize_publish((unsigned char *)buf , buflen, 0, qos, 0, packetid, topicString, (unsigned char *)payload, payload_len);
 N				rc = transport_sendPacketBuffer(mysock, buf, len);
 N				publist_status = PUBREC;
 N				
@@ -27788,13 +27786,14 @@ N				}
 N			break;
 N				
 N			case PUBREL:
+N				timer_delay_1ms(50);
 N				len = MQTTSerialize_pubrel(buf, buflen, 0, packetid);
 N				rc = transport_sendPacketBuffer(mysock, buf, len);
 N				publist_status = PUBCOMP;
 N			break;
 N
 N			case PUBCOMP:
-N				if (MQTTPacket_read(buf, buflen, transport_getdata) == PUBREC)
+N				if (MQTTPacket_read(buf, buflen, transport_getdata) == PUBCOMP)
 N				{
 N					ret = 1;
 N				}	
@@ -27883,25 +27882,29 @@ N
 N
 Nvoid mqtt_keep_alive(void)
 N{
-N	
-N	unsigned char buf[200];
-N	int buflen = sizeof(buf);
+N	int rc = 0;
+N	int mysock = 0;
 N	int len = 0;
+N	unsigned char buf[20];
+N	int buflen = sizeof(buf);
+N	
 N	
 N//	if(timer_is_timeout_1ms(timer_mqtt_keep_alive, 1000*60) == 0)
 N	{
+N		len = MQTTSerialize_pingreq(buf, buflen);
+N		rc = transport_sendPacketBuffer(mysock, buf, len);
+N//		usart_send(USART1, buf, len);
+N		
 N		while(1)
 N		{
+N			timer_delay_1ms(50);
 N			if(MQTTPacket_read(buf, buflen, transport_getdata) == PINGRESP)
 N			{
+N				USART_OUT(USART1, "mqtt_keep_alive ok\r\n", buf);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_keep_alive ok\r\n", buf);
 N				break;
 N			}
 N			
-N			len = MQTTSerialize_pingreq(buf, buflen);
-N			usart_send(USART1, buf, len);
-X			usart_send(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), buf, len);
-N			USART_OUT(USART1, "MQTTSerialize_pingreq=%s\r\n", buf);
-X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "MQTTSerialize_pingreq=%s\r\n", buf);
 N		}
 N	}
 N}

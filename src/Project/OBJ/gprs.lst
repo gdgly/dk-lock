@@ -25608,6 +25608,7 @@ Nenum timer
 N{
 N    tim1_cnt,
 N	timer_connect,
+N	timer_keep_alive,
 N    timer_batt,
 N	timer_mqtt_keep_alive,
 N	timer_gps_cycle,
@@ -26198,7 +26199,7 @@ N			break;
 N			
 N			case 6:
 N				gprs_status++;
-N//				ret = gprs_send_at("AT+CIPCLOSE\r\n", "OK", 800, 10000);//
+N//				ret = gprs_send_at("AT+CIPHEAD=0\r\n", "OK", 800, 10000);//
 N//				if (ret != NULL)
 N//				{
 N//					gprs_status++;
@@ -26215,8 +26216,8 @@ N//				}
 N			break;
 N			
 N			case 7:
-N				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 10000);//
-N//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 10000);
+N//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 10000);//
+N				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 10000);
 N				if (ret != NULL)
 X				if (ret != 0)
 N				{

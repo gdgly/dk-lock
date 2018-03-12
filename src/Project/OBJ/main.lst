@@ -25953,6 +25953,7 @@ Nenum timer
 N{
 N    tim1_cnt,
 N	timer_connect,
+N	timer_keep_alive,
 N    timer_batt,
 N	timer_mqtt_keep_alive,
 N	timer_gps_cycle,
@@ -26356,12 +26357,17 @@ Nvoid mqtt_keep_alive(void);
 N
 N
 Nint mqtt_connect(void);
-N
+Nint mqtt_publist(unsigned char* topic, unsigned char* payload, int payload_len, int qos, unsigned short packetid);
 N
 N
 N
 N#endif
 L 15 "..\app\main.c" 2
+N
+N
+N
+N
+Nextern usart_buff_t *mqtt_buff;
 N
 N
 N
@@ -26502,10 +26508,11 @@ N	u8 upload=0;
 N	u8 *ret;
 N	uint8_t status = 0;
 N//	u8 tt = 0;
-N	static u8 gps_send_flag = 0;
+N	static u8 mqtt_flag = 0;
 N//	u8 buf 
 N	u8 end_char[1];
-N	
+N	int mqtt_pub = 0;
+N	int mqtt_con = 0;
 N	
 N	end_char[0] = 0x1A;//½áÊø×Ö·û
 N
@@ -26525,23 +26532,41 @@ N	while(1)
 N	{
 N	
 N		gprs_init_task();
+N		
+N		if(mqtt_flag == 0)
+N		{
+N			timer_delay_1ms(1500);
+N			mqtt_con = mqtt_connect();
+N			if(1 == mqtt_con)
+N			{
+N				mqtt_flag = 1;
+N				timer_delay_1ms(20);
+N				USART_OUT(USART1, "mqtt_connect ok\r\n");
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_connect ok\r\n");
+N			}
+N		}
+N		
+N		usart2_recv_data();
+N		usart1_recv_data();
+N		
 N
-N		mqtt_connect();
-N		
-N		
-N		
-N//		ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
-N//		if(ret != NULL)
+N		p1 = strstr((char*)mqtt_buff->pdata, "CLOSE");
+N		if(p1 !=NULL)
+X		if(p1 !=0)
+N		{
+N			memset(mqtt_buff, 0, sizeof(usart_buff_t));	
+N			mqtt_flag = 0;
+N			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "MQTT SERVER CLOSE\r\n");
+N		}
+N//		if(timer_is_timeout_1ms(timer_keep_alive, 1000*30) == 0)
 N//		{
-N//			sprintf((char *)send_buff,"aaaaa%s\r\n", end_char);
-N
-N//			gprs_send_at(send_buff, 0, 500, 500);
-N////			gprs_send_data(send_buff, 8, 500);
+N//			mqtt_keep_alive();
+N//		}
 N
 N//			timer_delay_1ms(5000);
 N//		}
 N
-N		usart1_recv_data();
 N	}
 N	
 N	
