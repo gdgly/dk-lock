@@ -175,10 +175,9 @@ int main(void)
 	while(1)
 	{
 	
-		gprs_init_task();
-		
 		if(mqtt_flag == 0)
 		{
+			gprs_init_task();
 			timer_delay_1ms(1500);
 			mqtt_con = mqtt_connect();
 			if(1 == mqtt_con)
