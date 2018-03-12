@@ -197,6 +197,7 @@ int main(void)
 		{
 			memset(mqtt_buff, 0, sizeof(usart_buff_t));	
 			mqtt_flag = 0;
+			gprs_status = 0;
 			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
 		}
 //		if(timer_is_timeout_1ms(timer_keep_alive, 1000*30) == 0)
