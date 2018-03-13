@@ -25,6 +25,9 @@
 #include "bsp.h"
 #include "usart.h"
 #include "timer.h"
+#include "transport.h"
+
+
 
 
 
@@ -32,8 +35,8 @@ extern usart_buff_t  *usart1_rx_buff;
 extern usart_buff_t  *usart2_rx_buff;
 
 
-extern u8 usart2_buff[512];
-extern u16 usart2_cnt;
+//extern u8 usart2_buff[512];
+//extern u16 usart2_cnt;
 
 extern u8 usart2_rx_status;
 
@@ -136,43 +139,7 @@ u8 *gprs_check_cmd(u8 *src_str, u8 *p_str)
 * Note(s)     : none.
 *********************************************************************************************************
 */
-u8* gprs_send_at1(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
-{
-	u8 res = 1;
-	u8 buff[512] = {0};
-	
-	timer_is_timeout_1ms(timer_at, 0);	//开始定时器timer_at
-	while (res)
-	{	
-		memset(usart2_buff, 0, 512);
-		usart2_cnt = 0;
-		
-		usart2_rx_status = 0;
-		USART_OUT(USART2, cmd);							
-		timer_delay_1ms(waittime);				//AT指令延时
-	
-		usart2_rx_status = 1;	//数据未处理 不在接收数据
-		USART_OUT(USART1, "usart2_buff= %s", usart2_buff);
 
-		if (gprs_check_cmd(usart2_buff ,ack))	
-		{
-			res = 0;				//监测到正确的应答数据
-			usart2_rx_status = 0;	//数据处理完 开始接收数据
-			memcpy(buff, usart2_buff, 512);
-			USART_OUT(USART1,  buff);
-			memset(usart2_buff, 0, 512); 	//清理usart接收缓冲区
-			usart2_cnt = 0;		
-			return buff;
-		}
-			
-		if (timer_is_timeout_1ms(timer_at, timeout) == 0)	//定时器timer_at结束
-		{
-			res = 0;
-			usart2_rx_status = 0;	//数据处理完 开始接收数据
-			return NULL;
-		}
-	}	
-}
 
 
 u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
@@ -440,7 +407,7 @@ void gprs_config(void)
 void gprs_init_task(void)
 {
 
-
+	int mqtt_con = 0;
 	u8 *ret;
 	static u8 gprs_init_flag = true;		//
 		
@@ -477,6 +444,23 @@ void gprs_init_task(void)
 			break;
 			
 			case 2:
+				ret = gprs_send_at("ATE1\r\n", "OK", 800,10000);
+				if (ret != NULL)
+				{
+					gprs_status++;
+					gprs_err_cnt = 0;
+				}
+				else
+				{
+					gprs_err_cnt++;
+					if (gprs_err_cnt > 5)
+					{
+						gprs_status = 0;
+					}
+				}
+			break;
+				
+			case 3:
 				ret = gprs_send_at("AT+GSN\r\n", "OK", 800, 10000);
 				if (ret != NULL)
 				{
@@ -493,7 +477,7 @@ void gprs_init_task(void)
 				}
 			break;
 			
-			case 3:			
+			case 4:			
 				ret = gprs_send_at("AT+CPIN?\r\n", "OK", 800, 10000);
 				if (ret != NULL)
 				{
@@ -510,7 +494,7 @@ void gprs_init_task(void)
 				}
 			break;
 			
-			case 4:
+			case 5:
 				ret = gprs_send_at("AT+CSQ\r\n", "OK", 800, 10000);
 				if (ret != NULL)
 				{
@@ -526,7 +510,7 @@ void gprs_init_task(void)
 				}
 			break;
 			
-			case 5:
+			case 6:
 				ret = gprs_send_at("AT+CREG?\r\n", "OK", 800, 10000);
 				if (ret != NULL)
 				{
@@ -543,9 +527,9 @@ void gprs_init_task(void)
 				}
 			break;
 			
-			case 6:
+			case 7:
 				gprs_status++;
-//				ret = gprs_send_at("AT+CIPHEAD=0\r\n", "OK", 800, 10000);//
+//				ret = gprs_send_at("AT+CIPHEAD=1\r\n", "OK", 800, 10000);//
 //				if (ret != NULL)
 //				{
 //					gprs_status++;
@@ -561,9 +545,9 @@ void gprs_init_task(void)
 //				}
 			break;
 			
-			case 7:
-//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 10000);//
-				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 10000);
+			case 8:
+				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 10000);//
+//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 10000);
 				if (ret != NULL)
 				{
 					gprs_status++;
@@ -579,8 +563,33 @@ void gprs_init_task(void)
 				}
 			break;
 			
-			case 8:
-					
+			case 9:
+				ret = gprs_send_at("AT+CIPHEAD=1\r\n", "OK", 800, 10000);//
+				if (ret != NULL)
+				{
+					gprs_status++;
+					gprs_err_cnt = 0;
+				}
+				else
+				{
+					gprs_err_cnt++;
+					if (gprs_err_cnt > 5)
+					{
+						gprs_status = 0;
+					}
+				}
+			break;
+				
+				
+			case 10:
+//				timer_delay_1ms(1500);
+//				mqtt_con = mqtt_connect();
+//				if(1 == mqtt_con)
+//				{
+//					gprs_status = 255;
+//					timer_delay_1ms(20);
+//					USART_OUT(USART1, "mqtt_connect ok\r\n");
+//				}	
 				gprs_status = 255;
 			break;
 				

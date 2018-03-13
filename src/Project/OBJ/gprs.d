@@ -20,3 +20,4 @@
 .\obj\gprs.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 .\obj\gprs.o: ..\driver\usart.h
 .\obj\gprs.o: ..\driver\timer.h
+.\obj\gprs.o: ..\MQTT\transport.h

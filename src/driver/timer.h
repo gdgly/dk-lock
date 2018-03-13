@@ -27,6 +27,7 @@ enum timer
 	timer_uart1,
 	timer_uart2,
 	timer_uart3,
+	timer_uart4,
 	timer_gprs,
 	timer_at,
 	timer_max

@@ -25572,15 +25572,15 @@ N*******************************************************************************
 N*/
 Nvoid usart1_init(u32 band_rate, u8 word_length, u8 parity, u8 stop_bit);
 Nvoid usart2_init(u32 band_rate);
-Nvoid usart3_init(u32 band_rate);
+Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid USART3_IRQHandler(void);
+Nvoid UART4_IRQHandler(void);
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart3_recv_data(void);
+Nvoid usart4_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -25622,6 +25622,7 @@ N	timer_bell_2,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
+N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
 N	timer_max
@@ -25647,6 +25648,48 @@ N
 N 
 N#endif
 L 28 "..\driver\gprs.c" 2
+N#include "transport.h"
+L 1 "..\MQTT\transport.h" 1
+N/*******************************************************************************
+N * Copyright (c) 2014 IBM Corp.
+N *
+N * All rights reserved. This program and the accompanying materials
+N * are made available under the terms of the Eclipse Public License v1.0
+N * and Eclipse Distribution License v1.0 which accompany this distribution.
+N *
+N * The Eclipse Public License is available at
+N *    http://www.eclipse.org/legal/epl-v10.html
+N * and the Eclipse Distribution License is available at
+N *   http://www.eclipse.org/org/documents/edl-v10.php.
+N *
+N * Contributors:
+N *    Ian Craggs - initial API and implementation and/or initial documentation
+N *    Sergio R. Caprile - "commonalization" from prior samples and/or documentation extension
+N *******************************************************************************/
+N#ifndef __TRANSPORT_H_
+N#define __TRANSPORT_H_
+N
+N
+N
+Nint transport_sendPacketBuffer(int sock, unsigned char* buf, int buflen);
+Nint transport_getdata(unsigned char* buf, int count);
+Nint transport_getdatanb(void *sck, unsigned char* buf, int count);
+Nint transport_open(char* host, int port);
+Nint transport_close(int sock);
+Nvoid mqtt_qos0(void);
+Nvoid mqtt_qos2(void);
+Nvoid mqtt_keep_alive(void);
+N
+N
+Nint mqtt_connect(void);
+Nint mqtt_publist(unsigned char* topic, unsigned char* payload, int payload_len, int qos, unsigned short packetid);
+N
+N
+N
+N#endif
+L 29 "..\driver\gprs.c" 2
+N
+N
 N
 N
 N
@@ -25654,8 +25697,8 @@ Nextern usart_buff_t  *usart1_rx_buff;
 Nextern usart_buff_t  *usart2_rx_buff;
 N
 N
-Nextern u8 usart2_buff[512];
-Nextern u16 usart2_cnt;
+N//extern u8 usart2_buff[512];
+N//extern u16 usart2_cnt;
 N
 Nextern u8 usart2_rx_status;
 N
@@ -25759,47 +25802,7 @@ N*
 N* Note(s)     : none.
 N*********************************************************************************************************
 N*/
-Nu8* gprs_send_at1(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
-N{
-N	u8 res = 1;
-N	u8 buff[512] = {0};
-N	
-N	timer_is_timeout_1ms(timer_at, 0);	//开始定时器timer_at
-N	while (res)
-N	{	
-N		memset(usart2_buff, 0, 512);
-N		usart2_cnt = 0;
-N		
-N		usart2_rx_status = 0;
-N		USART_OUT(USART2, cmd);							
-X		USART_OUT(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), cmd);							
-N		timer_delay_1ms(waittime);				//AT指令延时
-N	
-N		usart2_rx_status = 1;	//数据未处理 不在接收数据
-N		USART_OUT(USART1, "usart2_buff= %s", usart2_buff);
-X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "usart2_buff= %s", usart2_buff);
 N
-N		if (gprs_check_cmd(usart2_buff ,ack))	
-N		{
-N			res = 0;				//监测到正确的应答数据
-N			usart2_rx_status = 0;	//数据处理完 开始接收数据
-N			memcpy(buff, usart2_buff, 512);
-N			USART_OUT(USART1,  buff);
-X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)),  buff);
-N			memset(usart2_buff, 0, 512); 	//清理usart接收缓冲区
-N			usart2_cnt = 0;		
-N			return buff;
-N		}
-N			
-N		if (timer_is_timeout_1ms(timer_at, timeout) == 0)	//定时器timer_at结束
-N		{
-N			res = 0;
-N			usart2_rx_status = 0;	//数据处理完 开始接收数据
-N			return NULL;
-X			return 0;
-N		}
-N	}	
-N}
 N
 N
 Nu8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
@@ -26088,7 +26091,7 @@ N*/
 Nvoid gprs_init_task(void)
 N{
 N
-N
+N	int mqtt_con = 0;
 N	u8 *ret;
 N	static u8 gprs_init_flag = true;		//
 X	static u8 gprs_init_flag = 1;		
@@ -26127,6 +26130,24 @@ N				}
 N			break;
 N			
 N			case 2:
+N				ret = gprs_send_at("ATE1\r\n", "OK", 800,10000);
+N				if (ret != NULL)
+X				if (ret != 0)
+N				{
+N					gprs_status++;
+N					gprs_err_cnt = 0;
+N				}
+N				else
+N				{
+N					gprs_err_cnt++;
+N					if (gprs_err_cnt > 5)
+N					{
+N						gprs_status = 0;
+N					}
+N				}
+N			break;
+N				
+N			case 3:
 N				ret = gprs_send_at("AT+GSN\r\n", "OK", 800, 10000);
 N				if (ret != NULL)
 X				if (ret != 0)
@@ -26144,7 +26165,7 @@ N					}
 N				}
 N			break;
 N			
-N			case 3:			
+N			case 4:			
 N				ret = gprs_send_at("AT+CPIN?\r\n", "OK", 800, 10000);
 N				if (ret != NULL)
 X				if (ret != 0)
@@ -26162,7 +26183,7 @@ N					}
 N				}
 N			break;
 N			
-N			case 4:
+N			case 5:
 N				ret = gprs_send_at("AT+CSQ\r\n", "OK", 800, 10000);
 N				if (ret != NULL)
 X				if (ret != 0)
@@ -26179,7 +26200,7 @@ N					}
 N				}
 N			break;
 N			
-N			case 5:
+N			case 6:
 N				ret = gprs_send_at("AT+CREG?\r\n", "OK", 800, 10000);
 N				if (ret != NULL)
 X				if (ret != 0)
@@ -26197,9 +26218,9 @@ N					}
 N				}
 N			break;
 N			
-N			case 6:
+N			case 7:
 N				gprs_status++;
-N//				ret = gprs_send_at("AT+CIPHEAD=0\r\n", "OK", 800, 10000);//
+N//				ret = gprs_send_at("AT+CIPHEAD=1\r\n", "OK", 800, 10000);//
 N//				if (ret != NULL)
 N//				{
 N//					gprs_status++;
@@ -26215,9 +26236,9 @@ N//					}
 N//				}
 N			break;
 N			
-N			case 7:
-N//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 10000);//
-N				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 10000);
+N			case 8:
+N				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 10000);//
+N//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 10000);
 N				if (ret != NULL)
 X				if (ret != 0)
 N				{
@@ -26234,8 +26255,34 @@ N					}
 N				}
 N			break;
 N			
-N			case 8:
-N					
+N			case 9:
+N				ret = gprs_send_at("AT+CIPHEAD=1\r\n", "OK", 800, 10000);//
+N				if (ret != NULL)
+X				if (ret != 0)
+N				{
+N					gprs_status++;
+N					gprs_err_cnt = 0;
+N				}
+N				else
+N				{
+N					gprs_err_cnt++;
+N					if (gprs_err_cnt > 5)
+N					{
+N						gprs_status = 0;
+N					}
+N				}
+N			break;
+N				
+N				
+N			case 10:
+N//				timer_delay_1ms(1500);
+N//				mqtt_con = mqtt_connect();
+N//				if(1 == mqtt_con)
+N//				{
+N//					gprs_status = 255;
+N//					timer_delay_1ms(20);
+N//					USART_OUT(USART1, "mqtt_connect ok\r\n");
+N//				}	
 N				gprs_status = 255;
 N			break;
 N				

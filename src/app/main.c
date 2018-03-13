@@ -167,31 +167,43 @@ int main(void)
                          
 	USART_OUT(USART1, "uart1 is ok\r\n");
 
-	
-//	mqtt_keep_alive();
-//	
-//	mqtt_qos0();
-	
+	USART_OUT(UART4, "uart4 is ok\r\n");
 	while(1)
 	{
 	
-		if(mqtt_flag == 0)
-		{
-			gprs_init_task();
-			timer_delay_1ms(1500);
-			mqtt_con = mqtt_connect();
-			if(1 == mqtt_con)
-			{
-				mqtt_flag = 1;
-				timer_delay_1ms(20);
-				USART_OUT(USART1, "mqtt_connect ok\r\n");
-			}
-		}
+//		if(mqtt_flag == 0)
+//		{
+//			gprs_init_task();
+//			timer_delay_1ms(1500);
+//			mqtt_con = mqtt_connect();
+//			if(1 == mqtt_con)
+//			{
+//				mqtt_flag = 1;
+//				timer_delay_1ms(20);
+//				USART_OUT(USART1, "mqtt_connect ok\r\n");
+//			}
+//		}
 		
-		usart2_recv_data();
+	
 		usart1_recv_data();
-		
+		usart2_recv_data();
+//		usart4_recv_data();
 
+		
+		
+		
+		
+	
+//		if(timer_is_timeout_1ms(timer_keep_alive, 1000*20) == 0)
+		{
+			mqtt_keep_alive();
+		}
+
+//			timer_delay_1ms(5000);
+
+
+		
+		
 		p1 = strstr((char*)mqtt_buff->pdata, "CLOSE");
 		if(p1 !=NULL)
 		{
@@ -200,14 +212,6 @@ int main(void)
 			gprs_status = 0;
 			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
 		}
-//		if(timer_is_timeout_1ms(timer_keep_alive, 1000*30) == 0)
-//		{
-//			mqtt_keep_alive();
-//		}
-
-//			timer_delay_1ms(5000);
-//		}
-
 	}
 	
 	

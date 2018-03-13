@@ -33,48 +33,17 @@
 */
 void bsp_rcc_init(void)
 {
-//	ErrorStatus err_status;
-
-//	RCC_DeInit();
-//	RCC_HSEConfig(RCC_HSE_ON);
-
-//	err_status = RCC_WaitForHSEStartUp();
-
-//	if (err_status == SUCCESS)
-//	{        
-//        /* HCLK = SYSCLK */
-//        RCC_HCLKConfig(RCC_SYSCLK_Div1); 
-//        
-//        /* PCLK2 = HCLK */
-//        RCC_PCLK2Config(RCC_HCLK_Div1); 
-//        
-//        /* PCLK1 = HCLK */
-//        RCC_PCLK1Config(RCC_HCLK_Div1);
-//        
-//        /* PLLCLK = 12MHz * 6 = 72 MHz */
-//        RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
-//        /* Enable PLL */ 
-//        RCC_PLLCmd(ENABLE);
-//	
-//		while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
-
-//		RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
-//        
-//        /* Wait till PLL is used as system clock source */
-//        while(RCC_GetSYSCLKSource() != 0x08);
-//	}
-
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);	
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
+//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB , ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD , ENABLE);
-	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 	
 }
@@ -171,6 +140,15 @@ void gpio_init(void)
   	GPIO_Init(GPIOB, &gpio_init_structure);
 	
 	
+	// UART4
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
+  	GPIO_Init(GPIOC, &gpio_init_structure);
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
+  	GPIO_Init(GPIOC, &gpio_init_structure);
 	
 	//I2C
 	gpio_init_structure.GPIO_Pin = GPIO_Pin_0;
@@ -260,6 +238,13 @@ void bsp_nvic_init(void)
     nvic_init_structure.NVIC_IRQChannelSubPriority = 3;
     nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
 	NVIC_Init(&nvic_init_structure);	
+	
+//	// USART4
+//	nvic_init_structure.NVIC_IRQChannel = UART4_IRQn;
+//    nvic_init_structure.NVIC_IRQChannelPreemptionPriority = 1;
+//    nvic_init_structure.NVIC_IRQChannelSubPriority = 4;
+//    nvic_init_structure.NVIC_IRQChannelCmd = ENABLE;	 
+//	NVIC_Init(&nvic_init_structure);	
 }
 
 
@@ -283,13 +268,12 @@ void bsp_init(void)
 //	iwatchdog_config();
 	usart1_init(115200, 8, 0, 1);
 	usart2_init(115200);
-	usart3_init(9600);
+	usart4_init(115200);
 
 	timer2_init(200, 41);
 //	pwm_timer3_init(9999, 143);
 //	pwm3_init(30);
-//	RTC_Init();
-//	AT24CXX_Init();   
+
 	Adc_Init();
 }
 

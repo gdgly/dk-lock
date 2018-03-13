@@ -23757,6 +23757,7 @@ N	timer_bell_2,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
+N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
 N	timer_max
@@ -23840,15 +23841,15 @@ N*******************************************************************************
 N*/
 Nvoid usart1_init(u32 band_rate, u8 word_length, u8 parity, u8 stop_bit);
 Nvoid usart2_init(u32 band_rate);
-Nvoid usart3_init(u32 band_rate);
+Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid USART3_IRQHandler(void);
+Nvoid UART4_IRQHandler(void);
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart3_recv_data(void);
+Nvoid usart4_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -23859,20 +23860,6 @@ N
 N
 N
 L 3 "..\driver\timer.c" 2
-N//////////////////////////////////////////////////////////////////////////////////	 
-N//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-N//Mini STM32开发板
-N//通用定时器 驱动代码			   
-N//正点原子@ALIENTEK
-N//技术论坛:www.openedv.com
-N//修改日期:2010/12/03
-N//版本：V1.0
-N//版权所有，盗版必究。
-N//Copyright(C) 正点原子 2009-2019
-N//All rights reserved
-N////////////////////////////////////////////////////////////////////////////////// 	  
-N 
-N
 N
 N
 N
@@ -23945,8 +23932,7 @@ N		if (g_timeout_cnt != 0x00)	//???????
 N		{
 N			g_timeout_cnt--;
 N		}
-N		
-N		
+N			
 N        for (i = 0; i<(uint8_t)timer_max; i++)
 N        {
 N            g_timer_cnt[i]++;

@@ -26617,15 +26617,15 @@ N*******************************************************************************
 N*/
 Nvoid usart1_init(u32 band_rate, u8 word_length, u8 parity, u8 stop_bit);
 Nvoid usart2_init(u32 band_rate);
-Nvoid usart3_init(u32 band_rate);
+Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid USART3_IRQHandler(void);
+Nvoid UART4_IRQHandler(void);
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart3_recv_data(void);
+Nvoid usart4_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -27371,6 +27371,7 @@ N	timer_bell_2,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
+N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
 N	timer_max
@@ -27538,6 +27539,8 @@ N	end_char[1] = 0x0D;
 N	end_char[2] = 0x0A;//½áÊø×Ö·û
 N	end_char[3] = '\0';
 N	
+N	memset(mqtt_buff, 0, sizeof(usart_buff_t));
+N	mqtt_buff_len = 0;
 N	ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
 N	if(ret != NULL)
 X	if(ret != 0)
@@ -27891,14 +27894,17 @@ N
 N	
 N//	if(timer_is_timeout_1ms(timer_mqtt_keep_alive, 1000*60) == 0)
 N	{
-N		len = MQTTSerialize_pingreq(buf, buflen);
-N		rc = transport_sendPacketBuffer(mysock, buf, len);
-N//		usart_send(USART1, buf, len);
-N		
+N//		len = MQTTSerialize_pingreq(buf, buflen);
+N//		rc = transport_sendPacketBuffer(mysock, buf, len);
+N//		
 N		while(1)
 N		{
-N			timer_delay_1ms(50);
-N			if(MQTTPacket_read(buf, buflen, transport_getdata) == PINGRESP)
+N			len = MQTTSerialize_pingreq(buf, buflen);
+N			rc = transport_sendPacketBuffer(mysock, buf, len);
+N			
+N			timer_delay_1ms(500);
+N			rc = MQTTPacket_read(buf, buflen, transport_getdata);
+N			if(rc == PINGREQ)
 N			{
 N				USART_OUT(USART1, "mqtt_keep_alive ok\r\n", buf);
 X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_keep_alive ok\r\n", buf);

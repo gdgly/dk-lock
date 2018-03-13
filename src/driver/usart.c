@@ -39,14 +39,15 @@ static usart_buff_t sb = SerialBuffDefault();
 usart_buff_t *usart1_rx_buff = &sb;
 usart_buff_t *usart2_rx_buff = &sb;
 usart_buff_t *usart3_rx_buff = &sb;
+usart_buff_t *usart4_rx_buff = &sb;
 usart_buff_t *mqtt_buff = &sb;
 
-u8 usart1_buff[USART_BUFF_LENGHT] = {0};
-u8 usart2_buff[USART_BUFF_LENGHT] = {0};
-u8 usart3_buff[USART_BUFF_LENGHT] = {0};
-u16 usart1_cnt = 0;
-u16 usart2_cnt = 0;
-u16 usart3_cnt = 0;
+//u8 usart1_buff[USART_BUFF_LENGHT] = {0};
+//u8 usart2_buff[USART_BUFF_LENGHT] = {0};
+//u8 usart3_buff[USART_BUFF_LENGHT] = {0};
+//u16 usart1_cnt = 0;
+//u16 usart2_cnt = 0;
+//u16 usart3_cnt = 0;
 
 u8 usart1_rx_status = 0;
 u8 usart2_rx_status = 0;
@@ -94,6 +95,17 @@ void usart_gpio_init(void)
   	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
   	GPIO_Init(GPIOB, &gpio_init_structure);
+	
+	
+	// UART4
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART3 TX				    
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
+  	GPIO_Init(GPIOC, &gpio_init_structure);
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
+  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
+  	GPIO_Init(GPIOC, &gpio_init_structure);
 	
 
 }
@@ -192,7 +204,7 @@ void usart2_init(u32 band_rate)
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void usart3_init(u32 band_rate)
+void usart4_init(u32 band_rate)
 {
 	USART_InitTypeDef usart_init_structre;
 	
@@ -202,14 +214,12 @@ void usart3_init(u32 band_rate)
 	usart_init_structre.USART_Parity = USART_Parity_No;
 	usart_init_structre.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	usart_init_structre.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-	USART_Init(USART3, &usart_init_structre);
+	USART_Init(UART4, &usart_init_structre);
 		
-	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
 	
-	USART_Cmd(USART3, ENABLE);
+	USART_Cmd(UART4, ENABLE);
 	
-	
-
 }
 
 
@@ -355,35 +365,34 @@ void usart2_recv_data(void)
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void USART3_IRQHandler(void)
+void UART4_IRQHandler(void)
 {
 	u8 ch = 0;	
 
-   	if (USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
+   	if (USART_GetITStatus(UART4, USART_IT_RXNE) != RESET)
     {   
-	    USART_ClearITPendingBit(USART3, USART_IT_RXNE);	
-		timer_is_timeout_1ms(timer_uart3, 0);
+	    USART_ClearITPendingBit(UART4, USART_IT_RXNE);	
+		timer_is_timeout_1ms(timer_uart4, 0);
 		
-//		if(usart3_rx_status == 0)
-		{	
-			ch = USART_ReceiveData(USART3);	 
-
-			if (usart3_cnt < USART_BUFF_LENGHT)
-			{
-				usart3_buff[usart3_cnt++] = ch;	
-				usart3_rx_status = 1;				
+//		if(usart4_rx_status == 0)
+		{
+			ch = USART_ReceiveData(UART4);	 
+			
+			if (usart4_rx_buff->index < USART_BUFF_LENGHT)
+			{			
+				usart4_rx_buff->pdata[usart4_rx_buff->index++] = ch;
+				USART_OUT(UART4, &ch);
 			}
 			else
 			{
-				memset(usart3_buff, 0, USART_BUFF_LENGHT);
-				usart3_cnt = 0;
+				memset(usart4_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 			}
 		}	
 	}
 	
-	if(USART_GetITStatus(USART3, USART_IT_TXE) != RESET)                  
+	if(USART_GetITStatus(UART4, USART_IT_TXE) != RESET)                  
   	{ 
-     	USART_ITConfig(USART3, USART_IT_TXE, DISABLE);					   
+     	USART_ITConfig(UART4, USART_IT_TXE, DISABLE);					   
   	}	
 	
 }
@@ -403,17 +412,12 @@ void USART3_IRQHandler(void)
 * Note(s)     : none.
 *********************************************************************************************************
 */
-void usart3_recv_data(void)
+void usart4_recv_data(void)
 {
-	
-	if(timer_is_timeout_1ms(timer_uart3, 50)==0)	//40ms没接收到数据认为接收数据完成		
+	if(timer_is_timeout_1ms(timer_uart4, 20) == 0)	//20ms没接收到数据认为接收数据完成		
 	{
-
-		USART_OUT(USART1, usart3_buff);
-		memcpy(gps_buff, usart3_buff, 512);
-		
-		memset(usart3_buff, 0, 512);	
-		usart3_cnt = 0;	
+		USART_OUT(UART4, usart4_rx_buff->pdata);
+		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 	}	
 }
 

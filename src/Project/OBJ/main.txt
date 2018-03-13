@@ -24,7 +24,7 @@
 ;;;159    	int mqtt_pub = 0;
 000008  bf00              NOP      
 ;;;160    	int mqtt_con = 0;
-00000a  2400              MOVS     r4,#0
+00000a  bf00              NOP      
 ;;;161    	
 ;;;162    	end_char[0] = 0x1A;//结束字符
 00000c  201a              MOVS     r0,#0x1a
@@ -36,487 +36,477 @@
 ;;;166    	
 ;;;167                             
 ;;;168    	USART_OUT(USART1, "uart1 is ok\r\n");
-000014  a11d              ADR      r1,|L1.140|
-000016  4821              LDR      r0,|L1.156|
+000014  a114              ADR      r1,|L1.104|
+000016  4818              LDR      r0,|L1.120|
 000018  f7fffffe          BL       USART_OUT
 ;;;169    
-;;;170    	
-;;;171    //	mqtt_keep_alive();
-;;;172    //	
-;;;173    //	mqtt_qos0();
-;;;174    	
-;;;175    	while(1)
-00001c  e034              B        |L1.136|
-                  |L1.30|
-;;;176    	{
-;;;177    	
-;;;178    		if(mqtt_flag == 0)
-00001e  4820              LDR      r0,|L1.160|
-000020  7800              LDRB     r0,[r0,#0]  ; mqtt_flag
-000022  b998              CBNZ     r0,|L1.76|
-;;;179    		{
-;;;180    			gprs_init_task();
-000024  f7fffffe          BL       gprs_init_task
-;;;181    			timer_delay_1ms(1500);
-000028  f24050dc          MOV      r0,#0x5dc
-00002c  f7fffffe          BL       timer_delay_1ms
-;;;182    			mqtt_con = mqtt_connect();
-000030  f7fffffe          BL       mqtt_connect
-000034  4604              MOV      r4,r0
-;;;183    			if(1 == mqtt_con)
-000036  2c01              CMP      r4,#1
-000038  d108              BNE      |L1.76|
-;;;184    			{
-;;;185    				mqtt_flag = 1;
-00003a  4919              LDR      r1,|L1.160|
-00003c  7008              STRB     r0,[r1,#0]
-;;;186    				timer_delay_1ms(20);
-00003e  2014              MOVS     r0,#0x14
-000040  f7fffffe          BL       timer_delay_1ms
-;;;187    				USART_OUT(USART1, "mqtt_connect ok\r\n");
-000044  a117              ADR      r1,|L1.164|
-000046  4815              LDR      r0,|L1.156|
-000048  f7fffffe          BL       USART_OUT
-                  |L1.76|
-;;;188    			}
-;;;189    		}
-;;;190    		
-;;;191    		usart2_recv_data();
-00004c  f7fffffe          BL       usart2_recv_data
-;;;192    		usart1_recv_data();
-000050  f7fffffe          BL       usart1_recv_data
+;;;170    	USART_OUT(UART4, "uart4 is ok\r\n");
+00001c  a117              ADR      r1,|L1.124|
+00001e  481b              LDR      r0,|L1.140|
+000020  f7fffffe          BL       USART_OUT
+;;;171    	while(1)
+000024  e01f              B        |L1.102|
+                  |L1.38|
+;;;172    	{
+;;;173    	
+;;;174    //		if(mqtt_flag == 0)
+;;;175    //		{
+;;;176    //			gprs_init_task();
+;;;177    //			timer_delay_1ms(1500);
+;;;178    //			mqtt_con = mqtt_connect();
+;;;179    //			if(1 == mqtt_con)
+;;;180    //			{
+;;;181    //				mqtt_flag = 1;
+;;;182    //				timer_delay_1ms(20);
+;;;183    //				USART_OUT(USART1, "mqtt_connect ok\r\n");
+;;;184    //			}
+;;;185    //		}
+;;;186    		
+;;;187    	
+;;;188    		usart1_recv_data();
+000026  f7fffffe          BL       usart1_recv_data
+;;;189    		usart2_recv_data();
+00002a  f7fffffe          BL       usart2_recv_data
+;;;190    //		usart4_recv_data();
+;;;191    
+;;;192    		
 ;;;193    		
-;;;194    
-;;;195    		p1 = strstr((char*)mqtt_buff->pdata, "CLOSE");
-000054  a118              ADR      r1,|L1.184|
-000056  481a              LDR      r0,|L1.192|
-000058  6800              LDR      r0,[r0,#0]  ; mqtt_buff
-00005a  1c80              ADDS     r0,r0,#2
-00005c  f7fffffe          BL       strstr
-000060  4918              LDR      r1,|L1.196|
-000062  6008              STR      r0,[r1,#0]  ; p1
-;;;196    		if(p1 !=NULL)
-000064  4608              MOV      r0,r1
-000066  6800              LDR      r0,[r0,#0]  ; p1
-000068  b170              CBZ      r0,|L1.136|
-;;;197    		{
-;;;198    			memset(mqtt_buff, 0, sizeof(usart_buff_t));	
-00006a  f2402102          MOV      r1,#0x202
-00006e  4814              LDR      r0,|L1.192|
-000070  6800              LDR      r0,[r0,#0]  ; mqtt_buff
-000072  f7fffffe          BL       __aeabi_memclr
-;;;199    			mqtt_flag = 0;
-000076  2000              MOVS     r0,#0
-000078  4909              LDR      r1,|L1.160|
-00007a  7008              STRB     r0,[r1,#0]
-;;;200    			gprs_status = 0;
-00007c  4912              LDR      r1,|L1.200|
-00007e  7008              STRB     r0,[r1,#0]
-;;;201    			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
-000080  a112              ADR      r1,|L1.204|
-000082  4806              LDR      r0,|L1.156|
-000084  f7fffffe          BL       USART_OUT
-                  |L1.136|
-000088  e7c9              B        |L1.30|
-;;;202    		}
-;;;203    //		if(timer_is_timeout_1ms(timer_keep_alive, 1000*30) == 0)
-;;;204    //		{
-;;;205    //			mqtt_keep_alive();
-;;;206    //		}
-;;;207    
-;;;208    //			timer_delay_1ms(5000);
-;;;209    //		}
-;;;210    
-;;;211    	}
-;;;212    	
-;;;213    	
-;;;214    	
-;;;215    	
-;;;216    	while(1)
-;;;217    	{	 
-;;;218    
-;;;219    		while(1)
-;;;220    		{
-;;;221    			gprs_config();
-;;;222    			if(gprs_status == 255)
-;;;223    			{
-;;;224    				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);			
-;;;225    				break;
-;;;226    			}
-;;;227    		}
-;;;228    	
-;;;229    		
-;;;230    		usart1_recv_data();
-;;;231    		usart2_recv_data();
+;;;194    		
+;;;195    		
+;;;196    	
+;;;197    //		if(timer_is_timeout_1ms(timer_keep_alive, 1000*20) == 0)
+;;;198    		{
+;;;199    			mqtt_keep_alive();
+00002e  f7fffffe          BL       mqtt_keep_alive
+;;;200    		}
+;;;201    
+;;;202    //			timer_delay_1ms(5000);
+;;;203    
+;;;204    
+;;;205    		
+;;;206    		
+;;;207    		p1 = strstr((char*)mqtt_buff->pdata, "CLOSE");
+000032  a117              ADR      r1,|L1.144|
+000034  4818              LDR      r0,|L1.152|
+000036  6800              LDR      r0,[r0,#0]  ; mqtt_buff
+000038  1c80              ADDS     r0,r0,#2
+00003a  f7fffffe          BL       strstr
+00003e  4917              LDR      r1,|L1.156|
+000040  6008              STR      r0,[r1,#0]  ; p1
+;;;208    		if(p1 !=NULL)
+000042  4608              MOV      r0,r1
+000044  6800              LDR      r0,[r0,#0]  ; p1
+000046  b170              CBZ      r0,|L1.102|
+;;;209    		{
+;;;210    			memset(mqtt_buff, 0, sizeof(usart_buff_t));	
+000048  f2402102          MOV      r1,#0x202
+00004c  4812              LDR      r0,|L1.152|
+00004e  6800              LDR      r0,[r0,#0]  ; mqtt_buff
+000050  f7fffffe          BL       __aeabi_memclr
+;;;211    			mqtt_flag = 0;
+000054  2000              MOVS     r0,#0
+000056  4912              LDR      r1,|L1.160|
+000058  7008              STRB     r0,[r1,#0]
+;;;212    			gprs_status = 0;
+00005a  4912              LDR      r1,|L1.164|
+00005c  7008              STRB     r0,[r1,#0]
+;;;213    			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
+00005e  a112              ADR      r1,|L1.168|
+000060  4805              LDR      r0,|L1.120|
+000062  f7fffffe          BL       USART_OUT
+                  |L1.102|
+000066  e7de              B        |L1.38|
+;;;214    		}
+;;;215    	}
+;;;216    	
+;;;217    	
+;;;218    	
+;;;219    	
+;;;220    	while(1)
+;;;221    	{	 
+;;;222    
+;;;223    		while(1)
+;;;224    		{
+;;;225    			gprs_config();
+;;;226    			if(gprs_status == 255)
+;;;227    			{
+;;;228    				MakeFile_MD5_Checksum(PARK_LOCK_Buffer, 16);			
+;;;229    				break;
+;;;230    			}
+;;;231    		}
 ;;;232    	
-;;;233    		// 电池信息
-;;;234    		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
-;;;235    		Bat_V=Bat_V*3300/4096;
-;;;236    		Bat_V=Bat_V*88/20;
-;;;237    		Bat_Pre=(Bat_V-5000)*100/2400;
-;;;238    		
-;;;239    //		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
-;;;240    		if(timer_is_timeout_1ms(timer_batt, 1000*60*60) == 0)
-;;;241    		{	
-;;;242    			Bat_Pre_Flag =  1;
-;;;243    			memset(send_buff, 0, 100);	
-;;;244    			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
-;;;245    
-;;;246    			USART_OUT(USART1, "ccc=%s\r\n", send_buff);
-;;;247    
-;;;248    			ret = gprs_send_at(send_buff, ">", 300, 2000);
-;;;249    			if(ret != NULL)
-;;;250    			{
-;;;251    				memset(expressText, 0 ,512);
-;;;252    				memset(cipherText, 0 ,512);
-;;;253    				sprintf((char *)expressText, "{%c%s%c:%s}",'"',"battery",'"',"20");
-;;;254    				USART_OUT(USART1, "expressText=%s\r\n", expressText);
-;;;255    				AES_Encrypt((char *)expressText, cipherText, aesKey);
-;;;256    				
-;;;257    				USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
-;;;258    				USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-;;;259    				ret = gprs_send_at(cipherText, "OK", 300, 0);
-;;;260    				if(ret != NULL)
-;;;261    				{
-;;;262    					timer_is_timeout_1ms(timer_heartbeat, 0);
-;;;263    				}			
-;;;264    			}
-;;;265    			else
-;;;266    			{
-;;;267    			}
-;;;268    
-;;;269    		}
-;;;270    //		//接收锁数据
-;;;271    		p1 = strstr((u8*)protocol_buff, "topic: lock/");
-;;;272    		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
-;;;273    		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
-;;;274    		{
-;;;275    			
-;;;276    			if(LOCK_ON_READ()==0 || LOCK_OFF_READ()==0)
-;;;277    			{
-;;;278    			timer_is_timeout_1ms(timer_heartbeat, 0);
-;;;279    			USART_OUT(USART1, "lock data\r\n");
-;;;280    			memset(receiveText ,0 , 512);
-;;;281    			memset(expressText ,0 , 512);
-;;;282    			
-;;;283    			strcpy((char*)receiveText ,(char *)(p1+33));
-;;;284    			USART_OUT(USART1, "receiveText=%s\r\n", receiveText);
-;;;285    			AES_Decrypt(expressText, receiveText, aesKey);
-;;;286    			if(*expressText==0x31)
-;;;287    			{
-;;;288    //				if(LOCK_ON_READ() == 0)
-;;;289    //				if(lock_on_status_get() == 0)
-;;;290    				if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
-;;;291    				{
-;;;292    					timer_is_timeout_1ms(timer_open_lock, 0);
-;;;293    					Shaking=1;
-;;;294    					Lock_Open=1;
-;;;295    					USART_OUT(USART1, "Lock_Open11111\r\n");
-;;;296    				}
-;;;297    				else
-;;;298    				{
-;;;299    					Lock_Open=0;
+;;;233    		
+;;;234    		usart1_recv_data();
+;;;235    		usart2_recv_data();
+;;;236    	
+;;;237    		// 电池信息
+;;;238    		Bat_V =Get_Adc_Average(ADC_Channel_0,10);
+;;;239    		Bat_V=Bat_V*3300/4096;
+;;;240    		Bat_V=Bat_V*88/20;
+;;;241    		Bat_Pre=(Bat_V-5000)*100/2400;
+;;;242    		
+;;;243    //		if(Bat_Pre<20&&Bat_Pre>10&&Bat_Pre_Flag==0)
+;;;244    		if(timer_is_timeout_1ms(timer_batt, 1000*60*60) == 0)
+;;;245    		{	
+;;;246    			Bat_Pre_Flag =  1;
+;;;247    			memset(send_buff, 0, 100);	
+;;;248    			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",24,2\r\n");
+;;;249    
+;;;250    			USART_OUT(USART1, "ccc=%s\r\n", send_buff);
+;;;251    
+;;;252    			ret = gprs_send_at(send_buff, ">", 300, 2000);
+;;;253    			if(ret != NULL)
+;;;254    			{
+;;;255    				memset(expressText, 0 ,512);
+;;;256    				memset(cipherText, 0 ,512);
+;;;257    				sprintf((char *)expressText, "{%c%s%c:%s}",'"',"battery",'"',"20");
+;;;258    				USART_OUT(USART1, "expressText=%s\r\n", expressText);
+;;;259    				AES_Encrypt((char *)expressText, cipherText, aesKey);
+;;;260    				
+;;;261    				USART_OUT(USART1, "aesKey=%s\r\n", aesKey);
+;;;262    				USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+;;;263    				ret = gprs_send_at(cipherText, "OK", 300, 0);
+;;;264    				if(ret != NULL)
+;;;265    				{
+;;;266    					timer_is_timeout_1ms(timer_heartbeat, 0);
+;;;267    				}			
+;;;268    			}
+;;;269    			else
+;;;270    			{
+;;;271    			}
+;;;272    
+;;;273    		}
+;;;274    //		//接收锁数据
+;;;275    		p1 = strstr((u8*)protocol_buff, "topic: lock/");
+;;;276    		p2 = strstr((u8 *)p1,(u8 *)PARK_LOCK_Buffer);
+;;;277    		if(strncmp((char *)p1,(char *)"topic: lock/",12)==0)
+;;;278    		{
+;;;279    			
+;;;280    			if(LOCK_ON_READ()==0 || LOCK_OFF_READ()==0)
+;;;281    			{
+;;;282    			timer_is_timeout_1ms(timer_heartbeat, 0);
+;;;283    			USART_OUT(USART1, "lock data\r\n");
+;;;284    			memset(receiveText ,0 , 512);
+;;;285    			memset(expressText ,0 , 512);
+;;;286    			
+;;;287    			strcpy((char*)receiveText ,(char *)(p1+33));
+;;;288    			USART_OUT(USART1, "receiveText=%s\r\n", receiveText);
+;;;289    			AES_Decrypt(expressText, receiveText, aesKey);
+;;;290    			if(*expressText==0x31)
+;;;291    			{
+;;;292    //				if(LOCK_ON_READ() == 0)
+;;;293    //				if(lock_on_status_get() == 0)
+;;;294    				if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
+;;;295    				{
+;;;296    					timer_is_timeout_1ms(timer_open_lock, 0);
+;;;297    					Shaking=1;
+;;;298    					Lock_Open=1;
+;;;299    					USART_OUT(USART1, "Lock_Open11111\r\n");
 ;;;300    				}
-;;;301    			}
-;;;302    			else if(*expressText==0x32)
-;;;303    			{
-;;;304    //				if(LOCK_OFF_READ() == 0)
-;;;305    //				if(lock_off_status_get() == 0)
-;;;306    				if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	
-;;;307    				{
-;;;308    					timer_is_timeout_1ms(timer_close_lock, 0);
-;;;309    					Shaking=1;
-;;;310    					Lock_Close=1;
-;;;311    					USART_OUT(USART1, "Lock_Close11111\r\n");
-;;;312    				}
-;;;313    				else
-;;;314    				{
-;;;315    					Lock_Close=0;
+;;;301    				else
+;;;302    				{
+;;;303    					Lock_Open=0;
+;;;304    				}
+;;;305    			}
+;;;306    			else if(*expressText==0x32)
+;;;307    			{
+;;;308    //				if(LOCK_OFF_READ() == 0)
+;;;309    //				if(lock_off_status_get() == 0)
+;;;310    				if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	
+;;;311    				{
+;;;312    					timer_is_timeout_1ms(timer_close_lock, 0);
+;;;313    					Shaking=1;
+;;;314    					Lock_Close=1;
+;;;315    					USART_OUT(USART1, "Lock_Close11111\r\n");
 ;;;316    				}
-;;;317    			
-;;;318    			}
-;;;319    			else if(*expressText == 0x30)
-;;;320    			{
-;;;321    				lock_stop();	//停止运行;
+;;;317    				else
+;;;318    				{
+;;;319    					Lock_Close=0;
+;;;320    				}
+;;;321    			
 ;;;322    			}
-;;;323    			
-;;;324    			memset(protocol_buff, 0, 512);					
-;;;325    		}
-;;;326    	}
-;;;327    
-;;;328    		//开锁逻辑		
-;;;329    		if(Lock_Open == 1)
-;;;330    		{
+;;;323    			else if(*expressText == 0x30)
+;;;324    			{
+;;;325    				lock_stop();	//停止运行;
+;;;326    			}
+;;;327    			
+;;;328    			memset(protocol_buff, 0, 512);					
+;;;329    		}
+;;;330    	}
 ;;;331    
-;;;332    			if(timer_is_timeout_1ms(timer_open_lock, 4000) == 0)
-;;;333    			{
-;;;334    				lock_open_err_flag = 1;
-;;;335    				
-;;;336    				lock_close();
-;;;337    				USART_OUT(USART1, "Lock_Open timer\r\n");
-;;;338    			}
-;;;339    			USART_OUT(USART1, "Lock_Open\r\n");
-;;;340    			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
-;;;341    			{
-;;;342    				lock_open();	//开锁	
-;;;343    				USART_OUT(USART1, "AAA lock_open\r\n");
-;;;344    			}
-;;;345    //			if(LOCK_OFF_READ()==0) //正常开锁
-;;;346    			if(lock_off_status_get() == 0)
-;;;347    			{
-;;;348    				USART_OUT(USART1, "AAA lock_stop\r\n");
-;;;349    				
-;;;350    				Lock_Open = 0;
-;;;351    				lock_stop();	//停止运行
-;;;352    				Shaking = 0;
+;;;332    		//开锁逻辑		
+;;;333    		if(Lock_Open == 1)
+;;;334    		{
+;;;335    
+;;;336    			if(timer_is_timeout_1ms(timer_open_lock, 4000) == 0)
+;;;337    			{
+;;;338    				lock_open_err_flag = 1;
+;;;339    				
+;;;340    				lock_close();
+;;;341    				USART_OUT(USART1, "Lock_Open timer\r\n");
+;;;342    			}
+;;;343    			USART_OUT(USART1, "Lock_Open\r\n");
+;;;344    			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1)
+;;;345    			{
+;;;346    				lock_open();	//开锁	
+;;;347    				USART_OUT(USART1, "AAA lock_open\r\n");
+;;;348    			}
+;;;349    //			if(LOCK_OFF_READ()==0) //正常开锁
+;;;350    			if(lock_off_status_get() == 0)
+;;;351    			{
+;;;352    				USART_OUT(USART1, "AAA lock_stop\r\n");
 ;;;353    				
-;;;354    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-;;;355    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-;;;356    				ret = gprs_send_at(send_buff, ">", 300, 2000);
-;;;357    				if(ret != NULL)
-;;;358    				{
-;;;359    					memset(expressText, 0 ,512);
-;;;360    					memset(cipherText, 0 ,512);
-;;;361    					sprintf(expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"0");
-;;;362    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
-;;;363    					AES_Encrypt((char *)expressText, cipherText, aesKey);
-;;;364    					USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
-;;;365    					
-;;;366    					ret = gprs_send_at(cipherText, "OK", 300, 0);
-;;;367    					if(ret != NULL)
-;;;368    					{
-;;;369    						timer_is_timeout_1ms(timer_heartbeat, 0);
-;;;370    					}
-;;;371    				}			
-;;;372    			}
-;;;373    			
-;;;374    			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1 && lock_open_err_flag == 1)//开锁超时异常处理
-;;;375    			{
-;;;376    				lock_open_err_flag = 0;
-;;;377    				Lock_Open = 0;
-;;;378    				lock_stop();
-;;;379    				Shaking = 0;
-;;;380    				USART_OUT(USART1, "open lock unusual\r\n");
-;;;381    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-;;;382    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-;;;383    				ret = gprs_send_at(send_buff, ">", 300, 2000);
-;;;384    				if(ret != NULL)
-;;;385    				{
-;;;386    					memset(expressText, 0 ,512);
-;;;387    					memset(cipherText, 0 ,512);
-;;;388    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"1");
-;;;389    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
-;;;390    					AES_Encrypt((char *)expressText, cipherText, aesKey);
-;;;391    					ret = gprs_send_at(cipherText, "OK", 300, 0);
-;;;392    					if(ret != NULL)
-;;;393    					{
-;;;394    						timer_is_timeout_1ms(timer_heartbeat, 0);
-;;;395    					}
-;;;396    				}
-;;;397    				else
-;;;398    				{
-;;;399    
-;;;400    				}	
-;;;401    			}
-;;;402    		}
-;;;403    		//关锁逻辑
-;;;404    		if(Lock_Close == 1)
-;;;405    		{
-;;;406    			if(timer_is_timeout_1ms(timer_close_lock, 4000) == 0)
-;;;407    			{
-;;;408    				lock_open();
-;;;409    				lock_close_err_flag = 1;
-;;;410    				USART_OUT(USART1, "Lock_Close timer\r\n");
-;;;411    			}
-;;;412    			USART_OUT(USART1, "lock close\r\n");
-;;;413    			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	//正常关锁
-;;;414    			{
-;;;415    				lock_close();
-;;;416    				USART_OUT(USART1, "BBB lock close\r\n");
-;;;417    			}
-;;;418    			
-;;;419    //			if(LOCK_ON_READ() == 0)	//正常关锁
-;;;420    			if(lock_on_status_get() == 0)
-;;;421    			{
-;;;422    				Lock_Close = 0;
-;;;423    				lock_stop();	//停止运行
-;;;424    				Shaking = 0;
-;;;425    				USART_OUT(USART1, "BBB lock_stop\r\n");
-;;;426    				
-;;;427    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-;;;428    				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
-;;;429    				ret = gprs_send_at(send_buff, ">", 300, 2000);
-;;;430    				if(ret != NULL)
-;;;431    				{
-;;;432    					memset(expressText, 0 ,512);
-;;;433    					memset(cipherText, 0 ,512);
-;;;434    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"0");
-;;;435    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
-;;;436    					AES_Encrypt((char *)expressText, cipherText, aesKey);
-;;;437    					ret = gprs_send_at(cipherText, "OK", 300, 0);
-;;;438    					if(ret != NULL)
-;;;439    					{
-;;;440    						timer_is_timeout_1ms(timer_heartbeat, 0);
-;;;441    					}
-;;;442    				}
-;;;443    			}
-;;;444    			
-;;;445    			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0 && lock_close_err_flag == 1) //关锁超时处理
-;;;446    			{
-;;;447    				lock_close_err_flag = 0;
-;;;448    				Lock_Close = 0;
-;;;449    				lock_stop();	//停止运行
-;;;450    				Shaking = 0;
-;;;451    				USART_OUT(USART1, "close lock unusual\r\n");
-;;;452    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
-;;;453    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
-;;;454    				ret = gprs_send_at(send_buff, ">", 300, 2000);
-;;;455    				if(ret != NULL)
-;;;456    				{
-;;;457    					memset(expressText, 0 ,512);
-;;;458    					memset(cipherText, 0 ,512);
-;;;459    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"1");
-;;;460    					AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
-;;;461    				
-;;;462    					ret = gprs_send_at(cipherText, "OK", 300, 0);
-;;;463    					if(ret != NULL)
-;;;464    					{
-;;;465    						timer_is_timeout_1ms(timer_heartbeat, 0);
-;;;466    					}
-;;;467    				}
-;;;468    			}		
-;;;469    		}
-;;;470    		//按键
-;;;471    		if(button_get_value() == 0)
-;;;472    		{
-;;;473    			USART_OUT(USART1, "button_get_value\r\n");
-;;;474    			timer_is_timeout_1ms(timer_close_lock, 0);
-;;;475    			Lock_Close = 1;
-;;;476    			Shaking=1;	
-;;;477    		}
-;;;478    			
-;;;479    		
-;;;480    		//报警器
-;;;481    		p1 = strstr((char*)protocol_buff, "topic: bell/");
-;;;482    		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
-;;;483    		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
-;;;484    		{
-;;;485    			timer_is_timeout_1ms(timer_heartbeat, 0);
-;;;486    			USART_OUT(USART1, "bell\r\n");
-;;;487    			memset(protocol_buff, 0, 512);	
-;;;488    			bell_flag=1;
-;;;489      	
-;;;490    			BEEP_ON();
-;;;491    			timer_delay_1ms(100);
-;;;492    			BEEP_OFF();
-;;;493    		}
-;;;494    				
-;;;495    		if(bell_flag == 1)
-;;;496    		{
-;;;497    			bell_flag = 0;
-;;;498    		}
-;;;499    		//晃动报警
-;;;500    		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1 && Shaking==0)
-;;;501    		{
-;;;502    			USART_OUT(USART1, "Sharking\r\n");
-;;;503    			if(timer_is_timeout_1ms(timer_bell_1, 400) == 0)
-;;;504    			{
-;;;505    				BEEP_ON();
-;;;506    			}
-;;;507    			if(timer_is_timeout_1ms(timer_bell_2, 800) == 0)
+;;;354    				Lock_Open = 0;
+;;;355    				lock_stop();	//停止运行
+;;;356    				Shaking = 0;
+;;;357    				
+;;;358    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+;;;359    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+;;;360    				ret = gprs_send_at(send_buff, ">", 300, 2000);
+;;;361    				if(ret != NULL)
+;;;362    				{
+;;;363    					memset(expressText, 0 ,512);
+;;;364    					memset(cipherText, 0 ,512);
+;;;365    					sprintf(expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"0");
+;;;366    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+;;;367    					AES_Encrypt((char *)expressText, cipherText, aesKey);
+;;;368    					USART_OUT(USART1, "cipherText=%s\r\n", cipherText);
+;;;369    					
+;;;370    					ret = gprs_send_at(cipherText, "OK", 300, 0);
+;;;371    					if(ret != NULL)
+;;;372    					{
+;;;373    						timer_is_timeout_1ms(timer_heartbeat, 0);
+;;;374    					}
+;;;375    				}			
+;;;376    			}
+;;;377    			
+;;;378    			if(LOCK_ON_READ()==0 && LOCK_OFF_READ()==1 && lock_open_err_flag == 1)//开锁超时异常处理
+;;;379    			{
+;;;380    				lock_open_err_flag = 0;
+;;;381    				Lock_Open = 0;
+;;;382    				lock_stop();
+;;;383    				Shaking = 0;
+;;;384    				USART_OUT(USART1, "open lock unusual\r\n");
+;;;385    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+;;;386    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+;;;387    				ret = gprs_send_at(send_buff, ">", 300, 2000);
+;;;388    				if(ret != NULL)
+;;;389    				{
+;;;390    					memset(expressText, 0 ,512);
+;;;391    					memset(cipherText, 0 ,512);
+;;;392    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"1",'"',"ok",'"',"1");
+;;;393    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+;;;394    					AES_Encrypt((char *)expressText, cipherText, aesKey);
+;;;395    					ret = gprs_send_at(cipherText, "OK", 300, 0);
+;;;396    					if(ret != NULL)
+;;;397    					{
+;;;398    						timer_is_timeout_1ms(timer_heartbeat, 0);
+;;;399    					}
+;;;400    				}
+;;;401    				else
+;;;402    				{
+;;;403    
+;;;404    				}	
+;;;405    			}
+;;;406    		}
+;;;407    		//关锁逻辑
+;;;408    		if(Lock_Close == 1)
+;;;409    		{
+;;;410    			if(timer_is_timeout_1ms(timer_close_lock, 4000) == 0)
+;;;411    			{
+;;;412    				lock_open();
+;;;413    				lock_close_err_flag = 1;
+;;;414    				USART_OUT(USART1, "Lock_Close timer\r\n");
+;;;415    			}
+;;;416    			USART_OUT(USART1, "lock close\r\n");
+;;;417    			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0)	//正常关锁
+;;;418    			{
+;;;419    				lock_close();
+;;;420    				USART_OUT(USART1, "BBB lock close\r\n");
+;;;421    			}
+;;;422    			
+;;;423    //			if(LOCK_ON_READ() == 0)	//正常关锁
+;;;424    			if(lock_on_status_get() == 0)
+;;;425    			{
+;;;426    				Lock_Close = 0;
+;;;427    				lock_stop();	//停止运行
+;;;428    				Shaking = 0;
+;;;429    				USART_OUT(USART1, "BBB lock_stop\r\n");
+;;;430    				
+;;;431    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+;;;432    				USART_OUT(USART1, "PublishLockBackbuf=%s\r\n", send_buff);
+;;;433    				ret = gprs_send_at(send_buff, ">", 300, 2000);
+;;;434    				if(ret != NULL)
+;;;435    				{
+;;;436    					memset(expressText, 0 ,512);
+;;;437    					memset(cipherText, 0 ,512);
+;;;438    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"0");
+;;;439    					USART_OUT(USART1, "expressText=%s\r\n", expressText);
+;;;440    					AES_Encrypt((char *)expressText, cipherText, aesKey);
+;;;441    					ret = gprs_send_at(cipherText, "OK", 300, 0);
+;;;442    					if(ret != NULL)
+;;;443    					{
+;;;444    						timer_is_timeout_1ms(timer_heartbeat, 0);
+;;;445    					}
+;;;446    				}
+;;;447    			}
+;;;448    			
+;;;449    			if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==0 && lock_close_err_flag == 1) //关锁超时处理
+;;;450    			{
+;;;451    				lock_close_err_flag = 0;
+;;;452    				Lock_Close = 0;
+;;;453    				lock_stop();	//停止运行
+;;;454    				Shaking = 0;
+;;;455    				USART_OUT(USART1, "close lock unusual\r\n");
+;;;456    				sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockback/",(char *)PARK_LOCK_Buffer,",44,2\r\n");
+;;;457    				USART_OUT(USART1, "send_buff=%s\r\n", send_buff);
+;;;458    				ret = gprs_send_at(send_buff, ">", 300, 2000);
+;;;459    				if(ret != NULL)
+;;;460    				{
+;;;461    					memset(expressText, 0 ,512);
+;;;462    					memset(cipherText, 0 ,512);
+;;;463    					sprintf((char *)expressText,"{%c%s%c:%s,%c%s%c:%s}",'"',"cmd",'"',"2",'"',"ok",'"',"1");
+;;;464    					AES_Encrypt((char *)expressText, (char*)cipherText, (char*)aesKey);
+;;;465    				
+;;;466    					ret = gprs_send_at(cipherText, "OK", 300, 0);
+;;;467    					if(ret != NULL)
+;;;468    					{
+;;;469    						timer_is_timeout_1ms(timer_heartbeat, 0);
+;;;470    					}
+;;;471    				}
+;;;472    			}		
+;;;473    		}
+;;;474    		//按键
+;;;475    		if(button_get_value() == 0)
+;;;476    		{
+;;;477    			USART_OUT(USART1, "button_get_value\r\n");
+;;;478    			timer_is_timeout_1ms(timer_close_lock, 0);
+;;;479    			Lock_Close = 1;
+;;;480    			Shaking=1;	
+;;;481    		}
+;;;482    			
+;;;483    		
+;;;484    		//报警器
+;;;485    		p1 = strstr((char*)protocol_buff, "topic: bell/");
+;;;486    		p2 = strstr((char *)p1,(char *)PARK_LOCK_Buffer);
+;;;487    		if(strncmp((char *)p1,(char *)"topic: bell/",12)==0 && bell_flag==0)
+;;;488    		{
+;;;489    			timer_is_timeout_1ms(timer_heartbeat, 0);
+;;;490    			USART_OUT(USART1, "bell\r\n");
+;;;491    			memset(protocol_buff, 0, 512);	
+;;;492    			bell_flag=1;
+;;;493      	
+;;;494    			BEEP_ON();
+;;;495    			timer_delay_1ms(100);
+;;;496    			BEEP_OFF();
+;;;497    		}
+;;;498    				
+;;;499    		if(bell_flag == 1)
+;;;500    		{
+;;;501    			bell_flag = 0;
+;;;502    		}
+;;;503    		//晃动报警
+;;;504    		if(LOCK_ON_READ()==1 && LOCK_OFF_READ()==1 && Shaking==0)
+;;;505    		{
+;;;506    			USART_OUT(USART1, "Sharking\r\n");
+;;;507    			if(timer_is_timeout_1ms(timer_bell_1, 400) == 0)
 ;;;508    			{
-;;;509    				BEEP_OFF();
+;;;509    				BEEP_ON();
 ;;;510    			}
-;;;511    		}
-;;;512    		else
-;;;513    		{
-;;;514    			BEEP_OFF();
+;;;511    			if(timer_is_timeout_1ms(timer_bell_2, 800) == 0)
+;;;512    			{
+;;;513    				BEEP_OFF();
+;;;514    			}
 ;;;515    		}
-;;;516    		
-;;;517    		//断线重连
-;;;518    		p1 = strstr((char*)protocol_buff, "MQTT CLOSE");
-;;;519    		if(p1 !=NULL)
-;;;520    		{
-;;;521    			memset(protocol_buff, 0, 512);	
-;;;522    			gprs_status = 0;
-;;;523    			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
-;;;524    		}
-;;;525    		
-;;;526    
-;;;527    		//心跳
-;;;528    		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
-;;;529    		{
-;;;530    			memset(send_buff, 0, 100);
-;;;531    			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
-;;;532    	
-;;;533    			USART_OUT(USART1, "heartbeat=%s\r\n", send_buff);
-;;;534    			ret = gprs_send_at(send_buff, ">", 300, 2000);
-;;;535    			if(ret != NULL)
-;;;536    			{
-;;;537    				memset(heartbeat_buff, 0, 2);
-;;;538    				heartbeat_buff[0] = 0x30;
-;;;539    				ret = gprs_send_at(heartbeat_buff, "OK", 300, 0);
-;;;540    				if(ret != NULL)
-;;;541    				{
-;;;542    					
-;;;543    				}	
-;;;544    			}
-;;;545    			else
-;;;546    			{
-;;;547    				
+;;;516    		else
+;;;517    		{
+;;;518    			BEEP_OFF();
+;;;519    		}
+;;;520    		
+;;;521    		//断线重连
+;;;522    		p1 = strstr((char*)protocol_buff, "MQTT CLOSE");
+;;;523    		if(p1 !=NULL)
+;;;524    		{
+;;;525    			memset(protocol_buff, 0, 512);	
+;;;526    			gprs_status = 0;
+;;;527    			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
+;;;528    		}
+;;;529    		
+;;;530    
+;;;531    		//心跳
+;;;532    		if(timer_is_timeout_1ms(timer_heartbeat, 1000*60*10) == 0)
+;;;533    		{
+;;;534    			memset(send_buff, 0, 100);
+;;;535    			sprintf((char *)send_buff,"%s%s%s","AT+PUBLISH=lockdata/",PARK_LOCK_Buffer,",1,2\r\n");
+;;;536    	
+;;;537    			USART_OUT(USART1, "heartbeat=%s\r\n", send_buff);
+;;;538    			ret = gprs_send_at(send_buff, ">", 300, 2000);
+;;;539    			if(ret != NULL)
+;;;540    			{
+;;;541    				memset(heartbeat_buff, 0, 2);
+;;;542    				heartbeat_buff[0] = 0x30;
+;;;543    				ret = gprs_send_at(heartbeat_buff, "OK", 300, 0);
+;;;544    				if(ret != NULL)
+;;;545    				{
+;;;546    					
+;;;547    				}	
 ;;;548    			}
-;;;549    		}	
-;;;550    		
-;;;551    		
-;;;552    //		if(timer_is_timeout_1ms(timer_gps_cycle, 1000*60*60*24) == 0)
-;;;553    //		{
-;;;554    //			gps_flag = 1;
-;;;555    //		}
-;;;556    		
-;;;557    		
-;;;558    
-;;;559    	}	 
-;;;560    }
-;;;561     
+;;;549    			else
+;;;550    			{
+;;;551    				
+;;;552    			}
+;;;553    		}	
+;;;554    		
+;;;555    		
+;;;556    //		if(timer_is_timeout_1ms(timer_gps_cycle, 1000*60*60*24) == 0)
+;;;557    //		{
+;;;558    //			gps_flag = 1;
+;;;559    //		}
+;;;560    		
+;;;561    		
+;;;562    
+;;;563    	}	 
+;;;564    }
+;;;565     
                           ENDP
 
-00008a  0000              DCW      0x0000
-                  |L1.140|
-00008c  75617274          DCB      "uart1 is ok\r\n",0
-000090  31206973
-000094  206f6b0d
-000098  0a00    
-00009a  00                DCB      0
-00009b  00                DCB      0
-                  |L1.156|
+                  |L1.104|
+000068  75617274          DCB      "uart1 is ok\r\n",0
+00006c  31206973
+000070  206f6b0d
+000074  0a00    
+000076  00                DCB      0
+000077  00                DCB      0
+                  |L1.120|
                           DCD      0x40013800
+                  |L1.124|
+00007c  75617274          DCB      "uart4 is ok\r\n",0
+000080  34206973
+000084  206f6b0d
+000088  0a00    
+00008a  00                DCB      0
+00008b  00                DCB      0
+                  |L1.140|
+                          DCD      0x40004c00
+                  |L1.144|
+000090  434c4f53          DCB      "CLOSE",0
+000094  4500    
+000096  00                DCB      0
+000097  00                DCB      0
+                  |L1.152|
+                          DCD      mqtt_buff
+                  |L1.156|
+                          DCD      ||p1||
                   |L1.160|
                           DCD      mqtt_flag
                   |L1.164|
-0000a4  6d717474          DCB      "mqtt_connect ok\r\n",0
-0000a8  5f636f6e
-0000ac  6e656374
-0000b0  206f6b0d
-0000b4  0a00    
-0000b6  00                DCB      0
-0000b7  00                DCB      0
-                  |L1.184|
-0000b8  434c4f53          DCB      "CLOSE",0
-0000bc  4500    
-0000be  00                DCB      0
-0000bf  00                DCB      0
-                  |L1.192|
-                          DCD      mqtt_buff
-                  |L1.196|
-                          DCD      ||p1||
-                  |L1.200|
                           DCD      gprs_status
-                  |L1.204|
-0000cc  4d515454          DCB      "MQTT SERVER CLOSE\r\n",0
-0000d0  20534552
-0000d4  56455220
-0000d8  434c4f53
-0000dc  450d0a00
+                  |L1.168|
+0000a8  4d515454          DCB      "MQTT SERVER CLOSE\r\n",0
+0000ac  20534552
+0000b0  56455220
+0000b4  434c4f53
+0000b8  450d0a00
 
                           AREA ||i.test_encrypt_ecb||, CODE, READONLY, ALIGN=2
 

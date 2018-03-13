@@ -53,15 +53,15 @@ typedef struct
 */
 void usart1_init(u32 band_rate, u8 word_length, u8 parity, u8 stop_bit);
 void usart2_init(u32 band_rate);
-void usart3_init(u32 band_rate);
+void usart4_init(u32 band_rate);
 
 void USART1_IRQHandler(void);
 void USART2_IRQHandler(void);
-void USART3_IRQHandler(void);
+void UART4_IRQHandler(void);
 
 void usart1_recv_data(void);
 void usart2_recv_data(void);
-void usart3_recv_data(void);
+void usart4_recv_data(void);
 
 void USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 void usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);

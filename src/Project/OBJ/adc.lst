@@ -24280,6 +24280,7 @@ N	timer_bell_2,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
+N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
 N	timer_max

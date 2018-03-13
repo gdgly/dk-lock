@@ -25967,6 +25967,7 @@ N	timer_bell_2,
 N	timer_uart1,
 N	timer_uart2,
 N	timer_uart3,
+N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
 N	timer_max
@@ -26152,15 +26153,15 @@ N*******************************************************************************
 N*/
 Nvoid usart1_init(u32 band_rate, u8 word_length, u8 parity, u8 stop_bit);
 Nvoid usart2_init(u32 band_rate);
-Nvoid usart3_init(u32 band_rate);
+Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid USART3_IRQHandler(void);
+Nvoid UART4_IRQHandler(void);
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart3_recv_data(void);
+Nvoid usart4_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -26523,32 +26524,44 @@ N
 N	USART_OUT(USART1, "uart1 is ok\r\n");
 X	USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "uart1 is ok\r\n");
 N
-N	
-N//	mqtt_keep_alive();
-N//	
-N//	mqtt_qos0();
-N	
+N	USART_OUT(UART4, "uart4 is ok\r\n");
+X	USART_OUT(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4C00)), "uart4 is ok\r\n");
 N	while(1)
 N	{
 N	
-N		if(mqtt_flag == 0)
-N		{
-N			gprs_init_task();
-N			timer_delay_1ms(1500);
-N			mqtt_con = mqtt_connect();
-N			if(1 == mqtt_con)
-N			{
-N				mqtt_flag = 1;
-N				timer_delay_1ms(20);
-N				USART_OUT(USART1, "mqtt_connect ok\r\n");
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_connect ok\r\n");
-N			}
-N		}
+N//		if(mqtt_flag == 0)
+N//		{
+N//			gprs_init_task();
+N//			timer_delay_1ms(1500);
+N//			mqtt_con = mqtt_connect();
+N//			if(1 == mqtt_con)
+N//			{
+N//				mqtt_flag = 1;
+N//				timer_delay_1ms(20);
+N//				USART_OUT(USART1, "mqtt_connect ok\r\n");
+N//			}
+N//		}
 N		
-N		usart2_recv_data();
+N	
 N		usart1_recv_data();
-N		
+N		usart2_recv_data();
+N//		usart4_recv_data();
 N
+N		
+N		
+N		
+N		
+N	
+N//		if(timer_is_timeout_1ms(timer_keep_alive, 1000*20) == 0)
+N		{
+N			mqtt_keep_alive();
+N		}
+N
+N//			timer_delay_1ms(5000);
+N
+N
+N		
+N		
 N		p1 = strstr((char*)mqtt_buff->pdata, "CLOSE");
 N		if(p1 !=NULL)
 X		if(p1 !=0)
@@ -26559,14 +26572,6 @@ N			gprs_status = 0;
 N			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
 X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "MQTT SERVER CLOSE\r\n");
 N		}
-N//		if(timer_is_timeout_1ms(timer_keep_alive, 1000*30) == 0)
-N//		{
-N//			mqtt_keep_alive();
-N//		}
-N
-N//			timer_delay_1ms(5000);
-N//		}
-N
 N	}
 N	
 N	

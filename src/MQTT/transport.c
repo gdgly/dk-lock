@@ -67,6 +67,8 @@ int transport_sendPacketBuffer(int sock, unsigned char* buf, int buflen)
 	end_char[2] = 0x0A;//½áÊø×Ö·û
 	end_char[3] = '\0';
 	
+	memset(mqtt_buff, 0, sizeof(usart_buff_t));
+	mqtt_buff_len = 0;
 	ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
 	if(ret != NULL)
 	{
@@ -405,14 +407,17 @@ void mqtt_keep_alive(void)
 	
 //	if(timer_is_timeout_1ms(timer_mqtt_keep_alive, 1000*60) == 0)
 	{
-		len = MQTTSerialize_pingreq(buf, buflen);
-		rc = transport_sendPacketBuffer(mysock, buf, len);
-//		usart_send(USART1, buf, len);
-		
+//		len = MQTTSerialize_pingreq(buf, buflen);
+//		rc = transport_sendPacketBuffer(mysock, buf, len);
+//		
 		while(1)
 		{
-			timer_delay_1ms(50);
-			if(MQTTPacket_read(buf, buflen, transport_getdata) == PINGRESP)
+			len = MQTTSerialize_pingreq(buf, buflen);
+			rc = transport_sendPacketBuffer(mysock, buf, len);
+			
+			timer_delay_1ms(500);
+			rc = MQTTPacket_read(buf, buflen, transport_getdata);
+			if(rc == PINGREQ)
 			{
 				USART_OUT(USART1, "mqtt_keep_alive ok\r\n", buf);
 				break;

@@ -25485,15 +25485,15 @@ N*******************************************************************************
 N*/
 Nvoid usart1_init(u32 band_rate, u8 word_length, u8 parity, u8 stop_bit);
 Nvoid usart2_init(u32 band_rate);
-Nvoid usart3_init(u32 band_rate);
+Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid USART3_IRQHandler(void);
+Nvoid UART4_IRQHandler(void);
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart3_recv_data(void);
+Nvoid usart4_recv_data(void);
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -25550,7 +25550,7 @@ N
 Nextern u8 usart2_buff[512];
 Nextern u16 usart2_cnt;
 Nextern u8 PARK_LOCK_Buffer[17];
-Nextern u8 protocol_buff[512];
+N
 N
 Ns8 a;
 N
@@ -25566,41 +25566,36 @@ N	u8 *par = NULL;
 X	u8 *par = 0;
 N	usart2_recv_data();
 N		
-N	//topic: lock/0018131408143929,1
-N	par = strstr((char *)protocol_buff, "topic:");
-N	
-N	if(par != NULL)
-X	if(par != 0)
-N	{
-N		par = str_picked(protocol_buff, "topic:", ",", mt.topic);
-N		if(par != NULL)
-X		if(par != 0)
-N		{
-N			
-N		}
-N	}
-N	
-N	sprintf((char*)topic, "%s%s", "lock/", PARK_LOCK_Buffer);
-N	
-N	if(strcmp(topic_tmp, topic) == 0)
-N	{
-N		
-N	}
-N	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
-X	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != 0)
-N	{
-N		
-N	}
-N	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
-X	else if(strstr((char *)usart2_buff, (char*)topic) != 0)
-N	{
-N		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
-X		if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0010))==0 || GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), ((uint16_t)0x0020)) == 0)
-N		{
-N			
-N			
-N		}
-N	}
+N//	//topic: lock/0018131408143929,1
+N//	par = strstr((char *)protocol_buff, "topic:");
+N//	
+N//	if(par != NULL)
+N//	{
+N//		par = str_picked(protocol_buff, "topic:", ",", mt.topic);
+N//		if(par != NULL)
+N//		{
+N//			
+N//		}
+N//	}
+N//	
+N//	sprintf((char*)topic, "%s%s", "lock/", PARK_LOCK_Buffer);
+N//	
+N//	if(strcmp(topic_tmp, topic) == 0)
+N//	{
+N//		
+N//	}
+N//	if(strstr((char *)usart2_buff, "+STATUS: MQTT CLOSE") != NULL)
+N//	{
+N//		
+N//	}
+N//	else if(strstr((char *)usart2_buff, (char*)topic) != NULL)
+N//	{
+N//		if(LOCK_ON_READ()==0 || LOCK_OFF_READ() == 0)
+N//		{
+N//			
+N//			
+N//		}
+N//	}
 N
 N
 N}
