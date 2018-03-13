@@ -76,21 +76,11 @@ u8 topic_id = 0;
 */
 void gprs_power_on(void)
 {
-//	OS_ERR err;
-//	
-//	GPIO_SetBits(GPIOC, GPIO_Pin_1);				//GPRS_PWR
-//	GPIO_ResetBits(GPIOB, GPIO_Pin_12);
-////	OSTimeDlyHMSM(0,0,0,500,OS_OPT_TIME_HMSM_STRICT,&err);
 
 //	
-//	GPIO_ResetBits(GPIOA, GPIO_Pin_7);
-////	OSTimeDlyHMSM(0,0,0,20,OS_OPT_TIME_HMSM_STRICT,&err);
-//	GPIO_SetBits(GPIOA, GPIO_Pin_7);				//GPRS_RESET
-////	OSTimeDlyHMSM(0,0,0,50,OS_OPT_TIME_HMSM_STRICT,&err);
-
-//	
-//	GPIO_ResetBits(GPIOB, GPIO_Pin_12);
-////	OSTimeDlyHMSM(0,0,1,100,OS_OPT_TIME_HMSM_STRICT,&err);
+	GPIO_SetBits(GPIOC, GPIO_Pin_2);				//GPRS_PWR
+	GPIO_ResetBits(GPIOC, GPIO_Pin_2);
+	timer_delay_1ms(1200);
 	
 }
 
@@ -416,14 +406,11 @@ void gprs_init_task(void)
 		switch(gprs_status)
 		{
 			case 0:
-//				gprs_power_on();
-//				OSTimeDlyHMSM(0,0,3,0,OS_OPT_TIME_HMSM_STRICT,&err);
-//				ret = gprs_send_at("AT+CFUN=1,1\r\n", "OK", 800,10000);
-//				if(ret != NULL)
-				{
-					gprs_status = 1;
-					gprs_err_cnt = 0;
-				}
+				gprs_power_on();
+			
+				gprs_status = 1;
+				gprs_err_cnt = 0;
+			
 			break;
 					
 			case 1:
@@ -461,7 +448,7 @@ void gprs_init_task(void)
 			break;
 				
 			case 3:
-				ret = gprs_send_at("AT+GSN\r\n", "OK", 800, 10000);
+				ret = gprs_send_at("AT+GGSN\r\n", "OK", 800, 10000);
 				if (ret != NULL)
 				{
 					gprs_status++;

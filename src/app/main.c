@@ -167,27 +167,27 @@ int main(void)
                          
 	USART_OUT(USART1, "uart1 is ok\r\n");
 
-	USART_OUT(UART4, "uart4 is ok\r\n");
+//	USART_OUT(UART4, "uart4 is ok\r\n");
 	while(1)
 	{
 	
-//		if(mqtt_flag == 0)
-//		{
-//			gprs_init_task();
-//			timer_delay_1ms(1500);
-//			mqtt_con = mqtt_connect();
-//			if(1 == mqtt_con)
-//			{
-//				mqtt_flag = 1;
-//				timer_delay_1ms(20);
-//				USART_OUT(USART1, "mqtt_connect ok\r\n");
-//			}
-//		}
+		if(mqtt_flag == 0)
+		{
+			gprs_init_task();
+			timer_delay_1ms(1500);
+			mqtt_con = mqtt_connect();
+			if(1 == mqtt_con)
+			{
+				mqtt_flag = 1;
+				timer_delay_1ms(20);
+				USART_OUT(USART1, "mqtt_connect ok\r\n");
+			}
+		}
 		
 	
 		usart1_recv_data();
 		usart2_recv_data();
-//		usart4_recv_data();
+
 
 		
 		

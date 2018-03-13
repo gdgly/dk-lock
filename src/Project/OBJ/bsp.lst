@@ -24604,20 +24604,16 @@ N  	GPIO_Init(GPIOB, &gpio_init_structure);
 X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00)), &gpio_init_structure);
 N	
 N	
-N	// UART4
-N	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
-X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0400);				
-N  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
-N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
-N  	GPIO_Init(GPIOC, &gpio_init_structure);
-X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), &gpio_init_structure);
-N	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
-X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0800);				
-N  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
-N  	GPIO_Init(GPIOC, &gpio_init_structure);
-X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), &gpio_init_structure);
-N	
+N//	// UART4
+N//	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
+N//  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
+N//  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
+N//  	GPIO_Init(GPIOC, &gpio_init_structure);
+N//	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
+N//  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+N//  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
+N//  	GPIO_Init(GPIOC, &gpio_init_structure);
+N//	
 N	//I2C
 N	gpio_init_structure.GPIO_Pin = GPIO_Pin_0;
 X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0001);
@@ -24659,8 +24655,8 @@ N  	GPIO_Init(GPIOC, &gpio_init_structure);
 X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1000)), &gpio_init_structure);
 N	
 N	//BELL
-N	gpio_init_structure.GPIO_Pin = GPIO_Pin_3;
-X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0008);
+N	gpio_init_structure.GPIO_Pin = GPIO_Pin_2;
+X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0004);
 N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
 N	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
 N  	GPIO_Init(GPIOC, &gpio_init_structure);
@@ -24756,7 +24752,7 @@ N//	pwm_gpio_init();
 N//	iwatchdog_config();
 N	usart1_init(115200, 8, 0, 1);
 N	usart2_init(115200);
-N	usart4_init(115200);
+N//	usart4_init(115200);
 N
 N	timer2_init(200, 41);
 N//	pwm_timer3_init(9999, 143);

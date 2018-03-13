@@ -26,21 +26,19 @@
 ;;;270    	usart2_init(115200);
 00001c  f44f30e1          MOV      r0,#0x1c200
 000020  f7fffffe          BL       usart2_init
-;;;271    	usart4_init(115200);
-000024  f44f30e1          MOV      r0,#0x1c200
-000028  f7fffffe          BL       usart4_init
+;;;271    //	usart4_init(115200);
 ;;;272    
 ;;;273    	timer2_init(200, 41);
-00002c  2129              MOVS     r1,#0x29
-00002e  20c8              MOVS     r0,#0xc8
-000030  f7fffffe          BL       timer2_init
+000024  2129              MOVS     r1,#0x29
+000026  20c8              MOVS     r0,#0xc8
+000028  f7fffffe          BL       timer2_init
 ;;;274    //	pwm_timer3_init(9999, 143);
 ;;;275    //	pwm3_init(30);
 ;;;276    
 ;;;277    	Adc_Init();
-000034  f7fffffe          BL       Adc_Init
+00002c  f7fffffe          BL       Adc_Init
 ;;;278    }
-000038  bd10              POP      {r4,pc}
+000030  bd10              POP      {r4,pc}
 ;;;279    
                           ENDP
 
@@ -236,7 +234,7 @@
 000012  f88d0002          STRB     r0,[sp,#2]
 ;;;115      	GPIO_Init(GPIOA, &gpio_init_structure);
 000016  4669              MOV      r1,sp
-000018  485d              LDR      r0,|L4.400|
+000018  484f              LDR      r0,|L4.344|
 00001a  f7fffffe          BL       GPIO_Init
 ;;;116    	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				
 00001e  f44f6080          MOV      r0,#0x400
@@ -249,7 +247,7 @@
 00002e  f88d0002          STRB     r0,[sp,#2]
 ;;;119      	GPIO_Init(GPIOA, &gpio_init_structure);
 000032  4669              MOV      r1,sp
-000034  4856              LDR      r0,|L4.400|
+000034  4848              LDR      r0,|L4.344|
 000036  f7fffffe          BL       GPIO_Init
 ;;;120    	
 ;;;121    	// UART2
@@ -264,7 +262,7 @@
 000048  f88d0002          STRB     r0,[sp,#2]
 ;;;125      	GPIO_Init(GPIOA, &gpio_init_structure);
 00004c  4669              MOV      r1,sp
-00004e  4850              LDR      r0,|L4.400|
+00004e  4842              LDR      r0,|L4.344|
 000050  f7fffffe          BL       GPIO_Init
 ;;;126    	gpio_init_structure.GPIO_Pin = GPIO_Pin_3;				
 000054  2008              MOVS     r0,#8
@@ -277,7 +275,7 @@
 000062  f88d0002          STRB     r0,[sp,#2]
 ;;;129      	GPIO_Init(GPIOA, &gpio_init_structure);
 000066  4669              MOV      r1,sp
-000068  4849              LDR      r0,|L4.400|
+000068  483b              LDR      r0,|L4.344|
 00006a  f7fffffe          BL       GPIO_Init
 ;;;130    
 ;;;131    
@@ -293,7 +291,7 @@
 00007e  f88d0002          STRB     r0,[sp,#2]
 ;;;136      	GPIO_Init(GPIOB, &gpio_init_structure);
 000082  4669              MOV      r1,sp
-000084  4843              LDR      r0,|L4.404|
+000084  4835              LDR      r0,|L4.348|
 000086  f7fffffe          BL       GPIO_Init
 ;;;137    	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
 00008a  f44f6000          MOV      r0,#0x800
@@ -306,151 +304,133 @@
 00009a  f88d0002          STRB     r0,[sp,#2]
 ;;;140      	GPIO_Init(GPIOB, &gpio_init_structure);
 00009e  4669              MOV      r1,sp
-0000a0  483c              LDR      r0,|L4.404|
+0000a0  482e              LDR      r0,|L4.348|
 0000a2  f7fffffe          BL       GPIO_Init
 ;;;141    	
 ;;;142    	
-;;;143    	// UART4
-;;;144    	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
-0000a6  f44f6080          MOV      r0,#0x400
-0000aa  f8ad0000          STRH     r0,[sp,#0]
-;;;145      	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
-0000ae  2018              MOVS     r0,#0x18
-0000b0  f88d0003          STRB     r0,[sp,#3]
-;;;146      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
-0000b4  2003              MOVS     r0,#3
-0000b6  f88d0002          STRB     r0,[sp,#2]
-;;;147      	GPIO_Init(GPIOC, &gpio_init_structure);
-0000ba  4669              MOV      r1,sp
-0000bc  4836              LDR      r0,|L4.408|
-0000be  f7fffffe          BL       GPIO_Init
-;;;148    	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
-0000c2  f44f6000          MOV      r0,#0x800
-0000c6  f8ad0000          STRH     r0,[sp,#0]
-;;;149      	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-0000ca  2004              MOVS     r0,#4
-0000cc  f88d0003          STRB     r0,[sp,#3]
-;;;150      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
-0000d0  2003              MOVS     r0,#3
-0000d2  f88d0002          STRB     r0,[sp,#2]
-;;;151      	GPIO_Init(GPIOC, &gpio_init_structure);
-0000d6  4669              MOV      r1,sp
-0000d8  482f              LDR      r0,|L4.408|
-0000da  f7fffffe          BL       GPIO_Init
-;;;152    	
+;;;143    //	// UART4
+;;;144    //	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
+;;;145    //  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
+;;;146    //  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
+;;;147    //  	GPIO_Init(GPIOC, &gpio_init_structure);
+;;;148    //	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
+;;;149    //  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+;;;150    //  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
+;;;151    //  	GPIO_Init(GPIOC, &gpio_init_structure);
+;;;152    //	
 ;;;153    	//I2C
 ;;;154    	gpio_init_structure.GPIO_Pin = GPIO_Pin_0;
-0000de  2001              MOVS     r0,#1
-0000e0  f8ad0000          STRH     r0,[sp,#0]
+0000a6  2001              MOVS     r0,#1
+0000a8  f8ad0000          STRH     r0,[sp,#0]
 ;;;155      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-0000e4  2003              MOVS     r0,#3
-0000e6  f88d0002          STRB     r0,[sp,#2]
+0000ac  2003              MOVS     r0,#3
+0000ae  f88d0002          STRB     r0,[sp,#2]
 ;;;156    	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
-0000ea  2010              MOVS     r0,#0x10
-0000ec  f88d0003          STRB     r0,[sp,#3]
+0000b2  2010              MOVS     r0,#0x10
+0000b4  f88d0003          STRB     r0,[sp,#3]
 ;;;157      	GPIO_Init(GPIOB, &gpio_init_structure);
-0000f0  4669              MOV      r1,sp
-0000f2  4828              LDR      r0,|L4.404|
-0000f4  f7fffffe          BL       GPIO_Init
+0000b8  4669              MOV      r1,sp
+0000ba  4828              LDR      r0,|L4.348|
+0000bc  f7fffffe          BL       GPIO_Init
 ;;;158    	
 ;;;159    	gpio_init_structure.GPIO_Pin = GPIO_Pin_1;
-0000f8  2002              MOVS     r0,#2
-0000fa  f8ad0000          STRH     r0,[sp,#0]
+0000c0  2002              MOVS     r0,#2
+0000c2  f8ad0000          STRH     r0,[sp,#0]
 ;;;160      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-0000fe  2003              MOVS     r0,#3
-000100  f88d0002          STRB     r0,[sp,#2]
+0000c6  2003              MOVS     r0,#3
+0000c8  f88d0002          STRB     r0,[sp,#2]
 ;;;161    	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_OD;          
-000104  2014              MOVS     r0,#0x14
-000106  f88d0003          STRB     r0,[sp,#3]
+0000cc  2014              MOVS     r0,#0x14
+0000ce  f88d0003          STRB     r0,[sp,#3]
 ;;;162      	GPIO_Init(GPIOB, &gpio_init_structure);
-00010a  4669              MOV      r1,sp
-00010c  4821              LDR      r0,|L4.404|
-00010e  f7fffffe          BL       GPIO_Init
+0000d2  4669              MOV      r1,sp
+0000d4  4821              LDR      r0,|L4.348|
+0000d6  f7fffffe          BL       GPIO_Init
 ;;;163    	
 ;;;164    	
 ;;;165    	//button
 ;;;166    	gpio_init_structure.GPIO_Pin = GPIO_Pin_6;
-000112  2040              MOVS     r0,#0x40
-000114  f8ad0000          STRH     r0,[sp,#0]
+0000da  2040              MOVS     r0,#0x40
+0000dc  f8ad0000          STRH     r0,[sp,#0]
 ;;;167    	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
-000118  2048              MOVS     r0,#0x48
-00011a  f88d0003          STRB     r0,[sp,#3]
+0000e0  2048              MOVS     r0,#0x48
+0000e2  f88d0003          STRB     r0,[sp,#3]
 ;;;168      	GPIO_Init(GPIOC, &gpio_init_structure);
-00011e  4669              MOV      r1,sp
-000120  481d              LDR      r0,|L4.408|
-000122  f7fffffe          BL       GPIO_Init
+0000e6  4669              MOV      r1,sp
+0000e8  481d              LDR      r0,|L4.352|
+0000ea  f7fffffe          BL       GPIO_Init
 ;;;169    	
 ;;;170    	
 ;;;171    	//LOCK ON   OFF
 ;;;172    	gpio_init_structure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
-000126  2030              MOVS     r0,#0x30
-000128  f8ad0000          STRH     r0,[sp,#0]
+0000ee  2030              MOVS     r0,#0x30
+0000f0  f8ad0000          STRH     r0,[sp,#0]
 ;;;173      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-00012c  2003              MOVS     r0,#3
-00012e  f88d0002          STRB     r0,[sp,#2]
+0000f4  2003              MOVS     r0,#3
+0000f6  f88d0002          STRB     r0,[sp,#2]
 ;;;174    	gpio_init_structure.GPIO_Mode = GPIO_Mode_IPU;          
-000132  2048              MOVS     r0,#0x48
-000134  f88d0003          STRB     r0,[sp,#3]
+0000fa  2048              MOVS     r0,#0x48
+0000fc  f88d0003          STRB     r0,[sp,#3]
 ;;;175      	GPIO_Init(GPIOA, &gpio_init_structure);
-000138  4669              MOV      r1,sp
-00013a  4815              LDR      r0,|L4.400|
-00013c  f7fffffe          BL       GPIO_Init
+000100  4669              MOV      r1,sp
+000102  4815              LDR      r0,|L4.344|
+000104  f7fffffe          BL       GPIO_Init
 ;;;176    	
 ;;;177    	//MOTO D+ MOTO D-
 ;;;178    	gpio_init_structure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;
-000140  2003              MOVS     r0,#3
-000142  f8ad0000          STRH     r0,[sp,#0]
+000108  2003              MOVS     r0,#3
+00010a  f8ad0000          STRH     r0,[sp,#0]
 ;;;179      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-000146  f88d0002          STRB     r0,[sp,#2]
+00010e  f88d0002          STRB     r0,[sp,#2]
 ;;;180    	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
-00014a  2010              MOVS     r0,#0x10
-00014c  f88d0003          STRB     r0,[sp,#3]
+000112  2010              MOVS     r0,#0x10
+000114  f88d0003          STRB     r0,[sp,#3]
 ;;;181      	GPIO_Init(GPIOC, &gpio_init_structure);
-000150  4669              MOV      r1,sp
-000152  4811              LDR      r0,|L4.408|
-000154  f7fffffe          BL       GPIO_Init
+000118  4669              MOV      r1,sp
+00011a  4811              LDR      r0,|L4.352|
+00011c  f7fffffe          BL       GPIO_Init
 ;;;182    	
 ;;;183    	//BELL
-;;;184    	gpio_init_structure.GPIO_Pin = GPIO_Pin_3;
-000158  2008              MOVS     r0,#8
-00015a  f8ad0000          STRH     r0,[sp,#0]
+;;;184    	gpio_init_structure.GPIO_Pin = GPIO_Pin_2;
+000120  2004              MOVS     r0,#4
+000122  f8ad0000          STRH     r0,[sp,#0]
 ;;;185      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-00015e  2003              MOVS     r0,#3
-000160  f88d0002          STRB     r0,[sp,#2]
+000126  2003              MOVS     r0,#3
+000128  f88d0002          STRB     r0,[sp,#2]
 ;;;186    	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
-000164  2010              MOVS     r0,#0x10
-000166  f88d0003          STRB     r0,[sp,#3]
+00012c  2010              MOVS     r0,#0x10
+00012e  f88d0003          STRB     r0,[sp,#3]
 ;;;187      	GPIO_Init(GPIOC, &gpio_init_structure);
-00016a  4669              MOV      r1,sp
-00016c  480a              LDR      r0,|L4.408|
-00016e  f7fffffe          BL       GPIO_Init
+000132  4669              MOV      r1,sp
+000134  480a              LDR      r0,|L4.352|
+000136  f7fffffe          BL       GPIO_Init
 ;;;188    	
 ;;;189    	
 ;;;190    	//GPS power enable
 ;;;191    	gpio_init_structure.GPIO_Pin = GPIO_Pin_4;
-000172  2010              MOVS     r0,#0x10
-000174  f8ad0000          STRH     r0,[sp,#0]
+00013a  2010              MOVS     r0,#0x10
+00013c  f8ad0000          STRH     r0,[sp,#0]
 ;;;192      	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
-000178  2003              MOVS     r0,#3
-00017a  f88d0002          STRB     r0,[sp,#2]
+000140  2003              MOVS     r0,#3
+000142  f88d0002          STRB     r0,[sp,#2]
 ;;;193    	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
-00017e  2010              MOVS     r0,#0x10
-000180  f88d0003          STRB     r0,[sp,#3]
+000146  2010              MOVS     r0,#0x10
+000148  f88d0003          STRB     r0,[sp,#3]
 ;;;194      	GPIO_Init(GPIOC, &gpio_init_structure);
-000184  4669              MOV      r1,sp
-000186  4804              LDR      r0,|L4.408|
-000188  f7fffffe          BL       GPIO_Init
+00014c  4669              MOV      r1,sp
+00014e  4804              LDR      r0,|L4.352|
+000150  f7fffffe          BL       GPIO_Init
 ;;;195    }
-00018c  bd08              POP      {r3,pc}
+000154  bd08              POP      {r3,pc}
 ;;;196    
                           ENDP
 
-00018e  0000              DCW      0x0000
-                  |L4.400|
+000156  0000              DCW      0x0000
+                  |L4.344|
                           DCD      0x40010800
-                  |L4.404|
+                  |L4.348|
                           DCD      0x40010c00
-                  |L4.408|
+                  |L4.352|
                           DCD      0x40011000
 
                           AREA ||i.iwatchdog_clear||, CODE, READONLY, ALIGN=1

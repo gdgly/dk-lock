@@ -140,16 +140,16 @@ void gpio_init(void)
   	GPIO_Init(GPIOB, &gpio_init_structure);
 	
 	
-	// UART4
-	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
-  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
-  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
-  	GPIO_Init(GPIOC, &gpio_init_structure);
-	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
-  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
-  	GPIO_Init(GPIOC, &gpio_init_structure);
-	
+//	// UART4
+//	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
+//  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
+//  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
+//  	GPIO_Init(GPIOC, &gpio_init_structure);
+//	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
+//  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+//  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
+//  	GPIO_Init(GPIOC, &gpio_init_structure);
+//	
 	//I2C
 	gpio_init_structure.GPIO_Pin = GPIO_Pin_0;
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -181,7 +181,7 @@ void gpio_init(void)
   	GPIO_Init(GPIOC, &gpio_init_structure);
 	
 	//BELL
-	gpio_init_structure.GPIO_Pin = GPIO_Pin_3;
+	gpio_init_structure.GPIO_Pin = GPIO_Pin_2;
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
 	gpio_init_structure.GPIO_Mode = GPIO_Mode_Out_PP;          
   	GPIO_Init(GPIOC, &gpio_init_structure);
@@ -268,7 +268,7 @@ void bsp_init(void)
 //	iwatchdog_config();
 	usart1_init(115200, 8, 0, 1);
 	usart2_init(115200);
-	usart4_init(115200);
+//	usart4_init(115200);
 
 	timer2_init(200, 41);
 //	pwm_timer3_init(9999, 143);
