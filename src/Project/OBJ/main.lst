@@ -26568,7 +26568,6 @@ X		if(p1 !=0)
 N		{
 N			memset(mqtt_buff, 0, sizeof(usart_buff_t));	
 N			mqtt_flag = 0;
-N			gprs_status = 0;
 N			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
 X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "MQTT SERVER CLOSE\r\n");
 N		}
