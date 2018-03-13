@@ -23,7 +23,11 @@ I (..\tplib\aes.h)(0x5A7928FC)
 I (..\driver\usart.h)(0x5AA7673E)
 I (..\driver\gprs.h)(0x5AA50867)
 I (D:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x569DEA3A)
+<<<<<<< HEAD
 F (..\app\main.c)(0x5AA76CC9)(-c --cpu Cortex-M3 -g -W -O0 --apcs=interwork --split_sections --asm --interleave --asm_dir ".\\OBJ\\" -I ..\driver -I ..\BSP -I ..\system -I ..\tplib -I ..\Libraries\STM32F10x_StdPeriph_Driver\inc -I ..\Libraries\CMSIS\CM3\CoreSupport -I ..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x -I ..\app -I ..\MQTT-I E:\github\dk-lock\src\Project\RTE-I D:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-I D:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="518" -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER -DSTM32F10X_HD-o .\obj\main.o --list_dir ".\\OBJ\\" --list --omf_browse .\obj\main.crf --depend .\obj\main.d)
+=======
+F (..\app\main.c)(0x5AA6650A)(-c --cpu Cortex-M3 -g -W -O0 --apcs=interwork --split_sections --asm --interleave --asm_dir ".\\OBJ\\" -I ..\driver -I ..\BSP -I ..\system -I ..\tplib -I ..\Libraries\STM32F10x_StdPeriph_Driver\inc -I ..\Libraries\CMSIS\CM3\CoreSupport -I ..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x -I ..\app -I ..\MQTT-I E:\github\dk-lock\src\Project\RTE-I D:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-I D:\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="518" -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER -DSTM32F10X_HD-o .\obj\main.o --list_dir ".\\OBJ\\" --list --omf_browse .\obj\main.crf --depend .\obj\main.d)
+>>>>>>> parent of 8334634... c
 I (..\driver\gps.h)(0x5A7FA400)
 I (..\BSP\bsp.h)(0x5A7FA3FC)
 I (..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h)(0x5A7FA3FD)
