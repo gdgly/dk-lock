@@ -172,17 +172,33 @@ u8* gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout)
 
 
 
-void gprs_send_data(u8 *data, u16 data_len, u16 waittime)
+int gprs_send_data(u8 *data, u16 data_len, u8 *ack, u16 waittime)
 {
-	u8 res = 1;
-	u8 buff[512];	
+	u8 res = 1;	
 
 	usart_send(USART2, data, data_len);	
 	
 	timer_delay_1ms(waittime);				//AT指令延时
 
 	USART_OUT(USART1, usart2_rx_buff->pdata);
+	
+	timer_is_timeout_1ms(timer_at, 0);	//开始定时器timer_at
+	while (res)
+	{	
+		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));
 		
+		usart_send(USART2, data, data_len);							
+		timer_delay_1ms(waittime);				//AT指令延时
+		USART_OUT(USART1, usart2_rx_buff->pdata);
+		if (gprs_check_cmd(usart2_rx_buff->pdata, ack))	
+		{
+			res = 0;				//监测到正确的应答数据
+			usart2_rx_status = 0;	//数据处理完 开始接收数据
+			
+			memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	
+			
+			return buff;
+		}
 }
 
 

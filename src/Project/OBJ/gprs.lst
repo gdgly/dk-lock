@@ -25840,10 +25840,10 @@ N}
 N
 N
 N
-Nvoid gprs_send_data(u8 *data, u16 data_len, u16 waittime)
+Nint gprs_send_data(u8 *data, u16 data_len, u8 *ack, u16 waittime)
+E "..\driver\gprs.c" 175 5 declaration is incompatible with "void gprs_send_data(u8 *, u16, u16)" (declared at line 61 of "..\driver\gprs.h")
 N{
-N	u8 res = 1;
-N	u8 buff[512];	
+N	u8 res = 1;	
 N
 N	usart_send(USART2, data, data_len);	
 X	usart_send(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), data, data_len);	
@@ -25852,10 +25852,32 @@ N	timer_delay_1ms(waittime);				//AT指令延时
 N
 N	USART_OUT(USART1, usart2_rx_buff->pdata);
 X	USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), usart2_rx_buff->pdata);
+N	
+N	timer_is_timeout_1ms(timer_at, 0);	//开始定时器timer_at
+N	while (res)
+N	{	
+N		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));
 N		
+N		usart_send(USART2, data, data_len);							
+X		usart_send(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), data, data_len);							
+N		timer_delay_1ms(waittime);				//AT指令延时
+N		USART_OUT(USART1, usart2_rx_buff->pdata);
+X		USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), usart2_rx_buff->pdata);
+N		if (gprs_check_cmd(usart2_rx_buff->pdata, ack))	
+N		{
+N			res = 0;				//监测到正确的应答数据
+N			usart2_rx_status = 0;	//数据处理完 开始接收数据
+N			
+N			memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	
+N			
+E "..\driver\gprs.c" 200 11 identifier "buff" is undefined
+N			return buff;
+N		}
 N}
 N
 N
+E "..\driver\gprs.c" 205 1 declaration may not appear after executable statement in block
+E "..\driver\gprs.c" 205 1 expected a "}"
 Nvoid gprs_config(void)
 N{
 N	u8 *ret;
@@ -26137,7 +26159,7 @@ N				}
 N			break;
 N				
 N			case 3:
-N				ret = gprs_send_at("AT+GSN\r\n", "OK", 800, 10000);
+N				ret = gprs_send_at("AT+GGSN\r\n", "OK", 800, 10000);
 N				if (ret != NULL)
 X				if (ret != 0)
 N				{
