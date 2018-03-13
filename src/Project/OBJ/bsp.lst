@@ -24474,37 +24474,6 @@ N*Others: 无
 N*/
 Nvoid bsp_rcc_init(void)
 N{
-N//	ErrorStatus err_status;
-N
-N//	RCC_DeInit();
-N//	RCC_HSEConfig(RCC_HSE_ON);
-N
-N//	err_status = RCC_WaitForHSEStartUp();
-N
-N//	if (err_status == SUCCESS)
-N//	{        
-N//        /* HCLK = SYSCLK */
-N//        RCC_HCLKConfig(RCC_SYSCLK_Div1); 
-N//        
-N//        /* PCLK2 = HCLK */
-N//        RCC_PCLK2Config(RCC_HCLK_Div1); 
-N//        
-N//        /* PCLK1 = HCLK */
-N//        RCC_PCLK1Config(RCC_HCLK_Div1);
-N//        
-N//        /* PLLCLK = 12MHz * 6 = 72 MHz */
-N//        RCC_PLLConfig(RCC_PLLSource_HSE_Div1, RCC_PLLMul_6);
-N//        /* Enable PLL */ 
-N//        RCC_PLLCmd(ENABLE);
-N//	
-N//		while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET);
-N
-N//		RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
-N//        
-N//        /* Wait till PLL is used as system clock source */
-N//        while(RCC_GetSYSCLKSource() != 0x08);
-N//	}
-N
 N
 N	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);	
 X	RCC_APB1PeriphClockCmd(((uint32_t)0x00000001), 1);	
