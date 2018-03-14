@@ -466,7 +466,7 @@ Xextern __declspec(__nothrow) int __ARM_snprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, ...) __attribute__((__nonnull__(3)));
 N
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 N#pragma __printf_args
 Nextern _ARMABI int snprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int snprintf(char * __restrict  , size_t  ,
@@ -586,7 +586,7 @@ N    * You can use instead of sscanf to improve code size.
 N    * Returns: as sscanf.
 N    */
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 N/* C99 additions */
 Nextern _ARMABI int vfscanf(FILE * __restrict /*stream*/, const char * __restrict /*format*/, __va_list) __attribute__((__nonnull__(1,2)));
 Xextern __declspec(__nothrow) int vfscanf(FILE * __restrict  , const char * __restrict  , __va_list) __attribute__((__nonnull__(1,2)));
@@ -646,7 +646,7 @@ Nextern _ARMABI int __ARM_vsnprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int __ARM_vsnprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, __va_list /*arg*/) __attribute__((__nonnull__(3)));
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 Nextern _ARMABI int vsnprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int vsnprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, __va_list /*arg*/) __attribute__((__nonnull__(3)));
@@ -25390,8 +25390,9 @@ N//#define NVIC_VECTOR_ADDR			0x1C00
 N
 N//#define NVIC_VECTOR_ADDR			0x0000
 N
+N
+Nvoid bsp_system_reset(void);
 Nvoid iwatchdog_clear(void);
-Nvoid gprs_config(void);
 Nvoid bsp_init(void);
 N
 N
@@ -25473,7 +25474,7 @@ N
 N
 N
 N
-N#define SerialBuffDefault() {0,0,{0}}
+N#define SerialBuffDefault() {0,{0}}
 N
 N
 N
@@ -25489,11 +25490,11 @@ Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid UART4_IRQHandler(void);
+N
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart4_recv_data(void);
+N
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -25521,8 +25522,8 @@ N       Author:
 N       Modification:
 N    2. ...
 N*************************************************/
-N#ifndef _COMMON_H
-N#define _COMMON_H
+N#ifndef __COMMON_H_
+N#define __COMMON_H_
 N#include <stm32f10x.h>
 N
 N
@@ -25534,8 +25535,7 @@ N
 N
 N
 Nvoid delay(uint32_t conut);
-Nvoid system_reset(void);
-Nuint8_t *str_picked(uint8_t *src_str, uint8_t *sub_str1, uint8_t *sub_str2, uint8_t *dst_str);
+Nchar *str_picked(char *src_str, char *sub_str1, char *sub_str2, char *dst_str);
 Nuint8_t *mem_picked(uint8_t *src_str, uint8_t *sub_str, uint16_t len, uint8_t *dst_str);
 Nchar *itoa(int value, char *string, int radix);
 Nchar *mem_str(char *mem, int mem_len, char *sub_str);

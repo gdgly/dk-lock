@@ -23730,8 +23730,9 @@ N//#define NVIC_VECTOR_ADDR			0x1C00
 N
 N//#define NVIC_VECTOR_ADDR			0x0000
 N
+N
+Nvoid bsp_system_reset(void);
 Nvoid iwatchdog_clear(void);
-Nvoid gprs_config(void);
 Nvoid bsp_init(void);
 N
 N
@@ -23759,8 +23760,8 @@ N       Author:
 N       Modification:
 N    2. ...
 N*************************************************/
-N#ifndef _COMMON_H
-N#define _COMMON_H
+N#ifndef __COMMON_H_
+N#define __COMMON_H_
 N#include <stm32f10x.h>
 N
 N
@@ -23772,8 +23773,7 @@ N
 N
 N
 Nvoid delay(uint32_t conut);
-Nvoid system_reset(void);
-Nuint8_t *str_picked(uint8_t *src_str, uint8_t *sub_str1, uint8_t *sub_str2, uint8_t *dst_str);
+Nchar *str_picked(char *src_str, char *sub_str1, char *sub_str2, char *dst_str);
 Nuint8_t *mem_picked(uint8_t *src_str, uint8_t *sub_str, uint16_t len, uint8_t *dst_str);
 Nchar *itoa(int value, char *string, int radix);
 Nchar *mem_str(char *mem, int mem_len, char *sub_str);
@@ -23816,6 +23816,7 @@ N	timer_uart3,
 N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
+N	timer_at_data,
 N	timer_max
 N};
 N
@@ -23885,7 +23886,7 @@ N
 N
 N
 N
-N#define SerialBuffDefault() {0,0,{0}}
+N#define SerialBuffDefault() {0,{0}}
 N
 N
 N
@@ -23901,11 +23902,11 @@ Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid UART4_IRQHandler(void);
+N
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart4_recv_data(void);
+N
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -24479,10 +24480,8 @@ N	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 X	RCC_APB1PeriphClockCmd(((uint32_t)0x00000001), 1);	
 N	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);	
 X	RCC_APB1PeriphClockCmd(((uint32_t)0x00020000), 1);	
-N	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-X	RCC_APB1PeriphClockCmd(((uint32_t)0x00040000), 1);
-N	RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
-X	RCC_APB1PeriphClockCmd(((uint32_t)0x00080000), 1);
+N//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+N//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
 N//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 N	
 N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
@@ -24491,13 +24490,28 @@ N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB , ENABLE);
 X	RCC_APB2PeriphClockCmd(((uint32_t)0x00000008) , 1);
 N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
 X	RCC_APB2PeriphClockCmd(((uint32_t)0x00000010) , 1);
-N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD , ENABLE);
-X	RCC_APB2PeriphClockCmd(((uint32_t)0x00000020) , 1);
 N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 X	RCC_APB2PeriphClockCmd(((uint32_t)0x00004000), 1);
 N	
 N}
 N
+N
+N/*
+N*Function: system_reset      
+N*Description: system reset  
+N*Calls: 无  
+N*Data Accessed: 无  
+N*Data Updated: 无    
+N*Input: 无
+N*Output: 无
+N*Return: 无     
+N*Others: 无    
+N*/
+Nvoid bsp_system_reset(void) 
+N{ 
+N	__set_FAULTMASK(1); 
+N	NVIC_SystemReset();  
+N} 
 N
 N
 N/*
@@ -24590,30 +24604,16 @@ X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), 
 N
 N
 N	// UART3
-N	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART3 TX				    
-X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0400);				
-N  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
-N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
-N  	GPIO_Init(GPIOB, &gpio_init_structure);
-X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00)), &gpio_init_structure);
-N	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
-X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0800);				
-N  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-N  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
-N  	GPIO_Init(GPIOB, &gpio_init_structure);
-X  	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00)), &gpio_init_structure);
-N	
-N	
-N//	// UART4
-N//	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
+N//	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART3 TX				    
 N//  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
 N//  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
-N//  	GPIO_Init(GPIOC, &gpio_init_structure);
+N//  	GPIO_Init(GPIOB, &gpio_init_structure);
 N//	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
 N//  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 N//  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
-N//  	GPIO_Init(GPIOC, &gpio_init_structure);
-N//	
+N//  	GPIO_Init(GPIOB, &gpio_init_structure);
+N	
+N
 N	//I2C
 N	gpio_init_structure.GPIO_Pin = GPIO_Pin_0;
 X	gpio_init_structure.GPIO_Pin = ((uint16_t)0x0001);

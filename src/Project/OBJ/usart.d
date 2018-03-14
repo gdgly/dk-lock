@@ -16,7 +16,9 @@
 .\obj\usart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 .\obj\usart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
 .\obj\usart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\obj\usart.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\obj\usart.o: ..\driver\usart.h
 .\obj\usart.o: ..\BSP\bsp.h
 .\obj\usart.o: ..\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_iwdg.h
 .\obj\usart.o: ..\driver\timer.h
+.\obj\usart.o: ..\system\common.h

@@ -586,8 +586,8 @@ N       Author:
 N       Modification:
 N    2. ...
 N*************************************************/
-N#ifndef _COMMON_H
-N#define _COMMON_H
+N#ifndef __COMMON_H_
+N#define __COMMON_H_
 N#include <stm32f10x.h>
 L 1 "..\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h" 1
 N/**
@@ -24098,8 +24098,7 @@ N
 N
 N
 Nvoid delay(uint32_t conut);
-Nvoid system_reset(void);
-Nuint8_t *str_picked(uint8_t *src_str, uint8_t *sub_str1, uint8_t *sub_str2, uint8_t *dst_str);
+Nchar *str_picked(char *src_str, char *sub_str1, char *sub_str2, char *dst_str);
 Nuint8_t *mem_picked(uint8_t *src_str, uint8_t *sub_str, uint16_t len, uint8_t *dst_str);
 Nchar *itoa(int value, char *string, int radix);
 Nchar *mem_str(char *mem, int mem_len, char *sub_str);
@@ -24325,8 +24324,9 @@ N//#define NVIC_VECTOR_ADDR			0x1C00
 N
 N//#define NVIC_VECTOR_ADDR			0x0000
 N
+N
+Nvoid bsp_system_reset(void);
 Nvoid iwatchdog_clear(void);
-Nvoid gprs_config(void);
 Nvoid bsp_init(void);
 N
 N
@@ -24356,22 +24356,7 @@ N	while(count--);
 N}
 N
 N
-N/*
-N*Function: system_reset      
-N*Description: system reset  
-N*Calls: 无  
-N*Data Accessed: 无  
-N*Data Updated: 无    
-N*Input: 无
-N*Output: 无
-N*Return: 无     
-N*Others: 无    
-N*/
-Nvoid system_reset(void) 
-N{ 
-N	__set_FAULTMASK(1); 
-N	NVIC_SystemReset();  
-N} 
+N
 N
 N/*
 N*Function: system_reset      
@@ -24384,11 +24369,11 @@ N*Output: 无
 N*Return: 无     
 N*Others: 无    
 N*/
-Nuint8_t *str_picked(uint8_t *src_str, uint8_t *sub_str1, uint8_t *sub_str2, uint8_t *dst_str)
+Nchar *str_picked(char *src_str, char *sub_str1, char *sub_str2, char *dst_str)
 N{
-N	uint8_t *tmp1 = NULL, *tmp2 = NULL, *str = src_str;
-X	uint8_t *tmp1 = 0, *tmp2 = 0, *str = src_str;
-N	uint8_t i = 0; 
+N	char *tmp1 = NULL, *tmp2 = NULL, *str = src_str;
+X	char *tmp1 = 0, *tmp2 = 0, *str = src_str;
+N	int i = 0; 
 N	int index = 0;
 N				
 N	tmp1 = (uint8_t*)strstr((char*)str, (char*)sub_str1);

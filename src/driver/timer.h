@@ -30,6 +30,7 @@ enum timer
 	timer_uart4,
 	timer_gprs,
 	timer_at,
+	timer_at_data,
 	timer_max
 };
 

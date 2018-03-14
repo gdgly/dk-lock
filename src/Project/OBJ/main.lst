@@ -23722,8 +23722,9 @@ N//#define NVIC_VECTOR_ADDR			0x1C00
 N
 N//#define NVIC_VECTOR_ADDR			0x0000
 N
+N
+Nvoid bsp_system_reset(void);
 Nvoid iwatchdog_clear(void);
-Nvoid gprs_config(void);
 Nvoid bsp_init(void);
 N
 N
@@ -24484,8 +24485,8 @@ N   * you can use -D__USE_C99_STDLIB (or -D__USE_C99ALL).
 N   */
 N  #ifndef __USE_C99_STDLIB
 N    #if defined(__USE_C99_ALL) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X    #if 0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
-S      #define __USE_C99_STDLIB 1
+X    #if 0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
+N      #define __USE_C99_STDLIB 1
 N    #endif
 N  #endif
 N
@@ -24545,7 +24546,7 @@ N   /* type of the value returned by the div function. */
 Ntypedef struct ldiv_t { long int quot, rem; } ldiv_t;
 N   /* type of the value returned by the ldiv function. */
 N#if !defined(__STRICT_ANSI__) || __USE_C99_STDLIB
-X#if !0L || __USE_C99_STDLIB
+X#if !0L || 1
 Ntypedef struct lldiv_t { __LONGLONG quot, rem; } lldiv_t;
 Xtypedef struct lldiv_t { long long quot, rem; } lldiv_t;
 N   /* type of the value returned by the lldiv function. */
@@ -24628,7 +24629,7 @@ N    * representation.
 N    * Returns: the converted value.
 N    */
 N#if !defined(__STRICT_ANSI__) || __USE_C99_STDLIB
-X#if !0L || __USE_C99_STDLIB
+X#if !0L || 1
 Nextern _ARMABI __LONGLONG atoll(const char * /*nptr*/) __attribute__((__nonnull__(1)));
 Xextern __declspec(__nothrow) long long atoll(const char *  ) __attribute__((__nonnull__(1)));
 N   /*
@@ -24660,7 +24661,7 @@ N    *          underflow, zero is returned and the value of the macro ERANGE is
 N    *          stored in errno.
 N    */
 N#if !defined(__STRICT_ANSI__) || __USE_C99_STDLIB
-X#if !0L || __USE_C99_STDLIB
+X#if !0L || 1
 Nextern _ARMABI float strtof(const char * __restrict /*nptr*/, char ** __restrict /*endptr*/) __attribute__((__nonnull__(1)));
 Xextern __declspec(__nothrow) float strtof(const char * __restrict  , char ** __restrict  ) __attribute__((__nonnull__(1)));
 Nextern _ARMABI long double strtold(const char * __restrict /*nptr*/, char ** __restrict /*endptr*/) __attribute__((__nonnull__(1)));
@@ -25099,7 +25100,7 @@ S   }
 N#endif
 N
 N#if !defined(__STRICT_ANSI__) || __USE_C99_STDLIB
-X#if !0L || __USE_C99_STDLIB
+X#if !0L || 1
 Nextern _ARMABI_PURE __LONGLONG llabs(__LONGLONG /*j*/);
 Xextern __declspec(__nothrow) __attribute__((const)) long long llabs(long long  );
 N   /*
@@ -25970,6 +25971,7 @@ N	timer_uart3,
 N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
+N	timer_at_data,
 N	timer_max
 N};
 N
@@ -26053,6 +26055,11 @@ L 27 "..\driver\gprs.h" 2
 N
 N
 N
+Ntypedef struct
+N{
+N	uint8_t *server_ip;	
+N	uint32_t server_port;
+N}GPRS_CONFIG;
 N
 N
 N
@@ -26063,18 +26070,6 @@ N
 N
 N
 N
-N#define GPRS_STATUS_0						0
-N#define GPRS_STATUS_1						1
-N#define GPRS_STATUS_2						2
-N#define GPRS_STATUS_3						3
-N#define GPRS_STATUS_4						4
-N#define GPRS_STATUS_5						5
-N#define GPRS_STATUS_6						6
-N#define GPRS_STATUS_7						7
-N#define GPRS_STATUS_8						8
-N#define GPRS_STATUS_9						9
-N#define GPRS_STATUS_10						10
-N#define GPRS_STATUS_11						11
 N
 N
 N
@@ -26084,7 +26079,7 @@ N
 N
 Nu8 *gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout);
 Nuint8_t send_at_cmd(uint8_t *cmd, uint8_t *str, uint32_t timeout);
-Nvoid gprs_send_data(u8 *data, u16 data_len, u16 waittime);
+Nint gprs_send_data(u8 *data, u16 data_len, u8 *ack, u16 waittime);
 Nuint8_t gprs_init(void);
 N
 Nvoid gprs_config(void);
@@ -26141,7 +26136,7 @@ N
 N
 N
 N
-N#define SerialBuffDefault() {0,0,{0}}
+N#define SerialBuffDefault() {0,{0}}
 N
 N
 N
@@ -26157,11 +26152,11 @@ Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid UART4_IRQHandler(void);
+N
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart4_recv_data(void);
+N
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -26349,18 +26344,14 @@ N
 N
 Nint transport_sendPacketBuffer(int sock, unsigned char* buf, int buflen);
 Nint transport_getdata(unsigned char* buf, int count);
-Nint transport_getdatanb(void *sck, unsigned char* buf, int count);
-Nint transport_open(char* host, int port);
-Nint transport_close(int sock);
-Nvoid mqtt_qos0(void);
-Nvoid mqtt_qos2(void);
-Nvoid mqtt_keep_alive(void);
+N
 N
 N
 Nint mqtt_connect(void);
 Nint mqtt_publist(unsigned char* topic, unsigned char* payload, int payload_len, int qos, unsigned short packetid);
-N
-N
+Nvoid mqtt_subscribe(unsigned char* topic, unsigned short packetid);
+Nint mqtt_subscribe_msg(unsigned char* topic, int req_qos, unsigned short packetid);
+Nint mqtt_keep_alive(void);
 N
 N#endif
 L 15 "..\app\main.c" 2
@@ -26368,7 +26359,7 @@ N
 N
 N
 N
-Nextern usart_buff_t *mqtt_buff;
+Nextern usart_buff_t mqtt_buff;
 N
 N
 N
@@ -26508,66 +26499,58 @@ N	u16 k = 0x1A;
 N	u8 upload=0; 
 N	u8 *ret;
 N	uint8_t status = 0;
-N//	u8 tt = 0;
-N	static u8 mqtt_flag = 0;
-N//	u8 buf 
-N	u8 end_char[1];
+N
+N
 N	int mqtt_pub = 0;
+N	int mqtt_sub = 0;
 N	int mqtt_con = 0;
-N	
-N	end_char[0] = 0x1A;//½áÊø×Ö·û
 N
 N	
 N	bsp_init();
-N	
 N                         
 N	USART_OUT(USART1, "uart1 is ok\r\n");
 X	USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "uart1 is ok\r\n");
 N
-N//	USART_OUT(UART4, "uart4 is ok\r\n");
 N	while(1)
 N	{
 N	
-N		if(mqtt_flag == 0)
-N		{
-N			gprs_init_task();
-N			timer_delay_1ms(1500);
-N			mqtt_con = mqtt_connect();
-N			if(1 == mqtt_con)
-N			{
-N				mqtt_flag = 1;
-N				timer_delay_1ms(20);
-N				USART_OUT(USART1, "mqtt_connect ok\r\n");
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_connect ok\r\n");
-N			}
-N		}
-N		
+N		gprs_init_task();
+N
 N	
 N		usart1_recv_data();
 N		usart2_recv_data();
-N
-N
+N//		mqtt_subscribe();
+N		
+N		if(timer_is_timeout_1ms(timer_batt, 1000*60*10) == 0)
+N		{
+N			mqtt_pub = mqtt_publist("test", 0, 0, 2, 1);
+N			if(mqtt_pub == 1)
+N			{
+N				USART_OUT(USART1, "mqtt_publist ok\r\n");
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_publist ok\r\n");
+N			}
+N//			mqtt_sub = mqtt_subscribe("test", 0, 2);
+N		}
 N		
 N		
 N		
 N		
-N	
-N//		if(timer_is_timeout_1ms(timer_keep_alive, 1000*20) == 0)
+N		if(timer_is_timeout_1ms(timer_keep_alive, 1000*60) == 0)
 N		{
 N			mqtt_keep_alive();
 N		}
 N
-N//			timer_delay_1ms(5000);
+N
 N
 N
 N		
 N		
-N		p1 = strstr((char*)mqtt_buff->pdata, "CLOSE");
+N		p1 = strstr((char*)mqtt_buff.pdata, "CLOSE");
 N		if(p1 !=NULL)
 X		if(p1 !=0)
 N		{
-N			memset(mqtt_buff, 0, sizeof(usart_buff_t));	
-N			mqtt_flag = 0;
+N			memset(&mqtt_buff, 0, sizeof(usart_buff_t));	
+N			gprs_status = 0;
 N			USART_OUT(USART1, "MQTT SERVER CLOSE\r\n");
 X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "MQTT SERVER CLOSE\r\n");
 N		}

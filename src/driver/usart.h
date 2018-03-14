@@ -41,7 +41,7 @@ typedef struct
 
 
 
-#define SerialBuffDefault() {0,0,{0}}
+#define SerialBuffDefault() {0,{0}}
 
 
 
@@ -57,11 +57,11 @@ void usart4_init(u32 band_rate);
 
 void USART1_IRQHandler(void);
 void USART2_IRQHandler(void);
-void UART4_IRQHandler(void);
+
 
 void usart1_recv_data(void);
 void usart2_recv_data(void);
-void usart4_recv_data(void);
+
 
 void USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 void usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);

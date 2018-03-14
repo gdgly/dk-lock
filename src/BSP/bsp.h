@@ -69,8 +69,9 @@
 
 //#define NVIC_VECTOR_ADDR			0x0000
 
+
+void bsp_system_reset(void);
 void iwatchdog_clear(void);
-void gprs_config(void);
 void bsp_init(void);
 
 

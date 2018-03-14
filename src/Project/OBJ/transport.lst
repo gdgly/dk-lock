@@ -44,18 +44,14 @@ N
 N
 Nint transport_sendPacketBuffer(int sock, unsigned char* buf, int buflen);
 Nint transport_getdata(unsigned char* buf, int count);
-Nint transport_getdatanb(void *sck, unsigned char* buf, int count);
-Nint transport_open(char* host, int port);
-Nint transport_close(int sock);
-Nvoid mqtt_qos0(void);
-Nvoid mqtt_qos2(void);
-Nvoid mqtt_keep_alive(void);
+N
 N
 N
 Nint mqtt_connect(void);
 Nint mqtt_publist(unsigned char* topic, unsigned char* payload, int payload_len, int qos, unsigned short packetid);
-N
-N
+Nvoid mqtt_subscribe(unsigned char* topic, unsigned short packetid);
+Nint mqtt_subscribe_msg(unsigned char* topic, int req_qos, unsigned short packetid);
+Nint mqtt_keep_alive(void);
 N
 N#endif
 L 22 "..\MQTT\transport.c" 2
@@ -524,7 +520,7 @@ Xextern __declspec(__nothrow) int __ARM_snprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, ...) __attribute__((__nonnull__(3)));
 N
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 N#pragma __printf_args
 Nextern _ARMABI int snprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int snprintf(char * __restrict  , size_t  ,
@@ -644,7 +640,7 @@ N    * You can use instead of sscanf to improve code size.
 N    * Returns: as sscanf.
 N    */
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 N/* C99 additions */
 Nextern _ARMABI int vfscanf(FILE * __restrict /*stream*/, const char * __restrict /*format*/, __va_list) __attribute__((__nonnull__(1,2)));
 Xextern __declspec(__nothrow) int vfscanf(FILE * __restrict  , const char * __restrict  , __va_list) __attribute__((__nonnull__(1,2)));
@@ -704,7 +700,7 @@ Nextern _ARMABI int __ARM_vsnprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int __ARM_vsnprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, __va_list /*arg*/) __attribute__((__nonnull__(3)));
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 Nextern _ARMABI int vsnprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int vsnprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, __va_list /*arg*/) __attribute__((__nonnull__(3)));
@@ -1902,8 +1898,8 @@ N   * you can use -D__USE_C99_STDLIB (or -D__USE_C99ALL).
 N   */
 N  #ifndef __USE_C99_STDLIB
 N    #if defined(__USE_C99_ALL) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X    #if 0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
-S      #define __USE_C99_STDLIB 1
+X    #if 0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
+N      #define __USE_C99_STDLIB 1
 N    #endif
 N  #endif
 N
@@ -1963,7 +1959,7 @@ N   /* type of the value returned by the div function. */
 Ntypedef struct ldiv_t { long int quot, rem; } ldiv_t;
 N   /* type of the value returned by the ldiv function. */
 N#if !defined(__STRICT_ANSI__) || __USE_C99_STDLIB
-X#if !0L || __USE_C99_STDLIB
+X#if !0L || 1
 Ntypedef struct lldiv_t { __LONGLONG quot, rem; } lldiv_t;
 Xtypedef struct lldiv_t { long long quot, rem; } lldiv_t;
 N   /* type of the value returned by the lldiv function. */
@@ -2046,7 +2042,7 @@ N    * representation.
 N    * Returns: the converted value.
 N    */
 N#if !defined(__STRICT_ANSI__) || __USE_C99_STDLIB
-X#if !0L || __USE_C99_STDLIB
+X#if !0L || 1
 Nextern _ARMABI __LONGLONG atoll(const char * /*nptr*/) __attribute__((__nonnull__(1)));
 Xextern __declspec(__nothrow) long long atoll(const char *  ) __attribute__((__nonnull__(1)));
 N   /*
@@ -2078,7 +2074,7 @@ N    *          underflow, zero is returned and the value of the macro ERANGE is
 N    *          stored in errno.
 N    */
 N#if !defined(__STRICT_ANSI__) || __USE_C99_STDLIB
-X#if !0L || __USE_C99_STDLIB
+X#if !0L || 1
 Nextern _ARMABI float strtof(const char * __restrict /*nptr*/, char ** __restrict /*endptr*/) __attribute__((__nonnull__(1)));
 Xextern __declspec(__nothrow) float strtof(const char * __restrict  , char ** __restrict  ) __attribute__((__nonnull__(1)));
 Nextern _ARMABI long double strtold(const char * __restrict /*nptr*/, char ** __restrict /*endptr*/) __attribute__((__nonnull__(1)));
@@ -2517,7 +2513,7 @@ S   }
 N#endif
 N
 N#if !defined(__STRICT_ANSI__) || __USE_C99_STDLIB
-X#if !0L || __USE_C99_STDLIB
+X#if !0L || 1
 Nextern _ARMABI_PURE __LONGLONG llabs(__LONGLONG /*j*/);
 Xextern __declspec(__nothrow) __attribute__((const)) long long llabs(long long  );
 N   /*
@@ -26574,8 +26570,9 @@ N//#define NVIC_VECTOR_ADDR			0x1C00
 N
 N//#define NVIC_VECTOR_ADDR			0x0000
 N
+N
+Nvoid bsp_system_reset(void);
 Nvoid iwatchdog_clear(void);
-Nvoid gprs_config(void);
 Nvoid bsp_init(void);
 N
 N
@@ -26605,7 +26602,7 @@ N
 N
 N
 N
-N#define SerialBuffDefault() {0,0,{0}}
+N#define SerialBuffDefault() {0,{0}}
 N
 N
 N
@@ -26621,11 +26618,11 @@ Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid UART4_IRQHandler(void);
+N
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart4_recv_data(void);
+N
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);
@@ -27374,6 +27371,7 @@ N	timer_uart3,
 N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
+N	timer_at_data,
 N	timer_max
 N};
 N
@@ -27457,6 +27455,11 @@ L 27 "..\driver\gprs.h" 2
 N
 N
 N
+Ntypedef struct
+N{
+N	uint8_t *server_ip;	
+N	uint32_t server_port;
+N}GPRS_CONFIG;
 N
 N
 N
@@ -27467,18 +27470,6 @@ N
 N
 N
 N
-N#define GPRS_STATUS_0						0
-N#define GPRS_STATUS_1						1
-N#define GPRS_STATUS_2						2
-N#define GPRS_STATUS_3						3
-N#define GPRS_STATUS_4						4
-N#define GPRS_STATUS_5						5
-N#define GPRS_STATUS_6						6
-N#define GPRS_STATUS_7						7
-N#define GPRS_STATUS_8						8
-N#define GPRS_STATUS_9						9
-N#define GPRS_STATUS_10						10
-N#define GPRS_STATUS_11						11
 N
 N
 N
@@ -27488,7 +27479,7 @@ N
 N
 Nu8 *gprs_send_at(u8 *cmd, u8 *ack, u16 waittime, u16 timeout);
 Nuint8_t send_at_cmd(uint8_t *cmd, uint8_t *str, uint32_t timeout);
-Nvoid gprs_send_data(u8 *data, u16 data_len, u16 waittime);
+Nint gprs_send_data(u8 *data, u16 data_len, u8 *ack, u16 waittime);
 Nuint8_t gprs_init(void);
 N
 Nvoid gprs_config(void);
@@ -27501,15 +27492,14 @@ N
 L 30 "..\MQTT\transport.c" 2
 N
 N
-Nextern usart_buff_t *gprs_buff;
-Nextern usart_buff_t *usart1_rx_buff;
-Nextern usart_buff_t *usart2_rx_buff;
+N
+Nextern usart_buff_t usart1_rx_buff;
+Nextern usart_buff_t usart2_rx_buff;
+Nextern usart_buff_t mqtt_buff;
 Nextern u8 send_buff[100];
-Nextern usart_buff_t *mqtt_buff;
 N
 N
-N
-N
+Nu8 subscribe_status = PUBLISH;
 N
 Nint mqtt_buff_len = 0;
 N
@@ -27531,39 +27521,37 @@ N{
 N	int rc = 0;
 N	u8 *ret;
 N	int len = 0;
-N	u8 end_char[4];
+N	u8 cmd[30] = {0};
+N//	u8 end_char[2] = {0};
+N
+N//	end_char[0] = 0x1A;//½áÊø×Ö·û
+N//	end_char[1] = '\0';
 N	
-N	
-N	end_char[0] = 0x1A;//½áÊø×Ö·û
-N	end_char[1] = 0x0D;
-N	end_char[2] = 0x0A;//½áÊø×Ö·û
-N	end_char[3] = '\0';
-N	
-N	memset(mqtt_buff, 0, sizeof(usart_buff_t));
+N	memset(send_buff, 0, sizeof(send_buff));
+N	memset(&mqtt_buff, 0, sizeof(usart_buff_t));
 N	mqtt_buff_len = 0;
-N	ret = gprs_send_at("AT+CIPSEND\r\n", ">", 100, 1000);
+N	sprintf((char *)cmd, "AT+CIPSEND=%d,1\r\n", buflen);
+N	ret = gprs_send_at(cmd, ">", 20, 100);
 N	if(ret != NULL)
 X	if(ret != 0)
 N	{
-N
 N		memcpy((char *)send_buff, buf, buflen);
-N		memcpy((char *)send_buff+buflen, (char*)end_char, sizeof(end_char));
-N//		usart_send(USART1, send_buff, buflen+3);
-N//		gprs_send_at(send_buff, 0, 200, 200);
-N
-N		gprs_send_data(send_buff, buflen+3, 300);
+N//		memcpy((char *)send_buff+buflen, (char*)end_char, sizeof(end_char));
+N		usart_send(USART2, send_buff, buflen);	
+X		usart_send(((USART_TypeDef *) (((uint32_t)0x40000000) + 0x4400)), send_buff, buflen);	
+N//		gprs_send_data(send_buff, buflen+3, "SEND OK", 100);
 N	}
 N	
-N	rc = buflen;
+N	rc = buflen+3;
 N	return rc;
 N}
 N
 N
 Nint transport_getdata(unsigned char* buf, int count)
 N{
-N	if(mqtt_buff->index > 0)
+N	if(mqtt_buff.index > 0)
 N	{
-N		memcpy(buf, &mqtt_buff->pdata[mqtt_buff_len], count);
+N		memcpy(buf, &mqtt_buff.pdata[mqtt_buff_len], count);
 N//		usart_send(USART1, mqtt_buff->pdata, mqtt_buff->index);
 N//		usart_send(USART1, &mqtt_buff->pdata[mqtt_buff_len], count);
 N		mqtt_buff_len += count;
@@ -27572,22 +27560,7 @@ N	}
 N	
 N}
 N
-Nint transport_getdatanb(void *sck, unsigned char* buf, int count)
-N{
-N	int sock = *((int *)sck); 	/* sck: pointer to whatever the system may use to identify the transport */
-N	/* this call will return after the timeout set on initialization if no bytes;
-N	   in your system you will use whatever you use to get whichever outstanding
-N	   bytes your socket equivalent has ready to be extracted right now, if any,
-N	   or return immediately */
-N	int rc;
-N	
-N//	rc = recv(sock, buf, count, 0);	
-N	if (rc == -1) {
-N		/* check error conditions from your system here, and return -1 */
-N		return 0;
-N	}
-N	return rc;
-N}
+N
 N
 Nint toStop = 0;
 N
@@ -27711,12 +27684,10 @@ X	MQTTPacket_connectData data = { {'M', 'Q', 'T', 'C'}, 0, 4, {0, {0, 0}}, 60, 1
 N	int rc = 0;
 N	int mysock = 0;
 N	unsigned char buf[200];
-N	unsigned char recv_buf[200];
-N	int buflen1 = 0;
 N	int buflen = sizeof(buf);
 N	int len = 0;
-N	char *host = "118.31.69.148";
-N	int port = 1883;
+N//	char *host = "118.31.69.148";
+N//	int port = 1883;
 N
 N	data.clientID.cstring = "me1";
 N	data.keepAliveInterval = 60;
@@ -27724,14 +27695,20 @@ N	data.cleansession = 1;
 N//	data.username.cstring = "";
 N//	data.password.cstring = "";
 N
-N	len = MQTTSerialize_connect(buf, buflen, &data);
-N		
+N	len = MQTTSerialize_connect(buf, buflen, &data);		
 N	rc = transport_sendPacketBuffer(mysock, buf, len);
-N//	timer_is_timeout_1ms(timer_connect, 0);
+N	
+N	timer_is_timeout_1ms(timer_connect, 0);
 N	while(!ret)
 N	{ 
-N		timer_delay_1ms(30);
+N		usart2_recv_data();
 N
+N		if(timer_is_timeout_1ms(timer_connect, 2000) == 0)
+N		{
+N			len = MQTTSerialize_connect(buf, buflen, &data);		
+N			rc = transport_sendPacketBuffer(mysock, buf, len);
+N		}
+N		
 N		if (MQTTPacket_read(buf, buflen, transport_getdata) == CONNACK)
 N		{
 N			unsigned char sessionPresent, connack_rc;
@@ -27747,6 +27724,8 @@ N				ret = 1;
 N				break;
 N			}
 N		}
+N		
+N		
 N	}
 N	
 N	return ret;
@@ -27769,12 +27748,12 @@ N	u8 publist_status = PUBLISH;
 N	
 N	while(!ret)
 N	{
+N		usart2_recv_data();
 N		switch(publist_status)
 N		{
 N			case PUBLISH:
 N				topicString.cstring = topic;				
 N//				strcpy(topicString.cstring, "test");
-N
 N				len = MQTTSerialize_publish((unsigned char *)buf , buflen, 0, qos, 0, packetid, topicString, (unsigned char *)payload, payload_len);
 N				rc = transport_sendPacketBuffer(mysock, buf, len);
 N				publist_status = PUBREC;
@@ -27789,7 +27768,6 @@ N				}
 N			break;
 N				
 N			case PUBREL:
-N				timer_delay_1ms(50);
 N				len = MQTTSerialize_pubrel(buf, buflen, 0, packetid);
 N				rc = transport_sendPacketBuffer(mysock, buf, len);
 N				publist_status = PUBCOMP;
@@ -27801,56 +27779,107 @@ N				{
 N					ret = 1;
 N				}	
 N			break;
+N				
+N			default:
+N			break;	
 N		}	
 N	}
 N	
 N	return ret;
 N}
 N
-N
-N
-Nint mqtt_subscribe(unsigned char* topic, int req_qos, unsigned short msgid)
+Nvoid mqtt_subscribe(unsigned char* topic, unsigned short packetid)
 N{
+N	
+N	u8 ret = 0;
+N	int rc = 0;
+N	int len = 0;
+N	char buf[200];
+N	int buflen = sizeof(buf);
+N	int mysock = 0;
+N	MQTTString topicString = MQTTString_initializer;
+X	MQTTString topicString = {0, {0, 0}};
+N	u8 publist_status = PUBLISH;
+N	
+N
+N	switch(subscribe_status)
+N	{
+N		case PUBLISH:			
+N			if (MQTTPacket_read(buf, buflen, transport_getdata) == PUBLISH)
+N			{
+N				unsigned char dup;
+N				int qos;
+N				unsigned char retained;
+N				unsigned short msgid;
+N				int payloadlen_in;
+N				unsigned char* payload_in;
+N				int rc;
+N				MQTTString receivedTopic;
+N				
+N				rc = MQTTDeserialize_publish(&dup, &qos, &retained, &msgid, &receivedTopic,
+N				&payload_in, &payloadlen_in, buf, buflen);
+N				
+N				USART_OUT(USART1, "message arrived %.*s\n", payloadlen_in, payload_in);
+X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "message arrived %.*s\n", payloadlen_in, payload_in);
+N				subscribe_status = PUBREC;
+N			}
+N		break;
+N			
+N		case PUBREC:
+N			len = MQTTSerialize_puback(buf, buflen, packetid);
+N			rc = transport_sendPacketBuffer(mysock, buf, len);
+N		
+N			subscribe_status = PUBREL;			
+N		break;
+N			
+N		case PUBREL:
+N			if (MQTTPacket_read(buf, buflen, transport_getdata) == PUBREL)
+N			{
+N				subscribe_status = PUBCOMP;
+N			}				
+N		break;
+N
+N		case PUBCOMP:
+N			len = MQTTSerialize_pubrel(buf, buflen, 0, packetid);
+N			rc = transport_sendPacketBuffer(mysock, buf, len);
+N			subscribe_status = PUBLISH;
+N		break;
+N			
+N		default:
+N		break;	
+N	}	
+N	
+N	
+N}
+N
+N
+N
+Nint mqtt_subscribe_msg(unsigned char* topic, int req_qos, unsigned short packetid)
+N{
+N	int ret = 0;
 N	unsigned char buf[200];
 N	int buflen = sizeof(buf);
 N	int len = 0;
 N	int rc = 0;
 N	int mysock = 0;
-N	u8 subscribe_status = PUBLISH;
+N	u8 subscribe_status = SUBSCRIBE;
 N	MQTTString topicString = MQTTString_initializer;
 X	MQTTString topicString = {0, {0, 0}};
 N	
 N	
-N	/* subscribe */
-N	topicString.cstring = topic;
-N	len = MQTTSerialize_subscribe(buf, buflen, 0, msgid, 1, &topicString, &req_qos);
-N	rc = transport_sendPacketBuffer(mysock, buf, len);
-N	
-N	
-N	if (MQTTPacket_read(buf, buflen, transport_getdata) == SUBACK) 	/* wait for suback */
+N	while(!ret)
 N	{
-N		unsigned short submsgid;
-N		int subcount;
-N		int granted_qos;
-N
-N		rc = MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos, buf, buflen);
-N		if (granted_qos != 0)
-N		{
-N			USART_OUT(USART1, "granted qos != 0, %d\n", granted_qos);
-X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "granted qos != 0, %d\n", granted_qos);
-N		}
-N	}
-N	
-N	
-N	while(1)
-N	{
+N		usart2_recv_data();
+N		
 N		switch(subscribe_status)
 N		{
 N			case SUBSCRIBE:
-N				len = MQTTSerialize_subscribe(buf, buflen, 0, msgid, 1, &topicString, &req_qos);
+N				/* subscribe */
+N				topicString.cstring = topic;
+N				len = MQTTSerialize_subscribe(buf, buflen, 0, packetid, 1, &topicString, &req_qos);
 N				rc = transport_sendPacketBuffer(mysock, buf, len);
+N				subscribe_status = SUBACK;
 N			break;
-N			
 N			
 N			case SUBACK:
 N				if (MQTTPacket_read(buf, buflen, transport_getdata) == SUBACK) 	/* wait for suback */
@@ -27860,31 +27889,28 @@ N					int subcount;
 N					int granted_qos;
 N
 N					rc = MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos, buf, buflen);
-N					if (granted_qos != 0)
-N					{
-N						USART_OUT(USART1, "granted qos != 0, %d\n", granted_qos);
-X						USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "granted qos != 0, %d\n", granted_qos);
-N					}
+N					USART_OUT(USART1, "granted qos != 0, %d\n", granted_qos);	
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "granted qos != 0, %d\n", granted_qos);	
+N					ret = 1;
 N				}
 N			break;
-N		
-N		
+N				
+N			default:
+N			break;	
+N			
 N		}
 N	}
 N	
 N	
-N	
-N	
-N	
-N
-N
+N	return ret;
 N}
 N
 N
 N
 N
-Nvoid mqtt_keep_alive(void)
+Nint mqtt_keep_alive(void)
 N{
+N	int ret = 0;
 N	int rc = 0;
 N	int mysock = 0;
 N	int len = 0;
@@ -27892,27 +27918,29 @@ N	unsigned char buf[20];
 N	int buflen = sizeof(buf);
 N	
 N	
-N//	if(timer_is_timeout_1ms(timer_mqtt_keep_alive, 1000*60) == 0)
+N	len = MQTTSerialize_pingreq(buf, buflen);
+N	rc = transport_sendPacketBuffer(mysock, buf, len);
+N	
+N	timer_is_timeout_1ms(timer_mqtt_keep_alive, 0);
+N	while(!ret)
 N	{
-N//		len = MQTTSerialize_pingreq(buf, buflen);
-N//		rc = transport_sendPacketBuffer(mysock, buf, len);
-N//		
-N		while(1)
+N		usart2_recv_data();	
+N		if(timer_is_timeout_1ms(timer_mqtt_keep_alive, 2000) == 0)
 N		{
 N			len = MQTTSerialize_pingreq(buf, buflen);
 N			rc = transport_sendPacketBuffer(mysock, buf, len);
-N			
-N			timer_delay_1ms(500);
-N			rc = MQTTPacket_read(buf, buflen, transport_getdata);
-N			if(rc == PINGREQ)
-N			{
-N				USART_OUT(USART1, "mqtt_keep_alive ok\r\n", buf);
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_keep_alive ok\r\n", buf);
-N				break;
-N			}
-N			
 N		}
+N
+N		rc = MQTTPacket_read(buf, buflen, transport_getdata);
+N		if(rc == PINGRESP)
+N		{
+N			USART_OUT(USART1, "mqtt_keep_alive ok\r\n", buf);
+X			USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_keep_alive ok\r\n", buf);
+N			ret = 1;
+N		}	
 N	}
+N	
+N	return ret;
 N}
 N
 N

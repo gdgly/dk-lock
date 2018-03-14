@@ -1062,7 +1062,7 @@ Xextern __declspec(__nothrow) int __ARM_snprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, ...) __attribute__((__nonnull__(3)));
 N
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 N#pragma __printf_args
 Nextern _ARMABI int snprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int snprintf(char * __restrict  , size_t  ,
@@ -1182,7 +1182,7 @@ N    * You can use instead of sscanf to improve code size.
 N    * Returns: as sscanf.
 N    */
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 N/* C99 additions */
 Nextern _ARMABI int vfscanf(FILE * __restrict /*stream*/, const char * __restrict /*format*/, __va_list) __attribute__((__nonnull__(1,2)));
 Xextern __declspec(__nothrow) int vfscanf(FILE * __restrict  , const char * __restrict  , __va_list) __attribute__((__nonnull__(1,2)));
@@ -1242,7 +1242,7 @@ Nextern _ARMABI int __ARM_vsnprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int __ARM_vsnprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, __va_list /*arg*/) __attribute__((__nonnull__(3)));
 N#if !defined(__STRICT_ANSI__) || (defined(__STDC_VERSION__) && 199901L <= __STDC_VERSION__) || (defined(__cplusplus) && 201103L <= __cplusplus)
-X#if !0L || (1L && 199901L <= 199409L) || (0L && 201103L <= __cplusplus)
+X#if !0L || (1L && 199901L <= 199901L) || (0L && 201103L <= __cplusplus)
 Nextern _ARMABI int vsnprintf(char * __restrict /*s*/, size_t /*n*/,
 Xextern __declspec(__nothrow) int vsnprintf(char * __restrict  , size_t  ,
 N                     const char * __restrict /*format*/, __va_list /*arg*/) __attribute__((__nonnull__(3)));

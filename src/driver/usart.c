@@ -23,24 +23,23 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "usart.h"
 #include "timer.h"
-
+#include "common.h"
 
 
 extern u8 protocol_buff[512];
-extern u8 gps_buff[512];
 
 
 
 
-static usart_buff_t sb = SerialBuffDefault();
-//usart_buff_t *gprs_buff = &sb;			//GPRS 接收缓冲区
-usart_buff_t *usart1_rx_buff = &sb;
-usart_buff_t *usart2_rx_buff = &sb;
-usart_buff_t *usart3_rx_buff = &sb;
-usart_buff_t *usart4_rx_buff = &sb;
-usart_buff_t *mqtt_buff = &sb;
+
+usart_buff_t sb = SerialBuffDefault();
+usart_buff_t usart1_rx_buff = SerialBuffDefault();
+usart_buff_t usart2_rx_buff = SerialBuffDefault();
+usart_buff_t usart3_rx_buff = SerialBuffDefault();
+usart_buff_t mqtt_buff = SerialBuffDefault();
 
 //u8 usart1_buff[USART_BUFF_LENGHT] = {0};
 //u8 usart2_buff[USART_BUFF_LENGHT] = {0};
@@ -53,7 +52,7 @@ u8 usart1_rx_status = 0;
 u8 usart2_rx_status = 0;
 u8 usart3_rx_status = 0;
 u8 usart4_rx_status = 0;
-u8 usart5_rx_status = 0;
+
 
 
 
@@ -241,7 +240,6 @@ void usart4_init(u32 band_rate)
 */
 void USART1_IRQHandler(void)
 {
-
 	u8 ch = 0;	
 	
    	if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
@@ -252,16 +250,15 @@ void USART1_IRQHandler(void)
 		
 		timer_is_timeout_1ms(timer_uart1, 0);
 		
-		if(usart1_rx_status == 0)
+//		if(usart1_rx_status == 0)
 		{
-			if (usart1_rx_buff->index < USART_BUFF_LENGHT)
+			if (usart1_rx_buff.index < USART_BUFF_LENGHT)
 			{	
-				usart1_rx_buff->pdata[usart1_rx_buff->index++] = ch;
-//				usart1_rx_status = 1;
+				usart1_rx_buff.pdata[usart1_rx_buff.index++] = ch;
 			}
 			else
 			{
-				memset(usart1_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区		
+				memset(&usart1_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区		
 			}
 		}
 	}
@@ -275,15 +272,13 @@ void USART1_IRQHandler(void)
 
 void usart1_recv_data(void)
 {
-
+	
 	if(timer_is_timeout_1ms(timer_uart1, 20) == 0)	//40ms没接收到数据认为接收数据完成		
 	{
 		
-//		memcpy(gprs_buff, usart1_rx_buff, sizeof(usart_buff_t));
+		usart_send(USART1, usart1_rx_buff.pdata, usart1_rx_buff.index);
 		
-		USART_OUT(USART1, usart1_rx_buff->pdata);
-		
-		memset(usart1_rx_buff, 0, sizeof(usart_buff_t));
+		memset(&usart1_rx_buff, 0, sizeof(usart_buff_t));
 	}
 
 }
@@ -311,20 +306,19 @@ void USART2_IRQHandler(void)
     {   
 	    USART_ClearITPendingBit(USART2, USART_IT_RXNE);	
 		
-		timer_is_timeout_1ms(timer_uart2, 0);		//定时器清零
-		
+		timer_is_timeout_1ms(timer_uart2, 0);		//定时器清零		
 //		if(usart2_rx_status == 0)
 		{
 			ch = USART_ReceiveData(USART2);	 
 			
-			if (usart2_rx_buff->index < USART_BUFF_LENGHT)
+			if (usart2_rx_buff.index < USART_BUFF_LENGHT)
 			{			
-				usart2_rx_buff->pdata[usart2_rx_buff->index++] = ch;
-//				USART_OUT(USART1, &ch);
+				usart2_rx_buff.pdata[usart2_rx_buff.index++] = ch;
+
 			}
 			else
 			{
-				memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
+				memset(&usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 			}
 		}
 	}
@@ -339,12 +333,31 @@ void USART2_IRQHandler(void)
 
 void usart2_recv_data(void)
 {		
+	char *p1 = NULL;
+	char *p2 = NULL;
+	char *p3 = NULL;
+	u8 tmp_str[20] = {0};
+	int data_len = 0;
+	
 	if(timer_is_timeout_1ms(timer_uart2, 20) == 0)	//20ms没接收到数据认为接收数据完成		
 	{
-//		USART_OUT(USART1, usart2_rx_buff->pdata);
-		memcpy(mqtt_buff, usart2_rx_buff, sizeof(usart_buff_t));
-		usart_send(USART1, mqtt_buff->pdata, mqtt_buff->index);
-		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
+		p1 = strstr((const char*)usart2_rx_buff.pdata, "+IPD");
+		if(p1 != NULL)
+		{
+			p2 = str_picked(p1, ",", ":", (char*)tmp_str);
+			if(p2 != NULL)
+			{
+				data_len = atoi((char*)tmp_str);
+			}
+			
+			p3 = strstr((const char*)usart2_rx_buff.pdata, ":");
+			memcpy(mqtt_buff.pdata, p3+1, data_len);
+			mqtt_buff.index = data_len;
+			
+			usart_send(USART1, usart2_rx_buff.pdata, usart2_rx_buff.index);	
+		}		
+		
+		memset(&usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
 	}	
 }
 
@@ -377,16 +390,7 @@ void UART4_IRQHandler(void)
 //		if(usart4_rx_status == 0)
 		{
 			ch = USART_ReceiveData(UART4);	 
-			
-			if (usart4_rx_buff->index < USART_BUFF_LENGHT)
-			{			
-				usart4_rx_buff->pdata[usart4_rx_buff->index++] = ch;
-				USART_OUT(UART4, &ch);
-			}
-			else
-			{
-				memset(usart4_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-			}
+		
 		}	
 	}
 	
@@ -414,11 +418,11 @@ void UART4_IRQHandler(void)
 */
 void usart4_recv_data(void)
 {
-	if(timer_is_timeout_1ms(timer_uart4, 20) == 0)	//20ms没接收到数据认为接收数据完成		
-	{
-		USART_OUT(UART4, usart4_rx_buff->pdata);
-		memset(usart2_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
-	}	
+//	if(timer_is_timeout_1ms(timer_uart4, 20) == 0)	//20ms没接收到数据认为接收数据完成		
+//	{
+//		USART_OUT(UART4, usart4_rx_buff->pdata);
+//		memset(usart4_rx_buff, 0, sizeof(usart_buff_t));	//清理缓冲区
+//	}	
 }
 
 

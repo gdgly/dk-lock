@@ -23720,8 +23720,9 @@ N//#define NVIC_VECTOR_ADDR			0x1C00
 N
 N//#define NVIC_VECTOR_ADDR			0x0000
 N
+N
+Nvoid bsp_system_reset(void);
 Nvoid iwatchdog_clear(void);
-Nvoid gprs_config(void);
 Nvoid bsp_init(void);
 N
 N
@@ -23760,6 +23761,7 @@ N	timer_uart3,
 N	timer_uart4,
 N	timer_gprs,
 N	timer_at,
+N	timer_at_data,
 N	timer_max
 N};
 N
@@ -23829,7 +23831,7 @@ N
 N
 N
 N
-N#define SerialBuffDefault() {0,0,{0}}
+N#define SerialBuffDefault() {0,{0}}
 N
 N
 N
@@ -23845,11 +23847,11 @@ Nvoid usart4_init(u32 band_rate);
 N
 Nvoid USART1_IRQHandler(void);
 Nvoid USART2_IRQHandler(void);
-Nvoid UART4_IRQHandler(void);
+N
 N
 Nvoid usart1_recv_data(void);
 Nvoid usart2_recv_data(void);
-Nvoid usart4_recv_data(void);
+N
 N
 Nvoid USART_OUT(USART_TypeDef* USARTx, uint8_t *Data,...);
 Nvoid usart_send(USART_TypeDef* USARTx, uint8_t *data, uint16_t data_size,...);

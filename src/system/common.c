@@ -39,22 +39,7 @@ void delay(uint32_t count)
 }
 
 
-/*
-*Function: system_reset      
-*Description: system reset  
-*Calls: 无  
-*Data Accessed: 无  
-*Data Updated: 无    
-*Input: 无
-*Output: 无
-*Return: 无     
-*Others: 无    
-*/
-void system_reset(void) 
-{ 
-	__set_FAULTMASK(1); 
-	NVIC_SystemReset();  
-} 
+
 
 /*
 *Function: system_reset      
@@ -67,10 +52,10 @@ void system_reset(void)
 *Return: 无     
 *Others: 无    
 */
-uint8_t *str_picked(uint8_t *src_str, uint8_t *sub_str1, uint8_t *sub_str2, uint8_t *dst_str)
+char *str_picked(char *src_str, char *sub_str1, char *sub_str2, char *dst_str)
 {
-	uint8_t *tmp1 = NULL, *tmp2 = NULL, *str = src_str;
-	uint8_t i = 0; 
+	char *tmp1 = NULL, *tmp2 = NULL, *str = src_str;
+	int i = 0; 
 	int index = 0;
 				
 	tmp1 = (uint8_t*)strstr((char*)str, (char*)sub_str1);

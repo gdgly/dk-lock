@@ -27,24 +27,17 @@ Project File Date:  03/13/2018
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
-compiling gprs.c...
-..\driver\gprs.c(175): error:  #147: declaration is incompatible with "void gprs_send_data(u8 *, u16, u16)" (declared at line 61 of "..\driver\gprs.h")
-  int gprs_send_data(u8 *data, u16 data_len, u8 *ack, u16 waittime)
-..\driver\gprs.c(200): error:  #20: identifier "buff" is undefined
-  			return buff;
-..\driver\gprs.c(205): error:  #268: declaration may not appear after executable statement in block
-  void gprs_config(void)
-..\driver\gprs.c(205): error:  #67: expected a "}"
-  void gprs_config(void)
-..\driver\gprs.c: 0 warnings, 4 errors
-".\OBJ\test.axf" - 4 Error(s), 0 Warning(s).
+compiling main.c...
+linking...
+Program Size: Code=10656 RO-data=872 RW-data=96 ZI-data=6800  
+FromELF: creating hex file...
+".\OBJ\test.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Collection of Component include folders:</h2>
   E:\github\dk-lock\src\Project\RTE
   D:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Target not created.
 Build Time Elapsed:  00:00:01
 </pre>
 </body>

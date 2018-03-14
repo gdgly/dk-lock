@@ -20,7 +20,7 @@
 #include "usart.h"
 #include <string.h>
 
-extern usart_buff_t *mqtt_buff;
+extern usart_buff_t mqtt_buff;
 extern int mqtt_buff_len;
 /**
  * Encodes the message length according to the MQTT algorithm
@@ -301,7 +301,6 @@ int MQTTPacket_read(unsigned char* buf, int buflen, int (*getfn)(unsigned char*,
 	{
 		goto exit;
 	}
-//	usart_send(USART1, buf, 1);
 
 	len = 1;
 	/* 2. read the remaining length.  This is variable in itself */
@@ -316,7 +315,7 @@ int MQTTPacket_read(unsigned char* buf, int buflen, int (*getfn)(unsigned char*,
 
 	header.byte = buf[0];
 	rc = header.bits.type;
-	memset(mqtt_buff, 0, sizeof(usart_buff_t));
+	memset(&mqtt_buff, 0, sizeof(usart_buff_t));
 	mqtt_buff_len = 0;
 exit:
 	return rc;

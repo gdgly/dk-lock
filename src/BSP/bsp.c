@@ -36,18 +36,34 @@ void bsp_rcc_init(void)
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);	
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
+//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+//	RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
 //	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB , ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD , ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 	
 }
 
+
+/*
+*Function: system_reset      
+*Description: system reset  
+*Calls: 无  
+*Data Accessed: 无  
+*Data Updated: 无    
+*Input: 无
+*Output: 无
+*Return: 无     
+*Others: 无    
+*/
+void bsp_system_reset(void) 
+{ 
+	__set_FAULTMASK(1); 
+	NVIC_SystemReset();  
+} 
 
 
 /*
@@ -130,26 +146,16 @@ void gpio_init(void)
 
 
 	// UART3
-	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART3 TX				    
-  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
-  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
-  	GPIO_Init(GPIOB, &gpio_init_structure);
-	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
-  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
-  	GPIO_Init(GPIOB, &gpio_init_structure);
-	
-	
-//	// UART4
-//	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART4 TX				    
+//	gpio_init_structure.GPIO_Pin = GPIO_Pin_10;				// UART3 TX				    
 //  	gpio_init_structure.GPIO_Mode = GPIO_Mode_AF_PP;
 //  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			
-//  	GPIO_Init(GPIOC, &gpio_init_structure);
+//  	GPIO_Init(GPIOB, &gpio_init_structure);
 //	gpio_init_structure.GPIO_Pin = GPIO_Pin_11;				
 //  	gpio_init_structure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 //  	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;			 
-//  	GPIO_Init(GPIOC, &gpio_init_structure);
-//	
+//  	GPIO_Init(GPIOB, &gpio_init_structure);
+	
+
 	//I2C
 	gpio_init_structure.GPIO_Pin = GPIO_Pin_0;
   	gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;
