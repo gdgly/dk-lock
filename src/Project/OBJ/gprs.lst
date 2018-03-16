@@ -25708,6 +25708,10 @@ Nuint8_t gprs_rx_flag = 0;
 N
 N
 N
+N
+N
+N
+N
 Nu8 PARK_LOCK_Buffer[17] = {0};
 Nextern u8 lock_id[16];
 Nu8 topic_id = 0;
@@ -25881,7 +25885,8 @@ N*/
 Nvoid gprs_init_task(void)
 N{
 N
-N	int mqtt_con = 0;
+N	int mqtt_rc = 0;
+N
 N	u8 *ret;
 N	static u8 gprs_init_flag = true;		//
 X	static u8 gprs_init_flag = 1;		
@@ -26025,8 +26030,8 @@ N				}
 N			break;
 N			
 N			case 8:
-N//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 20000);//
-N				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 20000);
+N//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1500, 20000);//
+N				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1500, 20000);
 N				if (ret != NULL)
 X				if (ret != 0)
 N				{
@@ -26044,10 +26049,10 @@ N				}
 N			break;
 N				
 N			case 9:
-N				mqtt_con = mqtt_connect();
-N				if(1 == mqtt_con)
+N				mqtt_rc = mqtt_connect();
+N				if(1 == mqtt_rc)
 N				{
-N					gprs_status = 255;
+N					gprs_status++;
 N					USART_OUT(USART1, "mqtt_connect ok\r\n");
 X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_connect ok\r\n");
 N				}	
@@ -26055,14 +26060,25 @@ N			break;
 N				
 N				
 N			case 10:
-N//				mqtt_con = mqtt_connect();
-N//				if(1 == mqtt_con)
-N//				{
-N//					gprs_status = 255;
-N//					USART_OUT(USART1, "mqtt_connect ok\r\n");
-N//				}	
+N				mqtt_rc = mqtt_subscribe_msg("test", 2, 1);
+N				if(1 == mqtt_rc)
+N				{
+N					gprs_status++;
+N					USART_OUT(USART1, "mqtt_subscribe_msg 1 ok\r\n");
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_subscribe_msg 1 ok\r\n");
+N				}
 N			break;
 N				
+N			case 11:
+N				mqtt_rc = mqtt_subscribe_msg("test1", 0, 2);
+N				if(1 == mqtt_rc)
+N				{
+N					gprs_status = 255;
+N					USART_OUT(USART1, "mqtt_subscribe_msg 2 ok\r\n");
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_subscribe_msg 2 ok\r\n");
+N				}
+N			break;
+N			
 N			case 255:	//gprs 初始化完成后进行数据传输
 N				
 N//				gprs_recv_task_create();

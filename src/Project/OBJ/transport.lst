@@ -27504,7 +27504,8 @@ N
 Nint mqtt_buff_len = 0;
 N
 Nu32 packet_id = 0;
-N
+Nuint16_t mqtt_publist_packetid = 0;				//发布消息id
+Nuint16_t mqtt_subscribe_packetid = 0;			//订阅消息id
 N
 N/**
 NThis simple low-level implementation assumes a single connection for a single thread. Thus, a static
@@ -27889,8 +27890,8 @@ N					int subcount;
 N					int granted_qos;
 N
 N					rc = MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos, buf, buflen);
-N					USART_OUT(USART1, "granted qos != 0, %d\n", granted_qos);	
-X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "granted qos != 0, %d\n", granted_qos);	
+N					USART_OUT(USART1, "granted qos =%d\n", granted_qos);	
+X					USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "granted qos =%d\n", granted_qos);	
 N					ret = 1;
 N				}
 N			break;

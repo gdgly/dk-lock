@@ -26521,15 +26521,18 @@ N		usart1_recv_data();
 N		usart2_recv_data();
 N//		mqtt_subscribe();
 N		
-N		if(timer_is_timeout_1ms(timer_batt, 1000*60*10) == 0)
+N//		if(timer_is_timeout_1ms(timer_batt, 1000*60*10) == 0)
 N		{
-N			mqtt_pub = mqtt_publist("test", 0, 0, 2, 1);
-N			if(mqtt_pub == 1)
-N			{
-N				USART_OUT(USART1, "mqtt_publist ok\r\n");
-X				USART_OUT(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "mqtt_publist ok\r\n");
-N			}
-N//			mqtt_sub = mqtt_subscribe("test", 0, 2);
+N//			mqtt_pub = mqtt_publist("test", 0, 0, 2, 1);
+N//			if(mqtt_pub == 1)
+N//			{
+N//				USART_OUT(USART1, "mqtt_publist ok\r\n");
+N//			}
+N//			mqtt_sub = mqtt_subscribe_msg("test", 0, 2);
+N//			if(mqtt_sub == 1)
+N//			{
+N//				USART_OUT(USART1, "mqtt_subscribe_msg ok\r\n");
+N//			}
 N		}
 N		
 N		

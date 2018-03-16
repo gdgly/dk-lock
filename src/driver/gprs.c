@@ -55,6 +55,10 @@ uint8_t gprs_rx_flag = 0;
 
 
 
+
+
+
+
 u8 PARK_LOCK_Buffer[17] = {0};
 extern u8 lock_id[16];
 u8 topic_id = 0;
@@ -219,7 +223,8 @@ int gprs_send_data(u8 *data, u16 data_len, u8 *ack, u16 waittime)
 void gprs_init_task(void)
 {
 
-	int mqtt_con = 0;
+	int mqtt_rc = 0;
+
 	u8 *ret;
 	static u8 gprs_init_flag = true;		//
 		
@@ -355,8 +360,8 @@ void gprs_init_task(void)
 			break;
 			
 			case 8:
-//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1000, 20000);//
-				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1000, 20000);
+//				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"103.46.128.47\",14947\r\n", "CONNECT OK", 1500, 20000);//
+				ret = gprs_send_at("AT+CIPSTART=\"TCP\",\"118.31.69.148\",1883\r\n", "CONNECT OK", 1500, 20000);
 				if (ret != NULL)
 				{
 					gprs_status++;
@@ -373,24 +378,33 @@ void gprs_init_task(void)
 			break;
 				
 			case 9:
-				mqtt_con = mqtt_connect();
-				if(1 == mqtt_con)
+				mqtt_rc = mqtt_connect();
+				if(1 == mqtt_rc)
 				{
-					gprs_status = 255;
+					gprs_status++;
 					USART_OUT(USART1, "mqtt_connect ok\r\n");
 				}	
 			break;
 				
 				
 			case 10:
-//				mqtt_con = mqtt_connect();
-//				if(1 == mqtt_con)
-//				{
-//					gprs_status = 255;
-//					USART_OUT(USART1, "mqtt_connect ok\r\n");
-//				}	
+				mqtt_rc = mqtt_subscribe_msg("test", 2, 1);
+				if(1 == mqtt_rc)
+				{
+					gprs_status++;
+					USART_OUT(USART1, "mqtt_subscribe_msg 1 ok\r\n");
+				}
 			break;
 				
+			case 11:
+				mqtt_rc = mqtt_subscribe_msg("test1", 0, 2);
+				if(1 == mqtt_rc)
+				{
+					gprs_status = 255;
+					USART_OUT(USART1, "mqtt_subscribe_msg 2 ok\r\n");
+				}
+			break;
+			
 			case 255:	//gprs 初始化完成后进行数据传输
 				
 //				gprs_recv_task_create();

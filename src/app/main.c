@@ -173,14 +173,18 @@ int main(void)
 		usart2_recv_data();
 //		mqtt_subscribe();
 		
-		if(timer_is_timeout_1ms(timer_batt, 1000*60*10) == 0)
+//		if(timer_is_timeout_1ms(timer_batt, 1000*60*10) == 0)
 		{
-			mqtt_pub = mqtt_publist("test", 0, 0, 2, 1);
-			if(mqtt_pub == 1)
-			{
-				USART_OUT(USART1, "mqtt_publist ok\r\n");
-			}
-//			mqtt_sub = mqtt_subscribe("test", 0, 2);
+//			mqtt_pub = mqtt_publist("test", 0, 0, 2, 1);
+//			if(mqtt_pub == 1)
+//			{
+//				USART_OUT(USART1, "mqtt_publist ok\r\n");
+//			}
+//			mqtt_sub = mqtt_subscribe_msg("test", 0, 2);
+//			if(mqtt_sub == 1)
+//			{
+//				USART_OUT(USART1, "mqtt_subscribe_msg ok\r\n");
+//			}
 		}
 		
 		

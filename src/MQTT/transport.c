@@ -41,7 +41,8 @@ u8 subscribe_status = PUBLISH;
 int mqtt_buff_len = 0;
 
 u32 packet_id = 0;
-
+uint16_t mqtt_publist_packetid = 0;				//发布消息id
+uint16_t mqtt_subscribe_packetid = 0;			//订阅消息id
 
 /**
 This simple low-level implementation assumes a single connection for a single thread. Thus, a static
@@ -410,7 +411,7 @@ int mqtt_subscribe_msg(unsigned char* topic, int req_qos, unsigned short packeti
 					int granted_qos;
 
 					rc = MQTTDeserialize_suback(&submsgid, 1, &subcount, &granted_qos, buf, buflen);
-					USART_OUT(USART1, "granted qos != 0, %d\n", granted_qos);	
+					USART_OUT(USART1, "granted qos =%d\n", granted_qos);	
 					ret = 1;
 				}
 			break;
